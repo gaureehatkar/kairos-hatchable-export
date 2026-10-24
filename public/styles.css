@@ -34,6 +34,16 @@
   --focus:0 0 0 1px #0A0A0A,0 0 0 3px #1B1BFF;
   color-scheme:dark;
 }
+/* Ensure standard form inputs use dark theme surface + high contrast text */
+input, select, textarea {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-color: var(--border) !important;
+}
+option {
+  background: var(--surface);
+  color: var(--text);
+}
 
 /* Base */
 *{box-sizing:border-box}
