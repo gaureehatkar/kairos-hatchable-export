@@ -21,17 +21,25 @@ export default async function (req, res) {
   }
   if (kind === "metadata_graph") {
     if (!Array.isArray(payload.assets) || !Array.isArray(payload.relationships || [])) return res.status(400).json({ok:false,error:"invalid_metadata_graph",message:"Provide assets: [] and relationships: [] arrays. Each asset needs a stable id and name; each relationship needs source and target asset IDs."});
-    const invalidAsset = payload.assets.findIndex(a => !a || typeof a !== "object" || !String(a.id||"").trim() || !String(a.name||a.qualified_name||"").trim());
+    const relationships = payload.relationships || [];
+    if (payload.assets.length > 1000 || relationships.length > 5000) return res.status(413).json({ok:false,error:"metadata_graph_too_large",message:"A generic metadata import is limited to 1,000 assets and 5,000 relationships per request. Split larger imports into smaller batches."});
+    const invalidAsset = payload.assets.findIndex(a => !a || typeof a !== "object" || Array.isArray(a) || !String(a.id||"").trim() || !String(a.name||a.qualified_name||"").trim());
     if (invalidAsset !== -1) return res.status(400).json({ok:false,error:"invalid_metadata_asset",message:"Each asset must have id and name (or qualified_name). Invalid asset at index "+invalidAsset+"."});
-    const ids = new Set(payload.assets.map(a=>String(a.id)));
-    const invalidRelationship = (payload.relationships||[]).findIndex(e => !e || typeof e !== "object" || !String(e.source_id||"").trim() || !String(e.target_id||"").trim());
+    const ids = new Set(payload.assets.map(a=>String(a.id).trim()));
+    if (ids.size !== payload.assets.length) return res.status(400).json({ok:false,error:"duplicate_metadata_asset_id",message:"Each asset id must be unique within the import batch."});
+    const invalidRelationship = relationships.findIndex(e => !e || typeof e !== "object" || Array.isArray(e) || !String(e.source_id||"").trim() || !String(e.target_id||"").trim());
     if (invalidRelationship !== -1) return res.status(400).json({ok:false,error:"invalid_metadata_relationship",message:"Each relationship must have source_id and target_id. Invalid relationship at index "+invalidRelationship+"."});
+    const missingEndpoint = relationships.findIndex(e => !ids.has(String(e.source_id).trim()) || !ids.has(String(e.target_id).trim()));
+    if (missingEndpoint !== -1) return res.status(400).json({ok:false,error:"unknown_metadata_relationship_endpoint",message:"Every relationship endpoint must reference an asset included in this import batch. Invalid relationship at index "+missingEndpoint+"."});
+    const invalidEvidence = relationships.findIndex(e => e.evidence != null && (typeof e.evidence !== "object" || Array.isArray(e.evidence)));
+    if (invalidEvidence !== -1) return res.status(400).json({ok:false,error:"invalid_relationship_evidence",message:"Attached relationship evidence must be a JSON object. Invalid relationship at index "+invalidEvidence+"."});
   }
   if (kind === "openlineage_event") {
     const events = Array.isArray(payload) ? payload : [payload];
+    if (!events.length) return res.status(400).json({ok:false,error:"empty_event_batch",message:"Choose a non-empty array of OpenLineage events."});
+    if (events.length > 100) return res.status(413).json({ok:false,error:"openlineage_batch_too_large",message:"An OpenLineage import is limited to 100 events per request. Split larger imports into smaller batches."});
     const invalidIndex = events.findIndex(event => !event || typeof event !== "object" || Array.isArray(event) || !event.job || typeof event.job.name !== "string" || !event.job.name.trim() || !event.run || typeof event.run.runId !== "string" || !event.run.runId.trim());
     if (invalidIndex !== -1) return res.status(400).json({ok:false,error:"invalid_openlineage_event",message:"Every event must include job.name and run.runId. Invalid event at index "+invalidIndex+"."});
-    if (!events.length) return res.status(400).json({ok:false,error:"empty_event_batch",message:"Choose a non-empty array of OpenLineage events."});
   }
   if (kind !== "dbt_manifest" && kind !== "openlineage_event" && kind !== "metadata_graph") return res.status(400).json({ok:false,error:"unsupported_kind",message:"kind must be dbt_manifest, openlineage_event, or metadata_graph."});
   try {
@@ -39,7 +47,7 @@ export default async function (req, res) {
       const assets = payload.assets || [], relationships = payload.relationships || [], idMap = new Map();
       let assetsUpserted=0, edgesUpserted=0, evidenceUpserted=0, skipped=0;
       for (const a of assets) {
-        const externalId=safe(a.id,900), name=safe(a.name||a.qualified_name,900), namespace=safe(a.namespace||a.domain||a.provider||"general",300);
+        const externalId=safe(String(a.id).trim(),900), name=safe(String(a.name||a.qualified_name).trim(),900), namespace=safe(a.namespace||a.domain||a.provider||"general",300);
         const qualifiedName=safe(a.qualified_name||((namespace?namespace+"/":"")+name),1200);
         const type=safe(a.type||a.asset_type||a.kind||"asset",120), kindValue=safe(a.kind||"asset",80);
         const metadata={...(a.metadata&&typeof a.metadata==="object"?a.metadata:{}),source_system:safe(a.source_system||payload.source_system||"generic_metadata",100),external_id:externalId,namespace,resource_type:type,format:a.format||null,uri:a.uri||a.path||null,columns:Array.isArray(a.columns)?a.columns:undefined};
@@ -47,7 +55,7 @@ export default async function (req, res) {
         idMap.set(externalId,{id:persisted.id,qualifiedName}); assetsUpserted++;
       }
       for (const rel of relationships) {
-        const source=idMap.get(String(rel.source_id)), target=idMap.get(String(rel.target_id));
+        const source=idMap.get(String(rel.source_id).trim()), target=idMap.get(String(rel.target_id).trim());
         if (!source || !target) { skipped++; continue; }
         const edgeType=safe(rel.type||rel.relationship_type||"dependency",100), edgeId=safe("generic-edge:"+source.id+"->"+target.id+":"+edgeType,1800);
         const evidenceRef=rel.evidence_id?safe(rel.evidence_id,500):null;
