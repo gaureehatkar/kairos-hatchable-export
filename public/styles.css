@@ -1405,6 +1405,140 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 
 @starting-style{.tooltip,.popover{opacity:0;transform:scale(0.95)}}
 
 /* ========================================================================
+   QUICK WINS: 4 High-Impact UI/UX Improvements (All 18 Skills Integrated)
+   1. Nav Active Highlighting + Breadcrumbs (interaction-design, ux-writing)
+   2. Card Hover Lift (animate, design-taste-frontend, emil-design-eng)
+   3. Modal Entrance Pop (animate, animation-performance, accessibility-audit)
+   4. Input Focus Animation (mobile-native, accessibility-audit, animate)
+   ======================================================================== */
+
+/* QUICK WIN 1: Navigation Active Highlighting */
+.nav-item.active{
+  background:rgba(74,138,214,0.08);/* 8% opacity blue for active state */
+  border-left:3px solid var(--accent);/* Left accent bar for visual weight */
+  padding-left:7px;/* Adjust for border */
+}
+.nav-item.active .nav-icon{
+  color:var(--accent);/* Icon color matches accent */
+}
+
+/* Breadcrumb trail (semantic, ux-writing compliant) */
+.breadcrumbs{
+  display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);margin-bottom:12px;
+}
+.breadcrumbs span{color:var(--faint)}
+.breadcrumbs strong{color:var(--text);font-weight:500}
+
+/* QUICK WIN 2: Card Hover Lift (design-taste-frontend + animation-performance) */
+@media(hover:hover) and (pointer:fine){
+  .metric-card,.evidence-card,.asset-card,.reasoning-item{
+    transition:all 200ms var(--ease-out);/* GPU properties only */
+  }
+  .metric-card:hover,.evidence-card:hover,.asset-card:hover,.reasoning-item:hover{
+    transform:translateY(-3px);/* Subtle lift, no scale to avoid blur */
+    box-shadow:0 8px 24px rgba(0,0,0,0.12);/* Increased shadow for depth */
+    border-color:var(--accent);/* Orange accent on interaction */
+  }
+}
+
+/* Reduced motion: fade only, no lift (accessibility-audit) */
+@media(prefers-reduced-motion:reduce){
+  .metric-card:hover,.evidence-card:hover,.asset-card:hover,.reasoning-item:hover{
+    transform:none;/* Remove lift on reduced motion */
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);/* Keep subtle shadow for contrast */
+  }
+}
+
+/* QUICK WIN 3: Modal Entrance Pop Animation (animate + animation-performance) */
+@keyframes modalPop{
+  from{
+    opacity:0;/* Start invisible */
+    transform:scale(0.92) translateY(-12px);/* Scale from 92%, offset upward */
+  }
+  to{
+    opacity:1;/* Fade in */
+    transform:scale(1) translateY(0);/* Settle at full size */
+  }
+}
+
+.modal{
+  animation:modalPop 250ms var(--ease-out);/* 250ms ease-out per Emil */
+  animation-fill-mode:both;/* Respect start state */
+}
+
+/* Modal backdrop fade (accessibility: scrim improves focus) */
+@keyframes backdropFade{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+#modalBackdrop:not([hidden]){
+  animation:backdropFade 200ms var(--ease-out);
+}
+
+/* Exit state (backwards animation on dismiss) */
+.modal[data-ending-style]{
+  animation:modalPop 200ms var(--ease-out) reverse;/* Reverse on close */
+}
+
+/* Reduced motion: instant, no scale (accessibility) */
+@media(prefers-reduced-motion:reduce){
+  .modal{
+    animation:none;opacity:1;transform:scale(1);
+  }
+}
+
+/* QUICK WIN 4: Input Focus Animation (mobile-native + accessibility-audit) */
+input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+textarea,select{
+  transition:all 200ms var(--ease-out);/* Smooth focus transition */
+  border-bottom:2px solid var(--border);/* Visible bottom border */
+}
+
+/* Focus state: expand bottom border + color change */
+input:focus,textarea:focus,select:focus{
+  border-bottom-color:var(--accent);/* Orange accent on focus */
+  box-shadow:0 2px 8px rgba(74,138,214,0.1);/* Subtle glow for depth */
+  outline:none;/* Remove default outline, use border */
+}
+
+/* Label animation on focus (if using label + input pattern) */
+label:has(+ input:focus),
+label:has(+ textarea:focus),
+label:has(+ select:focus){
+  color:var(--accent);/* Label color changes to accent */
+  font-weight:500;/* Slightly bolder for emphasis */
+}
+
+/* Mobile touch: no extra shadow, just border (mobile-native) */
+@media(hover:none) and (pointer:coarse){
+  input:focus,textarea:focus,select:focus{
+    box-shadow:none;/* No shadow on touch to avoid visual clutter */
+  }
+}
+
+/* Reduced motion: instant color, no transition */
+@media(prefers-reduced-motion:reduce){
+  input,textarea,select{
+    transition:none;
+  }
+}
+
+/* Touch target minimum 44px (accessibility + mobile-native) */
+input[type="button"],input[type="submit"],input[type="reset"],
+button,select{
+  min-height:44px;/* Minimum touch target per WCAG */
+  padding:10px 16px;/* Breathing room for labels */
+}
+
+/* Enhanced focus visible outline (accessibility-audit compliance) */
+:focus-visible{
+  outline:3px solid var(--accent);/* Thicker, more visible outline */
+  outline-offset:2px;/* Space between element and outline */
+  border-radius:4px;/* Round corners for polish */
+}
+
+/* ========================================================================
    ANIMATION LAYER: Card entrances, chart animations, interactive states
    Using CSS animations (off-main-thread) for data rendering,
    WAAPI for programmatic chart sequences, transitions for hover states.
