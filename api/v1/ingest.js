@@ -32,12 +32,19 @@ export default async function (req, res) {
     if (invalidAsset !== -1) return res.status(400).json({ok:false,error:"invalid_metadata_asset",message:"Each asset must have id and name (or qualified_name). Invalid asset at index "+invalidAsset+"."});
     const ids = new Set(payload.assets.map(a=>String(a.id).trim()));
     if (ids.size !== payload.assets.length) return res.status(400).json({ok:false,error:"duplicate_metadata_asset_id",message:"Each asset id must be unique within the import batch."});
+    const qualifiedNames = payload.assets.map(a=>String(a.qualified_name||((String(a.namespace||a.domain||a.provider||"general").trim()?String(a.namespace||a.domain||a.provider||"general").trim()+"/":"")+String(a.name||a.qualified_name||"").trim())).trim());
+    if (new Set(qualifiedNames).size !== qualifiedNames.length) return res.status(400).json({ok:false,error:"duplicate_metadata_qualified_name",message:"Each asset must resolve to a unique qualified_name within the import batch. Duplicate names would otherwise merge distinct assets."});
     const invalidRelationship = relationships.findIndex(e => !e || typeof e !== "object" || Array.isArray(e) || !String(e.source_id||"").trim() || !String(e.target_id||"").trim());
     if (invalidRelationship !== -1) return res.status(400).json({ok:false,error:"invalid_metadata_relationship",message:"Each relationship must have source_id and target_id. Invalid relationship at index "+invalidRelationship+"."});
     const missingEndpoint = relationships.findIndex(e => !ids.has(String(e.source_id).trim()) || !ids.has(String(e.target_id).trim()));
     if (missingEndpoint !== -1) return res.status(400).json({ok:false,error:"unknown_metadata_relationship_endpoint",message:"Every relationship endpoint must reference an asset included in this import batch. Invalid relationship at index "+missingEndpoint+"."});
     const invalidEvidence = relationships.findIndex(e => e.evidence != null && (typeof e.evidence !== "object" || Array.isArray(e.evidence)));
     if (invalidEvidence !== -1) return res.status(400).json({ok:false,error:"invalid_relationship_evidence",message:"Attached relationship evidence must be a JSON object. Invalid relationship at index "+invalidEvidence+"."});
+    const allowedEvidenceStates = new Set(["OBSERVED","REFUTED_FOR_RUN","POSSIBLE","UNKNOWN"]);
+    const invalidEvidenceState = relationships.findIndex(e => e.evidence?.state != null && !allowedEvidenceStates.has(String(e.evidence.state).toUpperCase()));
+    if (invalidEvidenceState !== -1) return res.status(400).json({ok:false,error:"invalid_evidence_state",message:"Evidence state must be one of OBSERVED, REFUTED_FOR_RUN, POSSIBLE, or UNKNOWN. Invalid evidence at relationship index "+invalidEvidenceState+"."});
+    const invalidRefutation = relationships.findIndex(e => String(e.evidence?.state||"").toUpperCase()==="REFUTED_FOR_RUN" && (!String(e.evidence.run_id||"").trim() || !String(e.evidence.coverage||"").trim() || e.evidence.metadata?.complete_negative_evaluation !== true));
+    if (invalidRefutation !== -1) return res.status(400).json({ok:false,error:"incomplete_refutation_scope",message:"REFUTED_FOR_RUN requires a run_id, explicit coverage, and evidence.metadata.complete_negative_evaluation=true. Missing events alone are not a refutation."});
   }
   if (kind === "openlineage_event") {
     const events = Array.isArray(payload) ? payload : [payload];
