@@ -10,10 +10,10 @@
     camera.position.set(0,13,26);
     const renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
     renderer.domElement.dataset.kairosScene='true'; renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75)); renderer.setSize(host.clientWidth||720,host.clientHeight||490);
-    renderer.outputColorSpace=T.SRGBColorSpace; renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1.12;
+    renderer.outputColorSpace=T.SRGBColorSpace; renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1.12; renderer.shadowMap.enabled=true; renderer.shadowMap.type=T.PCFSoftShadowMap;
     host.prepend(renderer.domElement);
     scene.add(new T.HemisphereLight(0xdce9ed,0x26313a,2.05));
-    const key=new T.DirectionalLight(0xffead2,3.0);key.position.set(-10,18,9);scene.add(key);
+    const key=new T.DirectionalLight(0xffead2,3.0);key.position.set(-10,18,9);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.camera.left=-24;key.shadow.camera.right=24;key.shadow.camera.top=18;key.shadow.camera.bottom=-18;key.shadow.bias=-0.00025;scene.add(key);
     const rim=new T.PointLight(0x80cdbd,65,45,2);rim.position.set(9,7,-4);scene.add(rim);
     const warm=new T.PointLight(0xe7b989,42,35,2);warm.position.set(-8,5,8);scene.add(warm);
     const root=new T.Group();scene.add(root); const structure=new T.Group();root.add(structure);const dataLayer=new T.Group();root.add(dataLayer);
@@ -27,7 +27,7 @@
       transform:new T.MeshStandardMaterial({color:0xb3a3e5,roughness:.3,metalness:.3,emissive:0x322752,emissiveIntensity:.38}),
       output:new T.MeshStandardMaterial({color:0x88b5e4,roughness:.28,metalness:.32,emissive:0x1d3856,emissiveIntensity:.4})
     };
-    function box(parent,x,y,z,w,h,d,mat){const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);parent.add(m);return m}
+    function box(parent,x,y,z,w,h,d,mat){const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
     function line(parent,pts,color=0x7ca7a6,opacity=.48){const g=new T.BufferGeometry().setFromPoints(pts.map(p=>new T.Vector3(...p)));const m=new T.Line(g,new T.LineBasicMaterial({color,transparent:true,opacity}));parent.add(m);return m}
     // Built environment: raised floor, architectural perimeter, ribs, glazing and practical light strips.
     box(structure,0,-1.25,0,34,.5,25,mats.floor);
@@ -87,7 +87,7 @@
     const zoomIn=()=>{zoom=clamp(zoom*1.15,.55,1.75);updateCamera()},zoomOut=()=>{zoom=clamp(zoom/1.15,.55,1.75);updateCamera()},resetCamera=()=>{target.set(0,0,0);rotY=0;rotX=.1;zoom=1;updateCamera()};
     const zoomInButtons=host.querySelectorAll('[data-action="zoom-in"]'),zoomOutButtons=host.querySelectorAll('[data-action="zoom-out"]'),resetButtons=host.querySelectorAll('[data-action="reset-3d"]');zoomInButtons.forEach(b=>b.addEventListener('click',zoomIn));zoomOutButtons.forEach(b=>b.addEventListener('click',zoomOut));resetButtons.forEach(b=>b.addEventListener('click',resetCamera));
     renderer.domElement.addEventListener('pointerdown',pointerDown);renderer.domElement.addEventListener('pointermove',pointerMove);renderer.domElement.addEventListener('pointerup',pointerUp);renderer.domElement.addEventListener('pointercancel',pointerUp);renderer.domElement.addEventListener('click',click);renderer.domElement.addEventListener('wheel',wheel,{passive:true});
-    const animate=()=>{if(!alive)return;raf=requestAnimationFrame(animate);const t=performance.now()*.00015;animated.forEach(p=>{const q=p.curve.getPoint((t+p.phase)%1);p.bead.position.copy(q)});if(!down){root.rotation.y=Math.sin(performance.now()*.000035)*.012}renderer.render(scene,camera)};
+    const animate=()=>{if(!alive)return;raf=requestAnimationFrame(animate);const t=performance.now()*.00015;animated.forEach(p=>{const q=p.curve.getPoint((t+p.phase)%1);p.bead.position.copy(q)});renderer.render(scene,camera)};
     animate();
     const resize=()=>{if(!host.isConnected)return;camera.aspect=Math.max(1,host.clientWidth)/Math.max(1,host.clientHeight);camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)};
     window.addEventListener('resize',resize);
