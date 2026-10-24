@@ -106,7 +106,7 @@
       ringMesh.rotation.x = Math.PI / 2 + (r * 0.2);
       ringMesh.position.y = -0.5 + (r * 0.6);
       coreGroup.add(ringMesh);
-      rings.push({mesh: ringMesh, speed: (r % 2 === 0 ? 1 : -1) * (0.008 + r * 0.004)});
+      rings.push({mesh: ringMesh, speed: (r % 2 === 0 ? 1 : -1) * (0.42 + r * 0.18)});
     }
 
     // Floating Data Crystal Orbiters
@@ -116,7 +116,7 @@
     for(let c=0; c<5; c++) {
       const crystal = new T.Mesh(crystalGeo, crystalMat);
       const angle = (c / 5) * Math.PI * 2;
-      crystals.push({mesh: crystal, angle, dist: 3.8 + (c % 2 * 0.8), speed: 0.012 + (c * 0.003), height: (c % 2 === 0 ? 0.8 : -0.6)});
+      crystals.push({mesh: crystal, angle, dist: 3.8 + (c % 2 * 0.8), speed: 0.65 + (c * 0.12), height: (c % 2 === 0 ? 0.8 : -0.6)});
       coreGroup.add(crystal);
     }
     // Background architectural consoles and vertical light wells.
@@ -132,7 +132,7 @@
     const zoomIn=()=>{zoom=clamp(zoom*1.15,.55,1.75);updateCamera()},zoomOut=()=>{zoom=clamp(zoom/1.15,.55,1.75);updateCamera()},resetCamera=()=>{target.set(0,0,0);rotY=0;rotX=.1;zoom=1;updateCamera()};
     const zoomInButtons=host.querySelectorAll('[data-action="zoom-in"]'),zoomOutButtons=host.querySelectorAll('[data-action="zoom-out"]'),resetButtons=host.querySelectorAll('[data-action="reset-3d"]');zoomInButtons.forEach(b=>b.addEventListener('click',zoomIn));zoomOutButtons.forEach(b=>b.addEventListener('click',zoomOut));resetButtons.forEach(b=>b.addEventListener('click',resetCamera));
     renderer.domElement.addEventListener('pointerdown',pointerDown);renderer.domElement.addEventListener('pointermove',pointerMove);renderer.domElement.addEventListener('pointerup',pointerUp);renderer.domElement.addEventListener('pointercancel',pointerUp);renderer.domElement.addEventListener('click',click);renderer.domElement.addEventListener('wheel',wheel,{passive:true});
-    const motionReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches||localStorage.getItem('kairos_reduceMotion')==='true';const animate=()=>{if(!alive)return;raf=requestAnimationFrame(animate);if(!motionReduced){const t=performance.now()*.00015;animated.forEach(p=>{const q=p.curve.getPoint((t+p.phase)%1);p.bead.position.copy(q)});if(coreGroup){coreGroup.rotation.y += 0.005;rings.forEach(r=>{r.mesh.rotation.z += r.speed});crystals.forEach(c=>{c.angle += c.speed;c.mesh.position.x = Math.cos(c.angle) * c.dist;c.mesh.position.z = Math.sin(c.angle) * c.dist;c.mesh.position.y = c.height + Math.sin(performance.now()*0.002 + c.angle)*0.2;c.mesh.rotation.x += 0.02;c.mesh.rotation.y += 0.03;})}}renderer.render(scene,camera)};
+    const motionQuery=window.matchMedia('(prefers-reduced-motion: reduce)');const motionReduced=()=>motionQuery.matches||localStorage.getItem('kairos_reduceMotion')==='true';let elapsed=0,previousTime=performance.now();const animate=(now)=>{if(!alive)return;raf=requestAnimationFrame(animate);const delta=Math.min(Math.max((now-previousTime)/1000,0),0.05);previousTime=now;if(!motionReduced()){elapsed+=delta;const t=elapsed*0.08;animated.forEach(p=>{const q=p.curve.getPoint((t+p.phase)%1);p.bead.position.copy(q)});if(coreGroup){coreGroup.rotation.y+=delta*0.30;rings.forEach(r=>{r.mesh.rotation.z+=delta*r.speed});crystals.forEach(c=>{c.angle+=delta*c.speed;c.mesh.position.x=Math.cos(c.angle)*c.dist;c.mesh.position.z=Math.sin(c.angle)*c.dist;c.mesh.position.y=c.height+Math.sin(elapsed*2+c.angle)*0.2;c.mesh.rotation.x+=delta*1.2;c.mesh.rotation.y+=delta*1.8})}}renderer.render(scene,camera)};
     animate();
     const resize=()=>{if(!host.isConnected)return;camera.aspect=Math.max(1,host.clientWidth)/Math.max(1,host.clientHeight);camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)};
     window.addEventListener('resize',resize);
