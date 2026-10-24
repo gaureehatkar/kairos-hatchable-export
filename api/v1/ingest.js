@@ -3,6 +3,11 @@ export const access = "admin";
 export const methods = ["POST"];
 const safe = (v, max=500) => String(v ?? "").slice(0,max);
 const jsonText = v => JSON.stringify(v ?? {});
+async function stableFingerprint(value) {
+  const bytes = new TextEncoder().encode(JSON.stringify(value));
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, "0")).join("");
+}
 async function upsertAsset({id,qualifiedName,schemaName,kind,type,owner,description,columnCount,metadata}) {
   const result = await db.query(
     "INSERT INTO kairos_assets (id, qualified_name, schema_name, asset_kind, asset_type, owner_name, description, column_count, metadata) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb) ON CONFLICT (qualified_name) DO UPDATE SET schema_name=EXCLUDED.schema_name, asset_kind=EXCLUDED.asset_kind, asset_type=EXCLUDED.asset_type, owner_name=EXCLUDED.owner_name, description=EXCLUDED.description, column_count=EXCLUDED.column_count, metadata=EXCLUDED.metadata, updated_at=now() RETURNING id, qualified_name",
@@ -114,8 +119,10 @@ export default async function (req, res) {
         const eventType=safe(event.eventType||"OTHER",40).toUpperCase();
         const inputs=Array.isArray(event.inputs)?event.inputs:[], outputs=Array.isArray(event.outputs)?event.outputs:[];
         const eventTime=event.eventTime && !Number.isNaN(Date.parse(event.eventTime)) ? new Date(event.eventTime).toISOString() : null;
-        const sourceRecordId=safe([runId,eventType,eventTime||crypto.randomUUID()].join(":"),1000);
-        await db.query("INSERT INTO kairos_raw_events (id,source_system,source_record_id,event_type,event_time,payload) VALUES ($1,'openlineage',$2,$3,$4,$5::jsonb) ON CONFLICT (source_system,source_record_id) DO NOTHING", [safe("raw:openlineage:"+sourceRecordId,1200),sourceRecordId,eventType,eventTime,jsonText(event)]);
+        const fingerprint=await stableFingerprint(event);
+        const sourceRecordId=safe("event:"+fingerprint,1000);
+        const rawInsert=await db.query("INSERT INTO kairos_raw_events (id,source_system,source_record_id,event_type,event_time,payload) VALUES ($1,'openlineage',$2,$3,$4,$5::jsonb) ON CONFLICT (source_system,source_record_id) DO NOTHING RETURNING id", [safe("raw:openlineage:"+fingerprint,1200),sourceRecordId,eventType,eventTime,jsonText(event)]);
+        if (!rawInsert.rows?.length) { skipped++; continue; }
         const datasetMap=new Map();
         for (const [direction,list] of [["input",inputs],["output",outputs]]) {
           for (const d of list) {
