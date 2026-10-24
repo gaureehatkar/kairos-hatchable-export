@@ -1,43 +1,40 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600;700&display=swap');
 /* ==========================================================================
-   KAIROS design system v135 (Grubhub 2025 Visual Identity)
-   Primary: Orange #FF5500 (Grubhub signature)
-   Neutrals: Espresso #18100F, Froth #F8F4F1, Latte #F3E3CB
-   Secondary: Egg Yolk, Shortcake, Mint, Plum
-   Typography: Inter (Bagoss-inspired)
-   Grid: 12-column desktop, 6-column mobile, 8% margins, 60% gutters
-   Motion: 200-300ms ease-out, GPU-only properties
+   KAIROS design system v5  (taste-skill: data-terminal, dark, labelled sidebar)
+   Move: every selection is a 1px accent line as wide as its label.
+   Face: the four-state evidence strip; IDs in mono; colour only on evidence.
+   Cards are darker than the ground; separation by 1px line, never glow/glass.
+   Also applied: design-systems (3-tier tokens), interaction-design (distinct
+   states, modeless feedback), accessibility-audit (4.5:1, focus, 44px touch),
+   ux-writing (sentence case), design-council (every element earns its place).
    ========================================================================== */
 
-/* Tier 1 - reference colors (Grubhub 2025 palette) */
+/* Tier 1 - reference */
 :root{
-  /* Grubhub Primary */
-  --grubhub-orange:#FF5500;--grubhub-espresso:#18100F;--grubhub-froth:#F8F4F1;
-  --grubhub-latte:#F3E3CB;--grubhub-cortado:#E7CDA2;--grubhub-white:#FFFFFF;
-  
-  /* Grubhub Secondary */
-  --grubhub-egg-yolk:#FFCA48;--grubhub-shortcake:#FFC4A7;--grubhub-mint:#B8D9C5;--grubhub-plum:#5F2B4B;
+  --n-0:#000;--n-50:#131217;--n-100:#171719;--n-150:#1b1a1f;--n-200:#212023;--n-250:#222224;--n-300:#3a3a3e;
+  --n-500:#8a8c92;--n-600:#b4b4b8;--n-700:#bdbdc0;--n-white:#fff;
+  --blue-500:#4a8ad6;--green-500:#44a282;--green-300:#5fc39c;--red-500:#e5566f;--amber-500:#d9a441;
 
-  /* Tier 2 - semantic (Grubhub mapped) */
-  --ground:var(--grubhub-froth);--surface:var(--grubhub-white);--raised:#F3F3F0;--hover:#F0EDED;
-  --border:var(--grubhub-cortado);--rule:var(--grubhub-latte);--control:var(--grubhub-cortado);
-  --text:var(--grubhub-espresso);--muted:var(--grubhub-cortado);--faint:#9B8B7E;
-  --accent:var(--grubhub-orange);--primary:var(--grubhub-orange);--on-primary:#FFFFFF;
-  --positive:var(--grubhub-mint);--negative:#E74C3C;--warning:var(--grubhub-egg-yolk);
-  --pill-positive-bg:rgba(184,217,197,0.15);--pill-positive-ink:var(--grubhub-mint);
-  --pill-negative-bg:rgba(231,205,162,0.15);--pill-negative-ink:#E74C3C;
-  --pill-warning-bg:rgba(255,202,72,0.15);--pill-warning-ink:var(--grubhub-egg-yolk);
-  --pill-neutral-bg:var(--grubhub-latte);--pill-neutral-ink:var(--grubhub-espresso);
+  /* Tier 2 - semantic */
+  --ground:var(--n-100);--surface:var(--n-50);--raised:var(--n-200);--hover:#1d1c21;
+  --border:var(--n-250);--rule:var(--n-150);--control:var(--n-300);
+  --text:var(--n-white);--muted:var(--n-600);--faint:var(--n-500);
+  --accent:var(--blue-500);--primary:var(--n-white);--on-primary:#111;
+  --positive:var(--green-500);--negative:var(--red-500);--warning:var(--amber-500);
+  --pill-positive-bg:#1b2828;--pill-positive-ink:var(--green-300);
+  --pill-negative-bg:#2c1a20;--pill-negative-ink:var(--red-500);
+  --pill-warning-bg:#2a2416;--pill-warning-ink:var(--amber-500);
+  --pill-neutral-bg:var(--n-200);--pill-neutral-ink:var(--n-700);
 
-  /* Tier 3 - component and legacy aliases */
+  /* Tier 3 - component and legacy aliases (ingestion.html reads these) */
   --bg:var(--ground);--panel:var(--surface);--panel2:var(--raised);--panel3:var(--raised);
   --line:var(--border);--line2:var(--control);--soft:var(--muted);
-  --mint:var(--grubhub-mint);--blue:var(--grubhub-orange);--amber:var(--grubhub-egg-yolk);--red:#E74C3C;--green:var(--grubhub-mint);--purple:var(--grubhub-plum);
-  --radius:8px;--radius-chip:4px;--radius-pill:999px;--gap:24px;--pad:32px;
-  --sidebar:232px;--topbar:56px;--control-h:44px;
-  --font:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;
+  --mint:var(--positive);--blue:var(--accent);--amber:var(--warning);--red:var(--negative);--green:var(--positive);--purple:var(--faint);
+  --radius:6px;--radius-chip:4px;--radius-pill:999px;--gap:16px;--pad:32px;
+  --sidebar:232px;--topbar:56px;--control-h:34px;
+  --font:'Public Sans',Inter,system-ui,sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;
   --ease-out:cubic-bezier(0.23,1,0.32,1);--ease-in-out:cubic-bezier(0.77,0,0.175,1);--ease-app:cubic-bezier(0.32,0.72,0,1);
-  color-scheme:light dark;
+  color-scheme:dark;
 }
 
 /* Base */
