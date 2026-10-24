@@ -8,22 +8,22 @@
   --slate-50:#fafafa;--slate-100:#f5f5f5;--slate-200:#e5e5e5;--slate-300:#d4d4d4;--slate-400:#a3a3a3;
   --slate-500:#737373;--slate-600:#525252;--slate-700:#404040;--slate-900:#111111;
   
-  /* Corporate / Vintage Muted Accents */
-  --teal-50:#f8fafc;--teal-100:#e2e8f0;--teal-700:#334155;--teal-800:#1e293b;
-  --green-50:#f3f7f4;--green-100:#e3eee6;--green-700:#2e4c38;--green-900:#1a2e20;
-  --red-50:#fdf5f5;--red-100:#fae6e6;--red-700:#6e2d2d;--red-900:#4a1b1b;
-  --amber-50:#fcf9f5;--amber-100:#f5ece1;--amber-700:#7b5628;--amber-900:#523716;
-  --blue-50:#f5f7fa;--blue-100:#e1e8f0;--blue-700:#2c3e50;--blue-900:#1a252f;
+  /* High-End Tech Dark Palette (Deep Charcoal, Slate, Muted Indigo/Teal Accents) */
+  --teal-50:#090d16;--teal-100:#1e293b;--teal-700:#38bdf8;--teal-800:#7dd3fc;
+  --green-50:#052e16;--green-100:#064e3b;--green-700:#4ade80;--green-900:#86efac;
+  --red-50:#450a0a;--red-100:#7f1d1d;--red-700:#f87171;--red-900:#fca5a5;
+  --amber-50:#451a03;--amber-100:#78350f;--amber-700:#fbbf24;--amber-900:#fde047;
+  --blue-50:#082f49;--blue-100:#0369a1;--blue-700:#38bdf8;--blue-900:#bae6fd;
 
   /* Tier 2 - semantic tokens */
-  --ground:#0f1115;--surface:#181a1f;--raised:#22252b;--hover:#2c3038;
-  --border:#2c3038;--rule:#2c3038;--control:#3f444f;
-  --text:#f8fafc;--muted:#94a3b8;--faint:#64748b;
-  --primary:#4f46e5;--accent:#0d9488;
-  --positive:#22c55e;--negative:#ef4444;--warning:#f59e0b;
+  --ground:#090b0e;--surface:#12161c;--raised:#1a202c;--hover:#232d3f;
+  --border:#212836;--rule:#212836;--control:#2e384d;
+  --text:#f1f5f9;--muted:#94a3b8;--faint:#64748b;
+  --primary:#6366f1;--accent:#14b8a6;
+  --positive:#4ade80;--negative:#f87171;--warning:#fbbf24;
   --bg:var(--ground);--panel:var(--surface);--panel2:var(--raised);--panel3:var(--hover);
   --line:var(--border);--line2:var(--control);--soft:var(--slate-700);
-  --mint:#14b8a6;--blue:#3b82f6;--amber:#f59e0b;--red:#ef4444;--green:#22c55e;--purple:#a855f7;
+  --mint:#14b8a6;--blue:#38bdf8;--amber:#fbbf24;--red:#f87171;--green:#4ade80;--purple:#c084fc;
   
   /* Smooth corners */
   --radius:12px;--radius-control:8px;--radius-chip:16px;--sidebar:248px;--topbar:56px;
