@@ -74,6 +74,51 @@
       const tube=new T.Mesh(new T.TubeGeometry(curve,28,.025,6,false),new T.MeshStandardMaterial({color:0x445566,metalness:.35,roughness:.4,emissive:0x111111,emissiveIntensity:1.0,transparent:true,opacity:.40}));tube.userData={from:e[0],to:e[1]};edgeMeshes.push(tube);dataLayer.add(tube);
       const bead=new T.Mesh(new T.SphereGeometry(.075,10,8),new T.MeshBasicMaterial({color:0xd7c69f}));dataLayer.add(bead);animated.push({bead,curve,phase:Math.random()});
     });
+    // Custom 3D Rendered Model: Kairos Data Core Monolith & Holographic Pulsar Rings
+    const coreGroup = new T.Group();
+    coreGroup.position.set(0, 1.2, 0);
+    structure.add(coreGroup);
+
+    // Central Monolith Pillar
+    const monolithGeo = new T.BoxGeometry(1.4, 4.2, 1.4);
+    const monolithMat = new T.MeshStandardMaterial({color: 0x1f2937, roughness: 0.2, metalness: 0.85, emissive: 0x0f172a, emissiveIntensity: 0.6});
+    const monolith = new T.Mesh(monolithGeo, monolithMat);
+    monolith.castShadow = true;
+    monolith.receiveShadow = true;
+    coreGroup.add(monolith);
+
+    // Glowing vertical energy runed fins on monolith
+    for(let a=0; a<4; a++) {
+      const angle = (a / 4) * Math.PI * 2;
+      const fin = new T.Mesh(new T.BoxGeometry(0.08, 3.8, 0.4), new T.MeshBasicMaterial({color: 0x5eead4}));
+      fin.position.set(Math.cos(angle) * 0.74, 0, Math.sin(angle) * 0.74);
+      fin.rotation.y = -angle;
+      coreGroup.add(fin);
+    }
+
+    // Floating Pulsar Rings
+    const rings = [];
+    for(let r=0; r<3; r++) {
+      const radius = 2.2 + r * 0.75;
+      const ringGeo = new T.TorusGeometry(radius, 0.04, 16, 100);
+      const ringMat = new T.MeshBasicMaterial({color: r===0? 0x38bdf8 : r===1? 0x00ff9c : 0xa855f7, transparent: true, opacity: 0.75});
+      const ringMesh = new T.Mesh(ringGeo, ringMat);
+      ringMesh.rotation.x = Math.PI / 2 + (r * 0.2);
+      ringMesh.position.y = -0.5 + (r * 0.6);
+      coreGroup.add(ringMesh);
+      rings.push({mesh: ringMesh, speed: (r % 2 === 0 ? 1 : -1) * (0.008 + r * 0.004)});
+    }
+
+    // Floating Data Crystal Orbiters
+    const crystalGeo = new T.OctahedronGeometry(0.32, 0);
+    const crystalMat = new T.MeshStandardMaterial({color: 0x00ff9c, roughness: 0.1, metalness: 0.9, emissive: 0x00ff9c, emissiveIntensity: 0.8});
+    const crystals = [];
+    for(let c=0; c<5; c++) {
+      const crystal = new T.Mesh(crystalGeo, crystalMat);
+      const angle = (c / 5) * Math.PI * 2;
+      crystals.push({mesh: crystal, angle, dist: 3.8 + (c % 2 * 0.8), speed: 0.012 + (c * 0.003), height: (c % 2 === 0 ? 0.8 : -0.6)});
+      coreGroup.add(crystal);
+    }
     // Background architectural consoles and vertical light wells.
     for(const side of [-1,1]){for(let i=0;i<4;i++){const z=-7+i*4.5;box(structure,side*14.4,.1,z,1.1,1.9,2.1,mats.dark);box(structure,side*14.4,.18,z,1.12,.08,1.85,mats.trim);const panel=new T.Mesh(new T.PlaneGeometry(.8,1.1),new T.MeshStandardMaterial({color:0x4b6b6b,emissive:0x274746,emissiveIntensity:.55,roughness:.3,metalness:.25}));panel.position.set(side*13.82,.8,z);panel.rotation.y=side===1?-Math.PI/2:Math.PI/2;structure.add(panel)}}
     const ray=new T.Raycaster(),pointer=new T.Vector2();let down=false,lastX=0,lastY=0,rotY=0,rotX=.1,zoom=1,target=new T.Vector3(0,0,0),raf=0,alive=true,dragMoved=false;
@@ -87,7 +132,7 @@
     const zoomIn=()=>{zoom=clamp(zoom*1.15,.55,1.75);updateCamera()},zoomOut=()=>{zoom=clamp(zoom/1.15,.55,1.75);updateCamera()},resetCamera=()=>{target.set(0,0,0);rotY=0;rotX=.1;zoom=1;updateCamera()};
     const zoomInButtons=host.querySelectorAll('[data-action="zoom-in"]'),zoomOutButtons=host.querySelectorAll('[data-action="zoom-out"]'),resetButtons=host.querySelectorAll('[data-action="reset-3d"]');zoomInButtons.forEach(b=>b.addEventListener('click',zoomIn));zoomOutButtons.forEach(b=>b.addEventListener('click',zoomOut));resetButtons.forEach(b=>b.addEventListener('click',resetCamera));
     renderer.domElement.addEventListener('pointerdown',pointerDown);renderer.domElement.addEventListener('pointermove',pointerMove);renderer.domElement.addEventListener('pointerup',pointerUp);renderer.domElement.addEventListener('pointercancel',pointerUp);renderer.domElement.addEventListener('click',click);renderer.domElement.addEventListener('wheel',wheel,{passive:true});
-    const motionReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches||localStorage.getItem('kairos_reduceMotion')==='true';const animate=()=>{if(!alive)return;raf=requestAnimationFrame(animate);if(!motionReduced){const t=performance.now()*.00015;animated.forEach(p=>{const q=p.curve.getPoint((t+p.phase)%1);p.bead.position.copy(q)})}renderer.render(scene,camera)};
+    const motionReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches||localStorage.getItem('kairos_reduceMotion')==='true';const animate=()=>{if(!alive)return;raf=requestAnimationFrame(animate);if(!motionReduced){const t=performance.now()*.00015;animated.forEach(p=>{const q=p.curve.getPoint((t+p.phase)%1);p.bead.position.copy(q)});if(coreGroup){coreGroup.rotation.y += 0.005;rings.forEach(r=>{r.mesh.rotation.z += r.speed});crystals.forEach(c=>{c.angle += c.speed;c.mesh.position.x = Math.cos(c.angle) * c.dist;c.mesh.position.z = Math.sin(c.angle) * c.dist;c.mesh.position.y = c.height + Math.sin(performance.now()*0.002 + c.angle)*0.2;c.mesh.rotation.x += 0.02;c.mesh.rotation.y += 0.03;})}}renderer.render(scene,camera)};
     animate();
     const resize=()=>{if(!host.isConnected)return;camera.aspect=Math.max(1,host.clientWidth)/Math.max(1,host.clientHeight);camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)};
     window.addEventListener('resize',resize);
