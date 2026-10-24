@@ -198,6 +198,38 @@ else if(a==='schema'){S.assetSearch=b.dataset.schema;S.assetFilter='all';go('ass
 else if(a==='reset-3d'){render()}
 else if(a==='room'){if($('#roomMode'))$('#roomMode').value=b.dataset.room;three();toast('Room layout changed.')}
 
+/* SVG Graph Enhancements: Add data attributes for CSS styling & interactions */
+function enhanceSVGGraphs(){
+  /* Node rectangles: add kind-based styling */
+  $$('.graph-stage svg rect').forEach(rect=>{
+    const nodeId=rect.getAttribute('id')||rect.parentElement.getAttribute('id');
+    const sourceAsset=A.find(a=>a.id===nodeId);
+    if(sourceAsset){
+      rect.setAttribute('data-node',sourceAsset.kind);
+      rect.setAttribute('data-id',sourceAsset.id);
+    }
+  });
+  /* Edge lines: add state-based coloring */
+  $$('.graph-stage svg line').forEach(line=>{
+    const fromAttr=line.getAttribute('data-from');
+    const toAttr=line.getAttribute('data-to');
+    if(fromAttr&&toAttr){
+      const evidence=V.find(ev=>ev.source===A.find(a=>a.id===fromAttr)?.path&&ev.target===A.find(a=>a.id===toAttr)?.path);
+      line.setAttribute('data-edge',evidence?.state.toLowerCase()||'unknown');
+      line.style.cursor='pointer';
+    }
+  });
+  /* Column lineage: semantic data attributes */
+  $$('.column-lineage-svg rect').forEach(rect=>rect.setAttribute('data-column','true'));
+  $$('.column-lineage-svg line').forEach(line=>line.setAttribute('data-edge','column'));
+}
+setTimeout(enhanceSVGGraphs,100);
+const origRender=render;
+render=function(){
+  origRender.apply(this,arguments);
+  setTimeout(enhanceSVGGraphs,50);
+};
+
 /* Keyboard navigation */
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'&&S.selected){S.selected=null;render();return}
