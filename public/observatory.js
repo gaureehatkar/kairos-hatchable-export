@@ -5,17 +5,17 @@
   function mount({host,assets,edges,selected,mode='overview',filter='all',onSelect=()=>{}}){
     if(!host || !T) return ()=>{};
     host.querySelectorAll('canvas[data-kairos-scene]').forEach(c=>c.remove());
-    const scene=new T.Scene(); scene.background=new T.Color(0x101a22); scene.fog=new T.FogExp2(0x101a22,.018);
+    const scene=new T.Scene(); scene.background=new T.Color(0x101a22); scene.fog=new T.FogExp2(0x101a22,.012);
     const camera=new T.PerspectiveCamera(43,Math.max(1,host.clientWidth)/Math.max(1,host.clientHeight),.1,180);
     camera.position.set(0,13,26);
     const renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
     renderer.domElement.dataset.kairosScene='true'; renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75)); renderer.setSize(host.clientWidth||720,host.clientHeight||490);
-    renderer.outputColorSpace=T.SRGBColorSpace; renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1.12; renderer.shadowMap.enabled=true; renderer.shadowMap.type=T.PCFSoftShadowMap;
+    renderer.outputColorSpace=T.SRGBColorSpace; renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1.0; renderer.shadowMap.enabled=true; renderer.shadowMap.type=T.PCFSoftShadowMap;
     host.prepend(renderer.domElement);
-    scene.add(new T.HemisphereLight(0xdce9ed,0x26313a,2.05));
-    const key=new T.DirectionalLight(0xffead2,3.0);key.position.set(-10,18,9);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.camera.left=-24;key.shadow.camera.right=24;key.shadow.camera.top=18;key.shadow.camera.bottom=-18;key.shadow.bias=-0.00025;scene.add(key);
-    const rim=new T.PointLight(0x80cdbd,65,45,2);rim.position.set(9,7,-4);scene.add(rim);
-    const warm=new T.PointLight(0xe7b989,42,35,2);warm.position.set(-8,5,8);scene.add(warm);
+    scene.add(new T.HemisphereLight(0xdce9ed,0x26313a,1.35));
+    const key=new T.DirectionalLight(0xffead2,1.75);key.position.set(-10,18,9);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.camera.left=-24;key.shadow.camera.right=24;key.shadow.camera.top=18;key.shadow.camera.bottom=-18;key.shadow.bias=-0.00025;scene.add(key);
+    const rim=new T.PointLight(0x80cdbd,16,45,2);rim.position.set(9,7,-4);scene.add(rim);
+    const warm=new T.PointLight(0xe7b989,12,35,2);warm.position.set(-8,5,8);scene.add(warm);
     const root=new T.Group();scene.add(root); const structure=new T.Group();root.add(structure);const dataLayer=new T.Group();root.add(dataLayer);
     const mats={
       floor:new T.MeshStandardMaterial({color:0x29343a,roughness:.82,metalness:.16}),
@@ -47,7 +47,7 @@
     const clusters={commerce:[-8,0],billing:[-8,-5],analytics:[0,0],bi:[8,0],ml_features:[8,5],support:[-8,5],operations:[0,6]};
     filtered.forEach((a,i)=>{
       let x,z;
-      if(mode==='lineage'){const lane={'a1':-12,'a2':-12,'a3':-12,'a9':-12,'a4':-4,'a10':-4,'a11':-4,'a5':4,'a6':4,'a12':4,'a8':11,'a7':12};x=lane[a.id]??0;z=(i%4-1.5)*3.4}
+      if(mode==='lineage'){const lane={'a1':-12,'a2':-12,'a3':-12,'a9':-12,'a4':-4,'a10':-4,'a11':-4,'a5':4,'a6':4,'a12':4,'a8':11,'a7':12};x=lane[a.id]??(-12+(i%4)*8);z=(i%4-1.5)*3.4}
       else if(mode==='clusters'){const c=clusters[a.schema]||[0,0];x=c[0]+Math.cos(i*2.4)*1.6;z=c[1]+Math.sin(i*2.4)*1.6}
       else {const ang=i/Math.max(1,filtered.length)*Math.PI*2;x=Math.cos(ang)*9.3;z=Math.sin(ang)*6.6}
       const y=.35+(i%3)*.15;positions[a.id]=new T.Vector3(x,y,z);
