@@ -44,11 +44,13 @@
     for(const r of [3.8,4.35,4.9]){const ring=new T.Mesh(new T.TorusGeometry(r,.025,8,100),new T.MeshStandardMaterial({color:0x9aaf9e,metalness:.55,roughness:.35,emissive:0x273f39,emissiveIntensity:.5}));ring.rotation.x=Math.PI/2;ring.position.y=-.85;structure.add(ring)}
     const filtered=assets.filter(a=>filter==='all'||a.schema===filter);
     const positions={},nodeMeshes=[],animated=[],edgeMeshes=[];
-    const clusters={commerce:[-8,0],billing:[-8,-5],analytics:[0,0],bi:[8,0],ml_features:[8,5],support:[-8,5],operations:[0,6]};
+    const schemas=[...new Set(filtered.map(a=>String(a.schema||'default')))];const clusters=Object.fromEntries(schemas.map((schema,i)=>{const angle=i/Math.max(1,schemas.length)*Math.PI*2;return[schema,[Math.cos(angle)*8,Math.sin(angle)*6]]}));
+    // Derive lineage layers from the actual edge list; asset IDs and schema names are never assumed.
+    const layerById=Object.fromEntries(filtered.map(a=>[a.id,0]));for(let pass=0;pass<filtered.length;pass++){let changed=false;edges.forEach(e=>{if(layerById[e[0]]!==undefined&&layerById[e[1]]!==undefined){const next=layerById[e[0]]+1;if(next>layerById[e[1]]){layerById[e[1]]=next;changed=true}}});if(!changed)break}const layerGroups={};filtered.forEach(a=>{const layer=layerById[a.id]||0;(layerGroups[layer]||(layerGroups[layer]=[])).push(a)});const maxLayer=Math.max(0,...Object.keys(layerGroups).map(Number));
     filtered.forEach((a,i)=>{
       let x,z;
-      if(mode==='lineage'){const lane={'a1':-12,'a2':-12,'a3':-12,'a9':-12,'a4':-4,'a10':-4,'a11':-4,'a5':4,'a6':4,'a12':4,'a8':11,'a7':12};x=lane[a.id]??(-12+(i%4)*8);z=(i%4-1.5)*3.4}
-      else if(mode==='clusters'){const c=clusters[a.schema]||[0,0];x=c[0]+Math.cos(i*2.4)*1.6;z=c[1]+Math.sin(i*2.4)*1.6}
+      if(mode==='lineage'){const layer=layerById[a.id]||0,group=layerGroups[layer]||[a],index=group.findIndex(item=>item.id===a.id);x=maxLayer===0?0:-12+(layer/maxLayer)*24;z=(index-(group.length-1)/2)*3.4}
+      else if(mode==='clusters'){const c=clusters[String(a.schema||'default')]||[0,0],schemaItems=filtered.filter(item=>String(item.schema||'default')===String(a.schema||'default')),index=schemaItems.findIndex(item=>item.id===a.id);x=c[0]+Math.cos(index*2.4)*1.6;z=c[1]+Math.sin(index*2.4)*1.6}
       else {const ang=i/Math.max(1,filtered.length)*Math.PI*2;x=Math.cos(ang)*9.3;z=Math.sin(ang)*6.6}
       const y=.35+(i%3)*.15;positions[a.id]=new T.Vector3(x,y,z);
       // Each asset is a compact physical-looking instrument/server plinth, not a floating sphere.
