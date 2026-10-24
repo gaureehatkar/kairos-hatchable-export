@@ -487,6 +487,11 @@ input::placeholder,textarea::placeholder{color:#8493ab;opacity:1}
 .notice,.data-source-banner{color:var(--text)}
 .notice .notice-icon{color:var(--muted)}
 td{color:var(--text)}
+
+@keyframes flowData {
+  from { stroke-dashoffset: 28; }
+  to { stroke-dashoffset: 0; }
+}
 .asset-glyph.transform{color:#b8c4d8}
 .state-unknown{color:#b8c4d8}
 .health-foot b{color:var(--text)}
