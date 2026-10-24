@@ -164,7 +164,7 @@ input::placeholder,textarea::placeholder{color:var(--faint)}
 
 /* KPI strip: one container, divided - no icons, no sparklines */
 .stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:16px}
-.stat-card{position:relative;padding:16px 20px;background:var(--slate-50);border-radius:var(--radius)}
+.stat-card{position:relative;padding:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius)}
 .stat-top{display:flex;align-items:center;justify-content:space-between;font-size:13px;color:var(--muted)}
 .stat-icon,.stat-accent{display:none}
 .stat-value{margin:8px 0 4px;font:500 28px/1.1 var(--font);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
