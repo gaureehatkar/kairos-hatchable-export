@@ -35,9 +35,38 @@ export default async function (req, res) {
   }
   if (kind !== "dbt_manifest" && kind !== "openlineage_event" && kind !== "metadata_graph") return res.status(400).json({ok:false,error:"unsupported_kind",message:"kind must be dbt_manifest, openlineage_event, or metadata_graph."});
   try {
+    if (kind === "metadata_graph") {
+      const assets = payload.assets || [], relationships = payload.relationships || [], idMap = new Map();
+      let assetsUpserted=0, edgesUpserted=0, evidenceUpserted=0, skipped=0;
+      for (const a of assets) {
+        const externalId=safe(a.id,900), name=safe(a.name||a.qualified_name,900), namespace=safe(a.namespace||a.domain||a.provider||"general",300);
+        const qualifiedName=safe(a.qualified_name||((namespace?namespace+"/":"")+name),1200);
+        const type=safe(a.type||a.asset_type||a.kind||"asset",120), kindValue=safe(a.kind||"asset",80);
+        const metadata={...(a.metadata&&typeof a.metadata==="object"?a.metadata:{}),source_system:safe(a.source_system||payload.source_system||"generic_metadata",100),external_id:externalId,namespace,resource_type:type,format:a.format||null,uri:a.uri||a.path||null,columns:Array.isArray(a.columns)?a.columns:undefined};
+        const persisted=await upsertAsset({id:safe("generic:"+externalId,1200),qualifiedName,schemaName:namespace,kind:kindValue,type,owner:a.owner||null,description:a.description||null,columnCount:Array.isArray(a.columns)?a.columns.length:Number(a.column_count||0),metadata});
+        idMap.set(externalId,{id:persisted.id,qualifiedName}); assetsUpserted++;
+      }
+      for (const rel of relationships) {
+        const source=idMap.get(String(rel.source_id)), target=idMap.get(String(rel.target_id));
+        if (!source || !target) { skipped++; continue; }
+        const edgeType=safe(rel.type||rel.relationship_type||"dependency",100), edgeId=safe("generic-edge:"+source.id+"->"+target.id+":"+edgeType,1800);
+        const evidenceRef=rel.evidence_id?safe(rel.evidence_id,500):null;
+        const metadata={source_system:safe(rel.source_system||payload.source_system||"generic_metadata",100),relationship_type:edgeType,activity:rel.activity||null,confidence:rel.confidence??null,description:rel.description||null,provenance:rel.provenance||"Supplied relationship metadata; not independently verified execution proof",external_metadata:rel.metadata||{}};
+        await db.query("INSERT INTO kairos_lineage_edges (id,source_asset_id,target_asset_id,edge_type,evidence_ref,metadata) VALUES ($1,$2,$3,$4,$5,$6::jsonb) ON CONFLICT (source_asset_id,target_asset_id,edge_type) DO UPDATE SET evidence_ref=EXCLUDED.evidence_ref,metadata=EXCLUDED.metadata",[edgeId,source.id,target.id,edgeType,evidenceRef,jsonText(metadata)]);
+        edgesUpserted++;
+        if (rel.evidence && typeof rel.evidence==="object") {
+          const ev=rel.evidence, evId=safe(ev.id||"generic-evidence:"+edgeId,1800);
+          await db.query("INSERT INTO kairos_evidence (id,source_name,target_name,state,evidence_type,run_id,coverage,rule_name,explanation,valid_from,valid_to,recorded_from,metadata) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,now(),$12::jsonb) ON CONFLICT (id) DO UPDATE SET state=EXCLUDED.state,evidence_type=EXCLUDED.evidence_type,explanation=EXCLUDED.explanation,metadata=EXCLUDED.metadata",[evId,source.qualifiedName,target.qualifiedName,safe(ev.state||"UNKNOWN",40),safe(ev.type||rel.source_system||payload.source_system||"supplied_metadata",120),ev.run_id||null,ev.coverage||null,ev.rule_name||null,safe(ev.explanation||"Evidence supplied with generic metadata; inspect its scope before drawing conclusions.",2000),ev.valid_from||null,ev.valid_to||null,jsonText({source_system:payload.source_system||"generic_metadata",relationship_id:edgeId,details:ev.metadata||{}})]);
+          evidenceUpserted++;
+        }
+      }
+      return res.status(200).json({ok:true,kind,source:payload.source_system||"generic_metadata",assets_upserted:assetsUpserted,relationships_upserted:edgesUpserted,evidence_upserted:evidenceUpserted,relationships_skipped:skipped,disclosure:"Generic assets and supplied relationships were stored without SQL parsing. Relationship records are not automatically proof of runtime execution; inspect attached evidence and scope."});
+    }
     if (kind === "dbt_manifest") {
       const nodes = payload.nodes || {}, sources = payload.sources || {}, exposures = payload.exposures || {};
       const all = {...sources,...nodes,...exposures};
+      const sourceRecordId=safe([payload.metadata?.generated_at||crypto.randomUUID(),payload.metadata?.project_name||payload.metadata?.project_id||"unknown"].join(":"),1000);
+      await db.query("INSERT INTO kairos_raw_events (id,source_system,source_record_id,event_type,event_time,payload) VALUES ($1,'dbt_manifest',$2,'MANIFEST',$3,$4::jsonb) ON CONFLICT (source_system,source_record_id) DO NOTHING", [safe("raw:dbt:"+sourceRecordId,1200),sourceRecordId,payload.metadata?.generated_at && !Number.isNaN(Date.parse(payload.metadata.generated_at)) ? new Date(payload.metadata.generated_at).toISOString() : null,jsonText(payload)]);
       const uidToAsset = new Map();
       let assetsCreated = 0, edgesCreated = 0, skipped = 0;
       for (const [uid,n] of Object.entries(all)) {
