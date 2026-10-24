@@ -56,7 +56,7 @@ const DEMO={A:JSON.parse(JSON.stringify(A)),E:JSON.parse(JSON.stringify(E)),V:JS
         const nextQuality=(payload.quality_checks||[]).map(q=>({name:String(q.rule_name||q.id),asset:String(q.qualified_asset_name||''),type:String(q.check_type||'Check'),score:q.score==null?null:Number(q.score),status:String(q.status||'UNKNOWN').toUpperCase(),evaluated_at:q.evaluated_at}));
         A.splice(0,A.length,...nextAssets);E.splice(0,E.length,...nextEdges);V.splice(0,V.length,...nextEvidence);R.splice(0,R.length,...nextRuns);Q.splice(0,Q.length,...nextQuality);
         S.selected=A.some(a=>a.id===S.selected)?S.selected:(A[0]?.id||'');S.selectedEv=V.some(e=>e.id===S.selectedEv)?S.selectedEv:(V[0]?.id||'');render();
-      }catch(err){S.dataError=err?.message||'Unable to load persisted catalog.';render();toast(S.dataError,true)}
+      }catch(err){S.dataError=err?.message||'Unable to load persisted catalog.';A.splice(0,A.length);E.splice(0,E.length);V.splice(0,V.length);R.splice(0,R.length);Q.splice(0,Q.length);S.selected='';S.selectedEv='';S.temporalResult=null;render();toast(S.dataError,true)}
     }
     function toast(t,err=false){const e=document.createElement('div');e.className='toast'+(err?' error':'');e.textContent=t;$('#toastRegion').append(e);setTimeout(()=>e.remove(),3200)}
 function pill(s){const c=({OBSERVED:'mint',REFUTED_FOR_RUN:'red',POSSIBLE:'amber',UNKNOWN:'purple',SUCCESS:'mint',PASS:'mint',WARNING:'amber',FAILED:'red',FAIL:'red'})[s]||'gray';return '<span class="pill '+c+'">'+esc(s)+'</span>'}
