@@ -114,7 +114,7 @@ if(S.columnGraph){
   svg.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY,px:S.graphPanX||0,py:S.graphPanY||0};moved=false;svg.setPointerCapture?.(e.pointerId);svg.style.cursor='grabbing'});
   svg.addEventListener('pointermove',e=>{if(!drag)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;if(Math.abs(dx)+Math.abs(dy)>3)moved=true;S.graphPanX=drag.px-dx/(S.graphZoom||1);S.graphPanY=drag.py-dy/(S.graphZoom||1);fit()});
   const stop=()=>{drag=null;svg.style.cursor='grab'};svg.addEventListener('pointerup',stop);svg.addEventListener('pointercancel',stop);svg.style.cursor='grab';
-  svg.querySelectorAll('g[role=button]').forEach(g=>{g.addEventListener('pointerdown',e=>e.stopPropagation());g.addEventListener('click',e=>{if(moved){e.stopImmediatePropagation();moved=false}},true)});
+  svg.querySelectorAll('g[role=button]').forEach(g=>{g.addEventListener('click',e=>{if(moved){e.stopImmediatePropagation();moved=false}},true)});
   $('#graphMeta').textContent=mappings.length+' column mappings · '+nodes.length+' assets · drag to pan, scroll to zoom';
   return;
 }
