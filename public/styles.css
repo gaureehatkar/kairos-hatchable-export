@@ -1403,3 +1403,250 @@ select:focus,input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 
 .tooltip,.popover{transform-origin:var(--transform-origin,center);transition:opacity 125ms var(--ease-out),transform 125ms var(--ease-out)}
 .tooltip[data-ending-style],.popover[data-ending-style]{opacity:0;transform:scale(0.95)}
 @starting-style{.tooltip,.popover{opacity:0;transform:scale(0.95)}}
+
+/* ========================================================================
+   ANIMATION LAYER: Card entrances, chart animations, interactive states
+   Using CSS animations (off-main-thread) for data rendering,
+   WAAPI for programmatic chart sequences, transitions for hover states.
+   ======================================================================== */
+
+/* Entrance: Card stagger (overview cards) */
+@keyframes cardSlideUp{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+@keyframes cardFadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+/* Cards animate in on page load */
+.metric-card,.evidence-card,.asset-card{
+  animation:cardSlideUp 300ms var(--ease-out) backwards;
+}
+
+.metric-card:nth-child(1){animation-delay:0ms}
+.metric-card:nth-child(2){animation-delay:80ms}
+.metric-card:nth-child(3){animation-delay:160ms}
+.metric-card:nth-child(4){animation-delay:240ms}
+
+.evidence-card:nth-child(1){animation-delay:320ms}
+.evidence-card:nth-child(2){animation-delay:400ms}
+.evidence-card:nth-child(3){animation-delay:480ms}
+.evidence-card:nth-child(4){animation-delay:560ms}
+
+/* Chart container entrance */
+@keyframes chartFadeIn{
+  from{opacity:0.5}
+  to{opacity:1}
+}
+.chart-container{animation:chartFadeIn 400ms var(--ease-out)}
+
+/* Interactive hover animations (no animation on touch) */
+@media (hover: hover) and (pointer: fine){
+  .asset-row,.table-row,.nav-item{
+    transition:background-color 125ms ease,transform 100ms var(--ease-out);
+  }
+  .asset-row:hover,.table-row:hover{
+    background-color:var(--hover);
+    transform:scale(1.01);
+  }
+  .nav-item:not(.active):hover{
+    background-color:rgba(255,255,255,0.05);
+  }
+  /* Graph nodes hover effect */
+  .graph-node{
+    transition:r 100ms var(--ease-out),fill 100ms ease,filter 100ms ease;
+  }
+  .graph-node:hover{
+    filter:drop-shadow(0 0 8px rgba(74,138,214,0.4));
+    r:6;
+  }
+  /* Edge glow on hover */
+  .graph-edge{
+    transition:stroke-width 100ms var(--ease-out),opacity 100ms ease;
+  }
+  .graph-edge:hover{
+    stroke-width:2.5;
+    opacity:0.9;
+  }
+}
+
+/* Reduced motion: disable transform-based hover effects */
+@media (prefers-reduced-motion: reduce){
+  .asset-row:hover,.table-row:hover{
+    transform:none;
+  }
+  .graph-node:hover{
+    filter:none;
+    r:5;
+  }
+  .graph-edge:hover{
+    stroke-width:1.5;
+  }
+  .metric-card,.evidence-card,.asset-card{
+    animation:cardFadeIn 200ms ease !important;
+    animation-delay:0 !important;
+  }
+}
+
+/* Modal entrance: Pop from center */
+@keyframes modalPop{
+  from{
+    opacity:0;
+    transform:scale(0.92) translateY(-20px);
+  }
+  to{
+    opacity:1;
+    transform:scale(1) translateY(0);
+  }
+}
+.modal{
+  animation:modalPop 250ms var(--ease-out);
+}
+.modal[data-ending-style]{
+  animation:none;
+  opacity:0;
+  transform:scale(0.92) translateY(-20px);
+}
+@starting-style{
+  .modal{
+    opacity:0;
+    transform:scale(0.92) translateY(-20px);
+  }
+}
+
+/* Drawer entrance: Slide from side */
+@keyframes drawerSlideIn{
+  from{
+    opacity:0;
+    transform:translateX(-100%);
+  }
+  to{
+    opacity:1;
+    transform:translateX(0);
+  }
+}
+.drawer{
+  animation:drawerSlideIn 300ms var(--ease-out);
+}
+
+/* Toast entrance: Slide in from bottom-right */
+@keyframes toastSlideIn{
+  from{
+    opacity:0;
+    transform:translateY(100%) translateX(100%);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) translateX(0);
+  }
+}
+.toast{
+  animation:toastSlideIn 200ms var(--ease-out);
+}
+
+/* Pulse for loading states */
+@keyframes pulse{
+  0%,100%{opacity:1}
+  50%{opacity:0.5}
+}
+.skeleton,.loading{
+  animation:pulse 2s ease-in-out infinite;
+}
+
+/* Spinner for async operations */
+@keyframes spin{
+  from{transform:rotate(0deg)}
+  to{transform:rotate(360deg)}
+}
+.spinner{
+  animation:spin 1.2s linear infinite;
+}
+
+/* Line chart draw animation (WAAPI-driven) */
+@keyframes lineChartDraw{
+  from{
+    stroke-dashoffset:1000;
+  }
+  to{
+    stroke-dashoffset:0;
+  }
+}
+.chart-line{
+  animation:lineChartDraw 1s var(--ease-out);
+  stroke-dasharray:1000;
+}
+
+/* Bar chart fill animation */
+@keyframes barFill{
+  from{
+    transform:scaleY(0);
+    transform-origin:bottom;
+  }
+  to{
+    transform:scaleY(1);
+    transform-origin:bottom;
+  }
+}
+.chart-bar{
+  animation:barFill 400ms var(--ease-out) backwards;
+}
+.chart-bar:nth-child(1){animation-delay:0ms}
+.chart-bar:nth-child(2){animation-delay:60ms}
+.chart-bar:nth-child(3){animation-delay:120ms}
+.chart-bar:nth-child(4){animation-delay:180ms}
+.chart-bar:nth-child(5){animation-delay:240ms}
+
+/* Lineage node entrance with cascade */
+@keyframes nodeSlideIn{
+  from{
+    opacity:0;
+    r:0;
+  }
+  to{
+    opacity:1;
+    r:5;
+  }
+}
+.lineage-node{
+  animation:nodeSlideIn 300ms var(--ease-out) backwards;
+}
+
+/* Edge path entrance */
+@keyframes edgeStroke{
+  from{
+    stroke-dashoffset:100;
+  }
+  to{
+    stroke-dashoffset:0;
+  }
+}
+.lineage-edge{
+  animation:edgeStroke 400ms var(--ease-out-slow) backwards;
+  stroke-dasharray:100;
+}
+
+/* Color state transition for evidence */
+@keyframes evidenceStateChange{
+  0%{fill:var(--from-color,#8a8c92)}
+  100%{fill:var(--to-color,#4a8ad6)}
+}
+.evidence-state-change{
+  animation:evidenceStateChange 250ms ease;
+}
+
+/* Cascade highlight on graph traverse */
+@keyframes cascadeGlow{
+  0%{filter:drop-shadow(0 0 0 transparent)}
+  50%{filter:drop-shadow(0 0 6px rgba(74,138,214,0.6))}
+  100%{filter:drop-shadow(0 0 0 transparent)}
+}
+.cascade-highlight{
+  animation:cascadeGlow 600ms ease-out;
+}
+
+/* Transition curves defined */
+:root{
+  --ease-out-slow:cubic-bezier(0.23,1,0.32,1);
+}
