@@ -25,7 +25,7 @@ Kairos is a technology-neutral metadata lineage, evidence, and temporal reasonin
 - [x] Generic JSON graph importer initial implementation (harden next).
 - [x] Existing OpenLineage run/dataset event importer (conservative about pairwise edges).
 - [x] Existing dbt manifest importer (declared/static dependencies clearly disclosed).
-- [ ] File inventory adapter (paths, hashes, formats, directory membership; do not read contents by default).
+- [x] File inventory JSON adapter (relative paths, hashes, formats, sizes, modification times, directory membership; does not read file contents and explicitly warns that membership is not data-flow lineage).
 - [ ] Python lineage adapter (explicit read/write declarations or instrumentation; static inference labelled candidate).
 - [ ] Workflow/ETL adapters and API/ML artifact metadata.
 - [ ] SQLGlot as one provider, never the canonical model.
