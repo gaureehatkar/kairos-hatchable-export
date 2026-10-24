@@ -384,3 +384,12 @@ td .subline{margin-top:2px;font-size:12px;color:var(--faint)}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 @media(forced-colors:active){.btn,.panel,.stat-grid,.pill,.toggle{border:1px solid CanvasText}.nav-item.active{outline:2px solid Highlight}}
+
+/* Usability polish: visible keyboard focus, readable data tables, and calmer motion. */
+:where(button,a,input,select,textarea,[tabindex]):focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.table-wrap{overflow-x:auto;max-width:100%;overscroll-behavior-x:contain}
+.table-wrap table{min-width:560px}
+th{position:sticky;top:0;z-index:1;background:var(--surface)}
+:where(button,a,select,input,textarea){touch-action:manipulation}
+@media(max-width:640px){.panel-head{gap:10px;align-items:flex-start;flex-wrap:wrap}.panel-head .btn{max-width:100%}.modal{max-height:calc(100dvh - 24px);overflow-y:auto}.modal-backdrop{padding:12px;align-items:flex-start}.page-heading p{max-width:68ch}}
+@media(prefers-reduced-motion:reduce){.observatory-stage canvas{scroll-behavior:auto}}
