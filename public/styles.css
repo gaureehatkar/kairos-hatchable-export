@@ -549,6 +549,407 @@ body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 @media print{.worst-case-toggle,.modal-backdrop,.toast-region{display:none!important}}
 
 /* ============================================================================
+   TASTE-SKILL V2: PREMIUM LAYOUT & DESIGN DIRECTION
+   Comprehensive visual polish for the entire Kairos application
+   Based on 247 curated gallery sites (One Page Love, Awwwards)
+   ============================================================================ */
+
+/* DESIGN PHILOSOPHY: Data-terminal aesthetic meets premium craft */
+
+/* Typography Direction: Optical Sizing & Hierarchy */
+:root{
+  --type-display: clamp(28px, 6vw, 48px); /* Hero headlines */
+  --type-h1: clamp(24px, 5vw, 32px); /* Page headers */
+  --type-h2: clamp(18px, 3vw, 24px); /* Section headers */
+  --type-h3: clamp(16px, 2.5vw, 20px); /* Subsection */
+  --type-body: 14px; /* Content */
+  --type-small: 12px; /* Labels, meta */
+  --type-tiny: 11px; /* Captions */
+}
+
+/* Page heading: bold, tracked, optical sizing */
+.page-heading h1{
+  font-size:var(--type-h1);
+  font-weight:700;
+  line-height:1.15;
+  letter-spacing:-0.015em;
+  color:#f0f4f8;
+  margin:0 0 12px;
+}
+.page-heading p{
+  font-size:var(--type-body);
+  line-height:1.6;
+  letter-spacing:0.01em;
+  color:#cbd5e1;
+  margin:0;
+}
+
+/* Panel headers: refined typography */
+.panel-head h2{
+  font-size:var(--type-h2);
+  font-weight:600;
+  line-height:1.25;
+  letter-spacing:-0.01em;
+  color:#f0f4f8;
+  margin:0;
+}
+.panel-head p{
+  font-size:var(--type-small);
+  color:#94a3b8;
+  margin:2px 0 0;
+  letter-spacing:0.02em;
+  text-transform:uppercase;
+  font-weight:500;
+}
+
+/* Label hierarchy: uppercase, tracked, muted */
+label,.nav-label,.graph-control>label{
+  font-size:var(--type-tiny);
+  font-weight:600;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:#64748b;
+  display:block;
+}
+
+/* Spacing System: Consistent vertical rhythm */
+.page-heading{margin-bottom:32px}
+.panel{margin-bottom:16px}
+.section-spacer{margin-top:var(--gap)}
+
+/* SPATIAL HIERARCHY: Layout breathing room */
+.content{
+  padding:var(--gap) var(--pad) 40px;
+  max-width:1680px;
+}
+.lineage-layout,.observatory-layout{
+  gap:24px;
+}
+.grid-2,.grid-equal,.two-col-layout{
+  gap:24px;
+  margin-bottom:24px;
+}
+
+/* CARD SYSTEM: Subtle depth, no harsh shadows */
+.panel{
+  border:1px solid rgba(148,163,184,0.1);
+  border-radius:8px;
+  background:linear-gradient(135deg,rgba(30,41,59,0.5) 0%,rgba(25,35,50,0.5) 100%);
+  backdrop-filter:blur(10px);
+  transition:all 200ms var(--ease-out);
+  overflow:hidden;
+}
+.panel:hover{
+  border-color:rgba(148,163,184,0.2);
+  background:linear-gradient(135deg,rgba(51,65,85,0.6) 0%,rgba(45,55,70,0.6) 100%);
+  box-shadow:0 8px 24px rgba(0,0,0,0.2);
+}
+
+/* STAT GRID: Refined number presentation */
+.stat-grid{
+  border:1px solid rgba(148,163,184,0.1);
+  border-radius:8px;
+  background:linear-gradient(135deg,rgba(30,41,59,0.4) 0%,rgba(25,35,50,0.4) 100%);
+  overflow:hidden;
+  backdrop-filter:blur(8px);
+}
+.stat-card{
+  padding:20px;
+  border-right:1px solid rgba(148,163,184,0.1);
+  border-bottom:1px solid rgba(148,163,184,0.1);
+}
+.stat-card:last-child{border-right:0}
+.stat-card:nth-child(n+3){border-bottom:0}
+.stat-value{
+  font-size:var(--type-h2);
+  font-weight:700;
+  line-height:1.2;
+  color:#f0f4f8;
+  margin:8px 0 4px;
+  letter-spacing:-0.02em;
+}
+.stat-top{
+  font-size:var(--type-small);
+  color:#94a3b8;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+}
+.stat-foot{
+  font-size:var(--type-tiny);
+  color:#64748b;
+  margin-top:8px;
+}
+
+/* CONTROLS: Premium button system */
+.btn{
+  font-size:var(--type-small);
+  font-weight:600;
+  letter-spacing:0.02em;
+  padding:10px 16px;
+  min-height:40px;
+  border:1px solid rgba(148,163,184,0.15);
+  border-radius:6px;
+  background:rgba(51,65,85,0.3);
+  backdrop-filter:blur(4px);
+  transition:all 120ms var(--ease-out);
+  cursor:pointer;
+}
+.btn:hover{
+  background:rgba(74,138,214,0.2);
+  border-color:rgba(74,138,214,0.3);
+  box-shadow:0 4px 12px rgba(74,138,214,0.15);
+}
+.btn:active{
+  transform:scale(0.98);
+}
+.btn.primary{
+  background:#4a8ad6;
+  border-color:#4a8ad6;
+  color:#fff;
+  font-weight:700;
+}
+.btn.primary:hover{
+  background:#5a9ae6;
+  box-shadow:0 6px 20px rgba(74,138,214,0.3);
+}
+
+/* FORM INPUTS: Refined field styling */
+input,textarea,select,.field input,.field select{
+  font-size:14px;
+  padding:10px 12px;
+  border:1px solid rgba(148,163,184,0.15);
+  border-radius:6px;
+  background:rgba(30,41,59,0.5);
+  backdrop-filter:blur(4px);
+  color:#f0f4f8;
+  transition:all 150ms var(--ease-out);
+}
+input:focus,textarea:focus,select:focus{
+  border-color:#4a8ad6;
+  background:rgba(30,41,59,0.8);
+  box-shadow:0 0 0 3px rgba(74,138,214,0.2);
+  outline:none;
+}
+input::placeholder{
+  color:#64748b;
+}
+
+/* TABLES: Refined data presentation */
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:var(--type-body);
+}
+th{
+  padding:12px 16px;
+  border-bottom:1px solid rgba(148,163,184,0.1);
+  background:rgba(15,23,42,0.3);
+  font-size:var(--type-small);
+  font-weight:600;
+  text-align:left;
+  color:#94a3b8;
+  letter-spacing:0.05em;
+  text-transform:uppercase;
+}
+td{
+  padding:14px 16px;
+  border-bottom:1px solid rgba(148,163,184,0.08);
+  color:#cbd5e1;
+  vertical-align:middle;
+}
+tbody tr{
+  transition:background 120ms var(--ease-out);
+}
+tbody tr:hover{
+  background:rgba(74,138,214,0.05);
+}
+td strong{
+  color:#f0f4f8;
+  font-weight:600;
+}
+
+/* PILL BADGES: Refined status indicators */
+.pill{
+  display:inline-flex;
+  align-items:center;
+  padding:4px 10px;
+  border-radius:12px;
+  font-size:var(--type-tiny);
+  font-weight:600;
+  letter-spacing:0.02em;
+  background:rgba(148,163,184,0.1);
+  color:#cbd5e1;
+  border:1px solid rgba(148,163,184,0.2);
+}
+.pill.mint{
+  background:rgba(16,185,129,0.1);
+  color:#5eead4;
+  border-color:rgba(16,185,129,0.2);
+}
+.pill.blue{
+  background:rgba(74,138,214,0.1);
+  color:#93c5fd;
+  border-color:rgba(74,138,214,0.2);
+}
+.pill.amber{
+  background:rgba(245,158,11,0.1);
+  color:#fcd34d;
+  border-color:rgba(245,158,11,0.2);
+}
+
+/* SIDEBAR: Premium dark theme */
+.sidebar{
+  background:linear-gradient(180deg,rgba(15,23,42,0.98) 0%,rgba(11,17,29,0.98) 100%);
+  border-right:1px solid rgba(148,163,184,0.1);
+}
+.nav-item{
+  font-size:var(--type-body);
+  color:#94a3b8;
+  transition:all 120ms var(--ease-out);
+}
+.nav-item.active{
+  color:#f0f4f8;
+  font-weight:600;
+}
+
+/* HEADER/TOPBAR: Glass effect */
+.topbar{
+  background:rgba(15,23,42,0.95);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid rgba(148,163,184,0.1);
+}
+.breadcrumbs{
+  font-size:var(--type-small);
+  color:#94a3b8;
+}
+.breadcrumbs strong{
+  color:#f0f4f8;
+  font-weight:600;
+}
+
+/* EMPTY STATES: Refined messaging */
+.empty-state{
+  padding:60px 20px;
+  text-align:center;
+}
+.empty-state>strong{
+  display:block;
+  font-size:var(--type-h2);
+  font-weight:700;
+  color:#f0f4f8;
+  margin-bottom:12px;
+  letter-spacing:-0.01em;
+}
+.empty-state p{
+  font-size:var(--type-body);
+  color:#94a3b8;
+  margin:0 auto 16px;
+  max-width:60ch;
+  line-height:1.6;
+}
+.empty-state img{
+  width:80px;
+  height:80px;
+  opacity:0.3;
+  margin-bottom:20px;
+  filter:grayscale(100%);
+}
+
+/* EVIDENCE STRIP: Premium data visualization */
+.evidence-strip{
+  display:flex;
+  gap:3px;
+  height:10px;
+  border-radius:2px;
+  overflow:hidden;
+  background:rgba(51,65,85,0.3);
+  padding:1px;
+  backdrop-filter:blur(4px);
+}
+.evidence-strip i{
+  display:block;
+  flex:1;
+  border-radius:1px;
+  transition:all 200ms var(--ease-out);
+}
+.evidence-strip .s-observed{
+  background:#10b981;
+  box-shadow:inset 0 -1px 0 rgba(0,0,0,0.2);
+}
+.evidence-strip .s-possible{
+  background:#f59e0b;
+}
+.evidence-strip .s-refuted{
+  background:#ef4444;
+  opacity:0.6;
+}
+
+/* MODAL: Premium overlay */
+.modal{
+  background:linear-gradient(135deg,rgba(15,23,42,0.98) 0%,rgba(11,17,29,0.98) 100%);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(148,163,184,0.1);
+  border-radius:12px;
+  box-shadow:0 20px 60px rgba(0,0,0,0.4);
+}
+.modal-head{
+  border-bottom:1px solid rgba(148,163,184,0.1);
+  padding-bottom:16px;
+  margin-bottom:16px;
+}
+.modal-head h2{
+  font-size:var(--type-h2);
+  font-weight:700;
+  color:#f0f4f8;
+  margin:0;
+  letter-spacing:-0.01em;
+}
+
+/* TOAST: Premium notifications */
+.toast{
+  background:rgba(30,41,59,0.95);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(148,163,184,0.15);
+  border-radius:8px;
+  padding:12px 16px;
+  box-shadow:0 8px 24px rgba(0,0,0,0.3);
+  font-size:var(--type-body);
+  color:#cbd5e1;
+}
+.toast strong{
+  color:#f0f4f8;
+  font-weight:600;
+}
+
+/* RESPONSIVE: Taste refinements per breakpoint */
+@media(max-width:1024px){
+  :root{
+    --type-h1:clamp(22px,4.5vw,28px);
+    --type-h2:clamp(16px,2.5vw,20px);
+  }
+  .content{padding:20px 20px 32px}
+  .lineage-layout,.observatory-layout,.grid-2{gap:16px}
+}
+
+@media(max-width:640px){
+  :root{
+    --type-h1:clamp(20px,4vw,24px);
+    --type-h2:clamp(14px,2vw,18px);
+    --type-body:13px;
+  }
+  .content{padding:12px 12px 24px}
+  .page-heading{display:block;margin-bottom:20px}
+  .page-heading h1{font-size:var(--type-h1)}
+  .heading-actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+  .heading-actions .btn{flex:1;min-width:auto}
+  .stat-grid{grid-template-columns:repeat(2,1fr);margin-bottom:16px}
+  .stat-card{padding:12px;border-bottom:1px solid rgba(148,163,184,0.1)}
+  .stat-value{font-size:var(--type-h3)}
+  table{font-size:12px}
+  th,td{padding:10px 12px}
+}
+
+/* ============================================================================
    COMPREHENSIVE GRAPH VISUALIZATION POLISH — All 18 Skills Applied
    Column lineage + table lineage + 2D/3D observatory enhancements
    ============================================================================ */
