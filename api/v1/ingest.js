@@ -15,7 +15,17 @@ export default async function (req, res) {
   const kind = body.kind;
   const payload = body.payload;
   if (!payload || typeof payload !== "object" || (Array.isArray(payload) && kind !== "openlineage_event")) return res.status(400).json({ok:false,error:"invalid_payload",message:kind === "openlineage_event" ? "Provide one OpenLineage event object or an array of event objects." : "Provide a JSON object in payload."});
-  if (kind === "openlineage_event" && Array.isArray(payload) && payload.some(event => !event || typeof event !== "object" || Array.isArray(event))) return res.status(400).json({ok:false,error:"invalid_payload",message:"Every item in an OpenLineage event array must be an event object."});
+  if (kind === "dbt_manifest") {
+    const hasManifestSections = ["nodes","sources","exposures"].some(key => payload[key] && typeof payload[key] === "object" && !Array.isArray(payload[key]));
+    if (!hasManifestSections) return res.status(400).json({ok:false,error:"invalid_dbt_manifest",message:"This does not look like a dbt manifest. Expected at least one object section: nodes, sources, or exposures."});
+  }
+  if (kind === "openlineage_event") {
+    const events = Array.isArray(payload) ? payload : [payload];
+    const invalidIndex = events.findIndex(event => !event || typeof event !== "object" || Array.isArray(event) || !event.job || typeof event.job.name !== "string" || !event.job.name.trim() || !event.run || typeof event.run.runId !== "string" || !event.run.runId.trim());
+    if (invalidIndex !== -1) return res.status(400).json({ok:false,error:"invalid_openlineage_event",message:"Every event must include job.name and run.runId. Invalid event at index "+invalidIndex+"."});
+    if (!events.length) return res.status(400).json({ok:false,error:"empty_event_batch",message:"Choose a non-empty array of OpenLineage events."});
+  }
+  if (kind !== "dbt_manifest" && kind !== "openlineage_event") return res.status(400).json({ok:false,error:"unsupported_kind",message:"kind must be dbt_manifest or openlineage_event."});
   try {
     if (kind === "dbt_manifest") {
       const nodes = payload.nodes || {}, sources = payload.sources || {}, exposures = payload.exposures || {};
