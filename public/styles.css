@@ -388,7 +388,7 @@ td .subline{margin-top:2px;font-size:12px;color:var(--faint)}
   .observatory-caption{max-width:200px}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
-@media(forced-colors:active){.btn,.panel,.stat-grid,.pill,.toggle{border:1px solid CanvasText}.nav-item.active{outline:2px solid Highlight}}
+@media(prefers-contrast:active){.btn,.panel,.stat-grid,.pill,.toggle{border:1px solid CanvasText}.nav-item.active{outline:2px solid Highlight}}
 
 /* Evidence state glossary: keep the four conclusions easy to scan. */
 .evidence-glossary{grid-template-columns:repeat(4,minmax(0,1fr));margin:16px 0}
@@ -397,6 +397,156 @@ td .subline{margin-top:2px;font-size:12px;color:var(--faint)}
 .evidence-glossary p{margin:8px 0 0}
 @media(max-width:900px){.evidence-glossary{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.evidence-glossary{grid-template-columns:minmax(0,1fr)}}
+
+/* ============================================================================
+   PHASES 2-5 IMPROVEMENTS: All 18 Kiro Skills Applied v128
+   Mobile·Craft·Design·Performance·Accessibility using all skills + taste
+   ============================================================================ */
+
+/* PHASE 2: Craft Polish & State Transitions */
+.modal-backdrop{animation:backdrop-in .25s var(--ease-out)}
+@keyframes backdrop-in{from{opacity:0}to{opacity:1}}
+.modal{animation:modal-in .25s var(--ease-out)}
+@keyframes modal-in{from{opacity:0;transform:scale(0.95)translateY(-20px)}to{opacity:1;transform:none}}
+
+/* Accordion: clip-path reveal (GPU-friendly, not max-height) */
+.nav-sublist{clip-path:inset(0 0 100% 0);transition:clip-path 150ms var(--ease-out)}
+.nav-sublist:not([hidden]){clip-path:inset(0 0 0 0)}
+
+/* Form focus: ring shadow */
+select:focus,input:focus,textarea:focus{box-shadow:0 0 0 3px rgba(74,138,214,0.2)}
+
+/* Button press feedback */
+.btn:active,.lineage-row:active,table tbody tr:active{transform:scale(0.97);transition:transform 100ms var(--ease-out)}
+
+/* Stagger entrance for lists */
+.list-item{animation:item-fade 300ms var(--ease-out) backwards}
+.list-item:nth-child(1){animation-delay:0ms}.list-item:nth-child(2){animation-delay:40ms}.list-item:nth-child(3){animation-delay:80ms}.list-item:nth-child(4){animation-delay:120ms}.list-item:nth-child(5){animation-delay:160ms}
+@keyframes item-fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* PHASE 3: Design Direction & Taste-Skill Polish */
+
+/* Border-based selection */
+.lineage-row.selected{border-left:2px solid var(--accent);padding-left:calc(20px - 2px)}
+
+/* Field missing indicator */
+.field-missing{color:var(--faint);font-weight:400}
+.field-missing::before{content:'— '}
+
+/* Fluid typography */
+.page-heading h1{font-size:clamp(24px,5vw,32px);line-height:1.2;letter-spacing:-0.02em}
+.panel-head h2{font-size:clamp(16px,3vw,18px);line-height:1.3;letter-spacing:-0.01em}
+
+/* Improved spacing in lists */
+.metric-line{padding:12px 0;min-height:44px}.metric-line:last-child{border-bottom:0}
+.activity-item{padding:16px 0;min-height:44px}.activity-item:last-child{border-bottom:0}
+
+/* Typography: optical sizing */
+h1,h2,h3{font-optical-sizing:auto}
+
+/* High contrast mode */
+@media(prefers-contrast:more){
+  .panel,.modal{border-width:2px}
+  .status-dot{width:8px;height:8px;border:1px solid currentColor}
+}
+
+/* PHASE 4: Performance Optimization */
+
+/* CSS Containment */
+.lineage-table,table{contain:layout style paint}
+.lineage-row,tbody tr{contain:content}
+
+/* GPU-accelerated layout */
+.sidebar{will-change:auto}
+.sidebar.open{will-change:transform;transform:none}
+
+/* Clip-path reveals (faster than height) */
+.dropdown-menu{clip-path:inset(-8px 0 100% 0);transform:scale(1,0);transition:clip-path 150ms var(--ease-out),transform 150ms var(--ease-out)}
+.dropdown-menu.open{clip-path:inset(0);transform:scale(1)}
+
+/* PHASE 5: Accessibility & Edge Cases */
+
+/* Reduced motion: critical override */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}
+  .modal,.toast,.sidebar{transform:none!important;transition:opacity 150ms ease!important}
+}
+
+/* Keyboard navigation */
+.lineage-row:focus-visible,table tbody tr:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* Touch hover gating */
+@media(hover:hover) and (pointer:fine){
+  .lineage-row:hover{background:var(--hover)}
+  table tbody tr:hover{background:var(--hover)}
+}
+
+/* Touch targets */
+@media(pointer:coarse){
+  .lineage-row,.activity-item,.btn,.nav-item,table tbody tr{min-height:44px}
+  input,textarea,select{font-size:16px;min-height:44px}
+}
+
+/* Long name truncation */
+.asset-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Empty state */
+.empty-state{padding:64px 20px}
+.empty-state img{width:64px;height:64px;opacity:0.5;filter:grayscale(100%)}
+
+/* Tabular numbers */
+.number,.count{font-variant-numeric:tabular-nums;text-align:right}
+
+/* Safe areas */
+.content{padding:var(--gap) calc(var(--pad) + env(safe-area-inset-right)) 40px calc(var(--pad) + env(safe-area-inset-left))}
+
+/* Dynamic viewport */
+.app-shell{min-height:100dvh}
+
+/* Touch action */
+button,[role="button"]{touch-action:manipulation}
+.graph-stage,.observatory-stage{touch-action:none}
+
+/* Input font size (prevent iOS zoom) */
+input,textarea,select{font-size:16px}
+
+/* Worst-case demo toggle */
+.worst-case-toggle{
+  position:fixed;bottom:20px;right:20px;z-index:40;
+  display:flex;align-items:center;gap:8px;
+  padding:8px 12px;border:1px solid var(--border);
+  border-radius:var(--radius-pill);background:var(--surface);
+  font-size:12px;color:var(--muted);cursor:pointer;
+  transition:all 100ms var(--ease-out)
+}
+.worst-case-toggle:hover{background:var(--hover);color:var(--text)}
+.worst-case-toggle input{cursor:pointer;margin:0}
+
+/* TASTE-SKILL PREMIUM FINISH */
+
+/* Consistent micro-interactions */
+button,a,[role="button"]{transition:all 100ms var(--ease-out)}
+
+/* Glass morphism depth */
+.panel,.modal{backdrop-filter:blur(8px);background:rgba(19,18,23,0.92)}
+
+/* Status indicator glow */
+.status-dot{box-shadow:0 0 8px currentColor}
+
+/* Button sophistication */
+.btn.primary:hover{background:#f5f5f5;border-color:#f5f5f5}
+
+/* Card elevation */
+.panel:hover{border-color:var(--accent);box-shadow:0 4px 12px rgba(74,138,214,0.1)}
+
+/* Label hierarchy */
+label,.nav-label{font-size:12px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase}
+
+/* Text rendering */
+body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+/* Print styles */
+@media print{.worst-case-toggle,.modal-backdrop,.toast-region{display:none!important}}
 
 /* Usability polish: visible keyboard focus, readable data tables, and calmer motion. */
 :where(button,a,input,select,textarea,[tabindex]):focus-visible{outline:2px solid var(--accent);outline-offset:3px}

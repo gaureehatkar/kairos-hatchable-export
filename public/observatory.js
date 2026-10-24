@@ -140,7 +140,25 @@
     window.addEventListener('resize',resize);
     const n=document.querySelector('#sceneNodes'),ed=document.querySelector('#sceneEdges');if(n)n.textContent=filtered.length;if(ed)ed.textContent=edges.filter(e=>positions[e[0]]&&positions[e[1]]).length;
     const roomTitle=host.querySelector('.observatory-caption strong');if(roomTitle)roomTitle.textContent=mode==='lineage'?'Lineage Map (Updated v4)':mode==='clusters'?'Cluster Laboratory (Updated v4)':'Central Observatory (Updated v4)';
-    return ()=>{alive=false;cancelAnimationFrame(raf);window.removeEventListener('resize',resize);renderer.domElement.removeEventListener('pointerdown',pointerDown);renderer.domElement.removeEventListener('pointermove',pointerMove);renderer.domElement.removeEventListener('pointerup',pointerUp);renderer.domElement.removeEventListener('pointercancel',pointerUp);renderer.domElement.removeEventListener('click',click);renderer.domElement.removeEventListener('wheel',wheel);zoomInButtons.forEach(b=>b.removeEventListener('click',zoomIn));zoomOutButtons.forEach(b=>b.removeEventListener('click',zoomOut));resetButtons.forEach(b=>b.removeEventListener('click',resetCamera));scene.traverse(o=>{o.geometry?.dispose?.();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose?.());else o.material.dispose?.()}if(o.material?.map)o.material.map.dispose?.()});renderer.dispose();renderer.domElement.remove()};
+    
+    /* Selection cascade highlighting: upstream (blue) + downstream (cyan) */
+    const originalClick=click;
+    const enhancedClick=(e)=>{
+      originalClick(e);
+      if(selected){
+        const downSet=new Set(),upSet=new Set();
+        const dq=[selected];while(dq.length){const cur=dq.pop();downSet.add(cur);edges.filter(ed=>ed[0]===cur).forEach(ed=>{if(!downSet.has(ed[1]))dq.push(ed[1])})};
+        const uq=[selected];while(uq.length){const cur=uq.pop();upSet.add(cur);edges.filter(ed=>ed[1]===cur).forEach(ed=>{if(!upSet.has(ed[0]))uq.push(ed[0])})};
+        /* Highlight halos */
+        nodeMeshes.forEach(n=>{const h=n.children.find(c=>c.geometry?.type==='TorusGeometry');if(h){const nid=n.userData.asset.id;let c=0x223344,op=0.15;if(nid===selected){c=0xffffff;op=1.0}else if(downSet.has(nid)){c=0x00ff9c;op=0.9}else if(upSet.has(nid)){c=0x0099ff;op=0.9}h.material.color.setHex(c);h.material.opacity=op;h.material.needsUpdate=true}});
+        /* Highlight tubes */
+        edgeMeshes.forEach(t=>{const f=t.userData.from,to=t.userData.to;let c=0x223344,em=0x000000,op=0.15;if(downSet.has(f)&&downSet.has(to)){c=0x00ff9c;em=0x00ff00;op=0.9}else if(upSet.has(f)&&upSet.has(to)){c=0x0099ff;em=0x0055ff;op=0.9}t.material.color.setHex(c);t.material.emissive.setHex(em);t.material.opacity=op;t.material.needsUpdate=true});
+      }
+    };
+    renderer.domElement.removeEventListener('click',click);
+    renderer.domElement.addEventListener('click',enhancedClick);
+    
+    return ()=>{alive=false;cancelAnimationFrame(raf);window.removeEventListener('resize',resize);renderer.domElement.removeEventListener('pointerdown',pointerDown);renderer.domElement.removeEventListener('pointermove',pointerMove);renderer.domElement.removeEventListener('pointerup',pointerUp);renderer.domElement.removeEventListener('pointercancel',pointerUp);renderer.domElement.removeEventListener('click',enhancedClick);renderer.domElement.removeEventListener('wheel',wheel);zoomInButtons.forEach(b=>b.removeEventListener('click',zoomIn));zoomOutButtons.forEach(b=>b.removeEventListener('click',zoomOut));resetButtons.forEach(b=>b.removeEventListener('click',resetCamera));scene.traverse(o=>{o.geometry?.dispose?.();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose?.());else o.material.dispose?.()}if(o.material?.map)o.material.map.dispose?.()});renderer.dispose();renderer.domElement.remove()};
   }
   window.KairosObservatory={mount};
 })();
