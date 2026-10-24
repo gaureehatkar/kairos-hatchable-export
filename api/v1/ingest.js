@@ -65,7 +65,7 @@ export default async function (req, res) {
       for (const a of assets) {
         const externalId=safe(String(a.id).trim(),900), name=safe(String(a.name||a.qualified_name).trim(),900), namespace=safe(a.namespace||a.domain||a.provider||"general",300);
         const qualifiedName=safe(a.qualified_name||((namespace?namespace+"/":"")+name),1200);
-        const type=safe(a.type||a.asset_type||a.kind||"asset",120), kindValue=safe(a.kind||"asset",80);
+        const type=safe(a.type||a.asset_type||a.kind||"asset",120), rawKind=String(a.kind||a.asset_kind||a.type||a.asset_type||"source").toLowerCase(), kindValue=/(output|dashboard|semantic|report|exposure)/.test(rawKind)?"output":/(transform|model|view|derived|pipeline|job|script|workflow)/.test(rawKind)?"transform":"source";
         const metadata={...(a.metadata&&typeof a.metadata==="object"?a.metadata:{}),source_system:safe(a.source_system||payload.source_system||"generic_metadata",100),external_id:externalId,namespace,resource_type:type,format:a.format||null,uri:a.uri||a.path||null,columns:Array.isArray(a.columns)?a.columns:undefined};
         const persisted=await upsertAsset({id:safe("generic:"+externalId,1200),qualifiedName,schemaName:namespace,kind:kindValue,type,owner:a.owner||null,description:a.description||null,columnCount:Array.isArray(a.columns)?a.columns.length:Number(a.column_count||0),metadata});
         idMap.set(externalId,{id:persisted.id,qualifiedName}); assetsUpserted++;
@@ -144,7 +144,7 @@ export default async function (req, res) {
             datasetMap.set(ns+"/"+name,{id:persistedAsset.id,qualifiedName:qn}); assetsUpserted++;
           }
         }
-        const status=eventType==="COMPLETE"?"SUCCESS":eventType==="FAIL"?"FAILED":(eventType==="START"||eventType==="RUNNING")?"RUNNING":eventType==="ABORT"?"ABORTED":"WARNING";
+        const status=eventType==="COMPLETE"?"SUCCESS":eventType==="FAIL"?"FAILED":(eventType==="START"||eventType==="RUNNING")?"RUNNING":"WARNING";
         const started=eventType==="START" && event.eventTime && !Number.isNaN(Date.parse(event.eventTime)) ? new Date(event.eventTime).toISOString() : null;
         await db.query("INSERT INTO kairos_pipeline_runs (id,pipeline_name,status,started_at,duration_ms,environment_name,asset_count,event_count,metadata) VALUES ($1,$2,$3,$4,NULL,$5,$6,$7,$8::jsonb) ON CONFLICT (id) DO UPDATE SET pipeline_name=EXCLUDED.pipeline_name,status=CASE WHEN EXCLUDED.metadata->>'event_time' IS NOT NULL AND (kairos_pipeline_runs.metadata->>'event_time' IS NULL OR EXCLUDED.metadata->>'event_time'>=kairos_pipeline_runs.metadata->>'event_time') THEN EXCLUDED.status ELSE kairos_pipeline_runs.status END,started_at=COALESCE(kairos_pipeline_runs.started_at,EXCLUDED.started_at),asset_count=GREATEST(kairos_pipeline_runs.asset_count,EXCLUDED.asset_count),event_count=kairos_pipeline_runs.event_count+EXCLUDED.event_count,metadata=CASE WHEN EXCLUDED.metadata->>'event_time' IS NOT NULL AND (kairos_pipeline_runs.metadata->>'event_time' IS NULL OR EXCLUDED.metadata->>'event_time'>=kairos_pipeline_runs.metadata->>'event_time') THEN kairos_pipeline_runs.metadata || EXCLUDED.metadata ELSE kairos_pipeline_runs.metadata END", [runId||("ol-event:"+Date.now()),jobName,status,started,event.environment||null,datasetMap.size,1,jsonText({source_system:"openlineage",job_namespace:namespace,event_type:eventType,producer:event.producer||null,inputs:inputs.map(x=>({namespace:x.namespace,name:x.name})),outputs:outputs.map(x=>({namespace:x.namespace,name:x.name})),event_time:eventTime})]);
         runsUpserted++;
