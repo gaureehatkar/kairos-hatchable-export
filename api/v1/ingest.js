@@ -105,6 +105,9 @@ export default async function (req, res) {
         const runId=safe(event.run.runId,300), jobName=safe(event.job.name,500), namespace=safe(event.job.namespace||"unknown",500);
         const eventType=safe(event.eventType||"OTHER",40).toUpperCase();
         const inputs=Array.isArray(event.inputs)?event.inputs:[], outputs=Array.isArray(event.outputs)?event.outputs:[];
+        const eventTime=event.eventTime && !Number.isNaN(Date.parse(event.eventTime)) ? new Date(event.eventTime).toISOString() : null;
+        const sourceRecordId=safe([runId,eventType,eventTime||crypto.randomUUID()].join(":"),1000);
+        await db.query("INSERT INTO kairos_raw_events (id,source_system,source_record_id,event_type,event_time,payload) VALUES ($1,'openlineage',$2,$3,$4,$5::jsonb) ON CONFLICT (source_system,source_record_id) DO NOTHING", [safe("raw:openlineage:"+sourceRecordId,1200),sourceRecordId,eventType,eventTime,jsonText(event)]);
         const datasetMap=new Map();
         for (const [direction,list] of [["input",inputs],["output",outputs]]) {
           for (const d of list) {
