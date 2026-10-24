@@ -14,7 +14,8 @@ export default async function (req, res) {
   const body = req.body || {};
   const kind = body.kind;
   const payload = body.payload;
-  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return res.status(400).json({ok:false,error:"invalid_payload",message:"Provide a JSON object in payload."});
+  if (!payload || typeof payload !== "object" || (Array.isArray(payload) && kind !== "openlineage_event")) return res.status(400).json({ok:false,error:"invalid_payload",message:kind === "openlineage_event" ? "Provide one OpenLineage event object or an array of event objects." : "Provide a JSON object in payload."});
+  if (kind === "openlineage_event" && Array.isArray(payload) && payload.some(event => !event || typeof event !== "object" || Array.isArray(event))) return res.status(400).json({ok:false,error:"invalid_payload",message:"Every item in an OpenLineage event array must be an event object."});
   try {
     if (kind === "dbt_manifest") {
       const nodes = payload.nodes || {}, sources = payload.sources || {}, exposures = payload.exposures || {};
