@@ -52,7 +52,7 @@
       else {const ang=i/Math.max(1,filtered.length)*Math.PI*2;x=Math.cos(ang)*9.3;z=Math.sin(ang)*6.6}
       const y=.35+(i%3)*.15;positions[a.id]=new T.Vector3(x,y,z);
       // Each asset is a compact physical-looking instrument/server plinth, not a floating sphere.
-      const group=new T.Group();group.position.copy(positions[a.id]);dataLayer.add(group);
+      const group=new T.Group();group.position.copy(positions[a.id]);group.scale.setScalar(1.12);dataLayer.add(group);
       const colorMat=mats[a.kind]||mats.transform;
       box(group,0,-.12,0,1.65,.2,1.12,mats.dark);
       box(group,0,.13,0,1.42,.42,.94,colorMat);
@@ -65,7 +65,7 @@
       ctx.fillStyle='#f1f1e9';ctx.font='600 29px Arial';ctx.fillText(a.name.length>25?a.name.slice(0,24)+'…':a.name,22,49);
       ctx.fillStyle='#b7c4bd';ctx.font='22px Arial';ctx.fillText(a.schema+'  /  '+a.kind,22,83);
       const tex=new T.CanvasTexture(canvas);tex.colorSpace=T.SRGBColorSpace;
-      const sprite=new T.Sprite(new T.SpriteMaterial({map:tex,transparent:true,depthTest:false}));sprite.position.set(x,1.55,z);sprite.scale.set(3.25,.82,1);dataLayer.add(sprite);
+      const sprite=new T.Sprite(new T.SpriteMaterial({map:tex,transparent:true,depthTest:false}));sprite.position.set(x,1.55,z);sprite.scale.set(3.75,.94,1);dataLayer.add(sprite);
     });
     // Structural conduit lines are routed through low, tidy waypoints; particles move along real relationships.
     edges.forEach(e=>{const from=positions[e[0]],to=positions[e[1]];if(!from||!to)return;
@@ -77,10 +77,10 @@
     // Background architectural consoles and vertical light wells.
     for(const side of [-1,1]){for(let i=0;i<4;i++){const z=-7+i*4.5;box(structure,side*14.4,.1,z,1.1,1.9,2.1,mats.dark);box(structure,side*14.4,.18,z,1.12,.08,1.85,mats.trim);const panel=new T.Mesh(new T.PlaneGeometry(.8,1.1),new T.MeshStandardMaterial({color:0x4b6b6b,emissive:0x274746,emissiveIntensity:.55,roughness:.3,metalness:.25}));panel.position.set(side*13.82,.8,z);panel.rotation.y=side===1?-Math.PI/2:Math.PI/2;structure.add(panel)}}
     const ray=new T.Raycaster(),pointer=new T.Vector2();let down=false,lastX=0,lastY=0,rotY=0,rotX=.1,zoom=1,target=new T.Vector3(0,0,0),raf=0,alive=true,dragMoved=false;
-    const updateCamera=()=>{const radius=27/zoom;camera.position.set(target.x+Math.sin(rotY)*radius,target.y+Math.max(-.1,Math.cos(rotX)*radius*.43),target.z+Math.cos(rotY)*radius);camera.lookAt(target)};
+    const updateCamera=()=>{const radius=23/zoom;camera.position.set(target.x+Math.sin(rotY)*radius,target.y+Math.max(-.1,Math.cos(rotX)*radius*.43),target.z+Math.cos(rotY)*radius);camera.lookAt(target)};
     updateCamera();
     const pointerDown=e=>{down=true;dragMoved=false;lastX=e.clientX;lastY=e.clientY;host.setPointerCapture?.(e.pointerId)};
-    let hovered=null;const pointerMove=e=>{if(!down){const rect=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);ray.setFromCamera(pointer,camera);const hits=ray.intersectObjects(nodeMeshes,true);let o=hits[0]?.object;while(o&&!o.userData.asset)o=o.parent;const next=o?.userData.asset?o:null;if(next!==hovered){if(hovered)hovered.scale.setScalar(1);hovered=next;if(hovered)hovered.scale.setScalar(1.045)}renderer.domElement.style.cursor=hovered?'pointer':'grab';return}const dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>2)dragMoved=true;rotY-=dx*.005;rotX=clamp(rotX+dy*.003,-.5,1.0);lastX=e.clientX;lastY=e.clientY;updateCamera()};
+    let hovered=null;const pointerMove=e=>{if(!down){const rect=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);ray.setFromCamera(pointer,camera);const hits=ray.intersectObjects(nodeMeshes,true);let o=hits[0]?.object;while(o&&!o.userData.asset)o=o.parent;const next=o?.userData.asset?o:null;if(next!==hovered){if(hovered)hovered.scale.setScalar(1.12);hovered=next;if(hovered)hovered.scale.setScalar(1.18)}renderer.domElement.style.cursor=hovered?'pointer':'grab';return}const dx=e.clientX-lastX,dy=e.clientY-lastY;if(Math.abs(dx)+Math.abs(dy)>2)dragMoved=true;rotY-=dx*.005;rotX=clamp(rotX+dy*.003,-.5,1.0);lastX=e.clientX;lastY=e.clientY;updateCamera()};
     const pointerUp=()=>{down=false};
     const wheel=e=>{zoom=clamp(zoom*(e.deltaY>0?.92:1.08),.55,1.75);updateCamera()};
     const click=e=>{if(dragMoved)return;const rect=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);ray.setFromCamera(pointer,camera);const hits=ray.intersectObjects(nodeMeshes,true);if(hits.length){let o=hits[0].object;while(o&&!o.userData.asset)o=o.parent;if(o?.userData.asset){const id=o.userData.asset.id;if(positions[id])target.copy(positions[id]);nodeMeshes.forEach(n=>{const h=n.children.find(c=>c.geometry?.type==='TorusGeometry');if(h){const active=n.userData.asset.id===id;h.material.color.setHex(active?0xf0d6a2:0x8da6a0);h.material.opacity=active?.95:.42;h.material.needsUpdate=true}});updateCamera();onSelect(id)}}};
