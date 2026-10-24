@@ -403,9 +403,92 @@ td .subline{margin-top:2px;font-size:12px;color:var(--faint)}
 .table-wrap{overflow-x:auto;max-width:100%;overscroll-behavior-x:contain}
 .table-wrap table{min-width:560px}
 th{position:sticky;top:0;z-index:1;background:var(--surface)}
+/* Phase 3: Design Polish - Typography and spacing */
+.page-heading h1{font-size:clamp(24px,5vw,32px);letter-spacing:-0.02em}
+.page-heading p{font-size:14px;line-height:1.6;max-width:72ch}
+h2,h3{letter-spacing:-0.01em}
+/* No thin rules or gradients - use solid separation */
+.horizontal-rule{border:0;border-top:2px solid var(--border);margin:20px 0}
+/* Remove eyebrows and index numbering */
+.eyebrow{display:none!important}
+.index-number{display:none!important}
+/* Improve button sizing for touch */
+.btn{min-height:40px;padding:8px 16px}
+.btn.small{min-height:36px;padding:4px 12px}
+/* Ensure no shadows on idle elements */
+.panel,.card,.asset-row{box-shadow:none}
+/* Active state gets subtle feedback */
+.panel:active,.card:active{opacity:0.9}
+/* Improve form field sizing */
+select,.field-input,.field input,.field select,.field textarea{min-height:40px;padding:8px 12px;font-size:14px}
+/* Better spacing in dense lists */
+.asset-row,.evidence-item{padding:12px 14px;border-bottom:1px solid var(--rule)}
+.asset-row:last-child{border-bottom:none}
+/* Section headers are meaningful, not decorative */
+.section-heading{font-size:16px;font-weight:600;margin:24px 0 12px;color:var(--text)}
+/* Data presentation - no invented numbers */
+.metric,.stat{font-feature-settings:"tnum"}
+.metric-value{font-size:24px;font-weight:600;line-height:1.1}
 :where(button,a,select,input,textarea){touch-action:manipulation}
 @media(max-width:640px){.panel-head{gap:10px;align-items:flex-start;flex-wrap:wrap}.panel-head .btn{max-width:100%}.modal{max-height:calc(100dvh - 24px);overflow-y:auto}.modal-backdrop{padding:12px;align-items:flex-start}.page-heading p{max-width:68ch}}
-@media(prefers-reduced-motion:reduce){.observatory-stage canvas{scroll-behavior:auto}}
+/* Phase 5: Edge Cases & Accessibility */
+/* Empty states */
+.empty-state{text-align:center;padding:48px 24px;color:var(--muted)}
+.empty-state svg{width:64px;height:64px;margin-bottom:16px;opacity:0.5}
+.empty-state h3{font-size:16px;font-weight:600;margin:12px 0 8px;color:var(--text)}
+.empty-state p{font-size:13px;line-height:1.6;max-width:48ch;margin:0 auto}
+/* Long name truncation with tooltip */
+.truncate-name{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.truncate-name:hover::after{content:attr(data-full-name);position:absolute;background:var(--panel);padding:6px 10px;border-radius:var(--radius);font-size:12px;white-space:nowrap;z-index:100;pointer-events:none;margin-top:4px;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+/* Handle missing fields gracefully */
+.field-missing,.value-empty{color:var(--faint);font-style:italic}
+.field-missing::before{content:"—";margin-right:4px}
+/* Huge numbers - format with units */
+.format-number{font-feature-settings:"tnum"}
+.large-number{font-weight:600}
+/* Handle zero items */
+.count-zero{opacity:0.6}
+/* Non-Latin text support */
+.text-cjk,.text-arabic,.text-rtl{font-family:system-ui,-apple-system,sans-serif;direction:auto}
+/* Emoji support */
+.allow-emoji{font-family:system-ui,-apple-system,"Apple Color Emoji","Segoe UI Emoji",sans-serif}
+/* Special characters in names */
+.monospace-id{font-family:var(--font-mono);word-break:break-all}
+/* Accessibility: focus visible always */
+*:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* High contrast mode support */
+@media(prefers-contrast:more){.btn,.panel,.card{border-width:2px}.text{color:var(--text);font-weight:500}}
+/* Dark mode media query for theme consistency */
+@media(prefers-color-scheme:dark){:root{color-scheme:dark}}
+/* Reduced motion strict */
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:0.01ms!important;transition-duration:0.01ms!important}}
+/* Worst-case data demo toggle */
+.worst-case-toggle{position:fixed;bottom:16px;right:16px;z-index:1000;font-size:12px}
+.worst-case-toggle input{margin-right:4px}
+/* When worst case is active, show edge cases */
+.show-worst-case .demo-placeholder{display:inline-block;background:var(--raised);padding:4px 8px;border-radius:var(--radius-chip);font-size:11px;color:var(--faint)}
+.show-worst-case .value-empty::before{content:"[missing]";margin-right:4px}
+/* Phase 4: Performance - no layout props animated, no inherited CSS vars, no unneeded will-change */
+/* Sidebar animation uses transform, not margin */
+.sidebar.collapsed{transform:translateX(-100%)!important;transition:transform 300ms var(--ease-app)}
+/* List animations use transform only - no height/width/padding */
+.list-item.entering{opacity:0;transform:translateY(8px);animation:fadeInUp 200ms var(--ease-out) forwards}
+/* Avoid animating inherited CSS variables - set transform directly */
+.drag-handle{cursor:grab}
+.drag-handle:active{cursor:grabbing}
+/* Graph/visualization performance */
+.graph-container{will-change:auto}
+.graph-container.panning{will-change:transform}
+/* Only promote layers when necessary */
+.modal{will-change:auto}
+.modal.entering{will-change:transform}
+/* Ensure no repeated style recalculation */
+.panel{contain:layout style paint}
+.asset-row{contain:content}
+/* Reduce blur cost - keep under 5px if animated */
+.soft-shadow{filter:drop-shadow(0 1px 2px rgba(0,0,0,0.1))}
+/* No filter: blur() animations - use opacity instead */
+.blur-transition{transition:opacity 200ms var(--ease-out)}
 
 /* Animation & entrance improvements */
 @keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
@@ -417,6 +500,16 @@ th{position:sticky;top:0;z-index:1;background:var(--surface)}
 .asset-row:nth-child(5){animation-delay:160ms}
 .asset-row:nth-child(6){animation-delay:200ms}
 .asset-row:nth-child(n+7){animation-delay:240ms}
+/* Phase 2: Craft Polish - Modal asymmetric timing */
 .modal{opacity:1;transform:scale(1);transition:opacity 200ms var(--ease-out),transform 200ms var(--ease-out)}
-.modal[data-ending-style]{opacity:0;transform:scale(0.95)}@supports not (animation: test) {.modal { animation: none; }}
+.modal[data-ending-style]{opacity:0;transform:scale(0.95);transition:opacity 150ms var(--ease-out),transform 150ms var(--ease-out)}@supporting not (animation: test) {.modal { animation: none; }}
 @starting-style{.modal{opacity:0;transform:scale(0.95)}}
+/* Dropdown/accordion entrance with scale instead of max-height */
+.nav-sublist{transform:scaleY(0);transform-origin:top;transition:transform 150ms var(--ease-out),opacity 150ms var(--ease-out);opacity:0}
+.nav-sublist:not([hidden]){transform:scaleY(1);opacity:1}
+/* Form field focus states */
+select:focus,input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(74,138,214,0.1)}
+/* Tooltip/popover origin awareness */
+.tooltip,.popover{transform-origin:var(--transform-origin,center);transition:opacity 125ms var(--ease-out),transform 125ms var(--ease-out)}
+.tooltip[data-ending-style],.popover[data-ending-style]{opacity:0;transform:scale(0.95)}
+@starting-style{.tooltip,.popover{opacity:0;transform:scale(0.95)}}

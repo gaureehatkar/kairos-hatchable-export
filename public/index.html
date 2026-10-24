@@ -62,7 +62,12 @@
   <div class="main-area">
     <header class="topbar"><button class="icon-btn menu-toggle" id="openNav" aria-label="Open navigation">☰</button><div class="breadcrumbs"><span>Workspace</span><b>/</b><strong id="breadcrumbTitle">Overview</strong></div><div class="top-actions"><label class="data-mode-control" for="dataModeSelect"><span>DATA</span><select id="dataModeSelect" aria-label="Choose data source"><option value="demo">Demo workspace</option><option value="postgresql">PostgreSQL catalog</option></select></label><div class="environment" id="environmentBadge"><span class="status-dot"></span>DEMO DATA</div><button class="top-icon" title="Search (Ctrl+K)" aria-label="Search workspace (Ctrl+K)" id="globalSearchButton">⌕</button><button class="top-icon" title="Help" aria-label="Help" id="helpButton">?</button><button class="top-avatar profile-avatar" type="button" data-view="settings" aria-label="Open profile and workspace settings">JS</button></div></header>
     <main id="mainContent" class="content"><div class="loading-state">Loading workspace…</div></main>
-    <footer class="footer"><span><i class="status-dot"></i> Kairos metadata engine <b>·</b> <span id="footerModeLabel">Demo mode</span></span><span>Evidence-first lineage <b>·</b> v0.1 prototype <b>·</b> build v124</span></footer>
+    <footer class="footer"><span><i class="status-dot"></i> Kairos metadata engine <b>·</b> <span id="footerModeLabel">Demo mode</span></span><span>Evidence-first lineage <b>·</b> v0.1 prototype <b>·</b> build v126</span></footer>
+    <!-- Phase 5: Worst-case data demo toggle -->
+    <label class="worst-case-toggle" title="Show worst-case data: long names, missing fields, huge numbers, edge cases">
+      <input type="checkbox" id="worstCaseToggle" aria-label="Toggle worst-case data demo" />
+      <span>Worst case</span>
+    </label>
   </div>
 </div>
 <div class="toast-region" id="toastRegion" aria-live="polite"></div>
