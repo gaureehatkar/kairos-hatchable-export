@@ -4,10 +4,11 @@ export const methods = ["POST"];
 const safe = (v, max=500) => String(v ?? "").slice(0,max);
 const jsonText = v => JSON.stringify(v ?? {});
 async function upsertAsset({id,qualifiedName,schemaName,kind,type,owner,description,columnCount,metadata}) {
-  await db.query(
-    "INSERT INTO kairos_assets (id, qualified_name, schema_name, asset_kind, asset_type, owner_name, description, column_count, metadata) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb) ON CONFLICT (qualified_name) DO UPDATE SET schema_name=EXCLUDED.schema_name, asset_kind=EXCLUDED.asset_kind, asset_type=EXCLUDED.asset_type, owner_name=EXCLUDED.owner_name, description=EXCLUDED.description, column_count=EXCLUDED.column_count, metadata=EXCLUDED.metadata, updated_at=now()",
+  const result = await db.query(
+    "INSERT INTO kairos_assets (id, qualified_name, schema_name, asset_kind, asset_type, owner_name, description, column_count, metadata) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9::jsonb) ON CONFLICT (qualified_name) DO UPDATE SET schema_name=EXCLUDED.schema_name, asset_kind=EXCLUDED.asset_kind, asset_type=EXCLUDED.asset_type, owner_name=EXCLUDED.owner_name, description=EXCLUDED.description, column_count=EXCLUDED.column_count, metadata=EXCLUDED.metadata, updated_at=now() RETURNING id, qualified_name",
     [id,qualifiedName,schemaName,kind,type,owner||null,description||null,columnCount||0,jsonText(metadata)]
   );
+  return result.rows?.[0] || {id, qualified_name:qualifiedName};
 }
 export default async function (req, res) {
   const body = req.body || {};
@@ -31,8 +32,8 @@ export default async function (req, res) {
         const cols = n.columns && typeof n.columns === "object" ? Object.keys(n.columns) : [];
         const kindValue = resource === "source" ? "source" : (resource === "exposure" || resource === "semantic_model" ? "output" : "transform");
         const metadata = {source_system:"dbt",unique_id:uid,resource_type:resource,package_name:n.package_name||null,original_file_path:n.original_file_path||null,raw_code_hash:n.raw_code_hash||null,columns:n.columns||{},tags:n.tags||[],depends_on:n.depends_on?.nodes||[],manifest_metadata:{dbt_version:payload.metadata?.dbt_version||null,generated_at:payload.metadata?.generated_at||null,manifest_version:payload.metadata?.manifest_version||null}};
-        await upsertAsset({id:assetId,qualifiedName,schemaName:schema,kind:kindValue,type:"dbt "+resource,owner:n.meta?.owner||n.owner||null,description:n.description||null,columnCount:cols.length,metadata});
-        uidToAsset.set(uid,{id:assetId,qualifiedName,uid});
+        const persistedAsset=await upsertAsset({id:assetId,qualifiedName,schemaName:schema,kind:kindValue,type:"dbt "+resource,owner:n.meta?.owner||n.owner||null,description:n.description||null,columnCount:cols.length,metadata});
+        uidToAsset.set(uid,{id:persistedAsset.id,qualifiedName,uid});
         assetsCreated++;
       }
       for (const [uid,n] of Object.entries(all)) {
@@ -62,8 +63,8 @@ export default async function (req, res) {
             if (!d || !d.name) { skipped++; continue; }
             const ns=safe(d.namespace||"unknown",500), name=safe(d.name,700), qn=safe("openlineage://"+ns+"/"+name,1200);
             const id=safe("ol:"+ns+":"+name,1200), schema=safe(ns,500);
-            await upsertAsset({id,qualifiedName:qn,schemaName:schema,kind:direction==="input"?"source":"output",type:"OpenLineage dataset",owner:null,description:null,columnCount:Array.isArray(d.facets?.schema?.fields)?d.facets.schema.fields.length:0,metadata:{source_system:"openlineage",namespace:ns,dataset_name:name,direction,facets:d.facets||{},last_run_id:runId,job_namespace:namespace,job_name:jobName}});
-            datasetMap.set(ns+"/"+name,{id,qualifiedName:qn}); assetsUpserted++;
+            const persistedAsset=await upsertAsset({id,qualifiedName:qn,schemaName:schema,kind:direction==="input"?"source":"output",type:"OpenLineage dataset",owner:null,description:null,columnCount:Array.isArray(d.facets?.schema?.fields)?d.facets.schema.fields.length:0,metadata:{source_system:"openlineage",namespace:ns,dataset_name:name,direction,facets:d.facets||{},last_run_id:runId,job_namespace:namespace,job_name:jobName}});
+            datasetMap.set(ns+"/"+name,{id:persistedAsset.id,qualifiedName:qn}); assetsUpserted++;
           }
         }
         const status=eventType==="COMPLETE"?"SUCCESS":eventType==="FAIL"?"FAILED":eventType==="START"?"RUNNING":"WARNING";
