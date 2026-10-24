@@ -16,9 +16,9 @@
   --blue-50:#082f49;--blue-100:#0369a1;--blue-700:#38bdf8;--blue-900:#bae6fd;
 
   /* Tier 2 - semantic tokens */
-  --ground:#090b0e;--surface:#12161c;--raised:#1a202c;--hover:#232d3f;
-  --border:#212836;--rule:#212836;--control:#2e384d;
-  --text:#f1f5f9;--muted:#94a3b8;--faint:#64748b;
+  --ground:#06080a;--surface:#0e1217;--raised:#151b23;--hover:#1d2633;
+  --border:#1f2937;--rule:#1f2937;--control:#2a3649;
+  --text:#e2e8f0;--muted:#94a3b8;--faint:#64748b;
   --primary:#6366f1;--accent:#14b8a6;
   --positive:#4ade80;--negative:#f87171;--warning:#fbbf24;
   --bg:var(--ground);--panel:var(--surface);--panel2:var(--raised);--panel3:var(--hover);
