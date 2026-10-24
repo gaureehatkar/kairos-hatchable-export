@@ -5,7 +5,7 @@
   function mount({host,assets,edges,selected,mode='overview',filter='all',onSelect=()=>{}}){
     if(!host || !T) return ()=>{};
     host.querySelectorAll('canvas[data-kairos-scene]').forEach(c=>c.remove());
-    const scene=new T.Scene(); scene.background=new T.Color(0x101a22); scene.fog=new T.FogExp2(0x101a22,.012);
+    const scene=new T.Scene(); scene.background=new T.Color(0x000000); scene.fog=new T.FogExp2(0x000000,.012);
     const camera=new T.PerspectiveCamera(43,Math.max(1,host.clientWidth)/Math.max(1,host.clientHeight),.1,180);
     camera.position.set(0,13,26);
     const renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
@@ -71,7 +71,7 @@
     edges.forEach(e=>{const from=positions[e[0]],to=positions[e[1]];if(!from||!to)return;
       const mid1=new T.Vector3(from.x,(from.y+to.y)/2+.55,from.z),mid2=new T.Vector3(to.x,(from.y+to.y)/2+.55,to.z);
       const curve=new T.CatmullRomCurve3([from.clone().add(new T.Vector3(0,.1,0)),mid1,mid2,to.clone().add(new T.Vector3(0,.1,0))]);
-      const tube=new T.Mesh(new T.TubeGeometry(curve,28,.025,6,false),new T.MeshStandardMaterial({color:0x8aaca7,metalness:.35,roughness:.4,emissive:0x253d39,emissiveIntensity:.6,transparent:true,opacity:.72}));dataLayer.add(tube);
+      const tube=new T.Mesh(new T.TubeGeometry(curve,28,.025,6,false),new T.MeshStandardMaterial({color:0xff3333,metalness:.35,roughness:.4,emissive:0xff0000,emissiveIntensity:1.0,transparent:true,opacity:.90}));dataLayer.add(tube);
       const bead=new T.Mesh(new T.SphereGeometry(.075,10,8),new T.MeshBasicMaterial({color:0xd7c69f}));dataLayer.add(bead);animated.push({bead,curve,phase:Math.random()});
     });
     // Background architectural consoles and vertical light wells.
@@ -92,7 +92,7 @@
     const resize=()=>{if(!host.isConnected)return;camera.aspect=Math.max(1,host.clientWidth)/Math.max(1,host.clientHeight);camera.updateProjectionMatrix();renderer.setSize(host.clientWidth,host.clientHeight)};
     window.addEventListener('resize',resize);
     const n=document.querySelector('#sceneNodes'),ed=document.querySelector('#sceneEdges');if(n)n.textContent=filtered.length;if(ed)ed.textContent=edges.filter(e=>positions[e[0]]&&positions[e[1]]).length;
-    const roomTitle=host.querySelector('.observatory-caption strong');if(roomTitle)roomTitle.textContent=mode==='lineage'?'Lineage Exploration Chamber':mode==='clusters'?'Cluster Laboratory':'Central Observatory';
+    const roomTitle=host.querySelector('.observatory-caption strong');if(roomTitle)roomTitle.textContent=mode==='lineage'?'Lineage Map (Updated v4)':mode==='clusters'?'Cluster Laboratory (Updated v4)':'Central Observatory (Updated v4)';
     return ()=>{alive=false;cancelAnimationFrame(raf);window.removeEventListener('resize',resize);renderer.domElement.removeEventListener('pointerdown',pointerDown);renderer.domElement.removeEventListener('pointermove',pointerMove);renderer.domElement.removeEventListener('pointerup',pointerUp);renderer.domElement.removeEventListener('pointercancel',pointerUp);renderer.domElement.removeEventListener('click',click);renderer.domElement.removeEventListener('wheel',wheel);zoomInButtons.forEach(b=>b.removeEventListener('click',zoomIn));zoomOutButtons.forEach(b=>b.removeEventListener('click',zoomOut));resetButtons.forEach(b=>b.removeEventListener('click',resetCamera));scene.traverse(o=>{o.geometry?.dispose?.();if(o.material){if(Array.isArray(o.material))o.material.forEach(m=>m.dispose?.());else o.material.dispose?.()}if(o.material?.map)o.material.map.dispose?.()});renderer.dispose();renderer.domElement.remove()};
   }
   window.KairosObservatory={mount};
