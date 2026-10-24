@@ -16,13 +16,13 @@
   --blue-50:#082f49;--blue-100:#0369a1;--blue-700:#38bdf8;--blue-900:#bae6fd;
 
   /* Tier 2 - semantic tokens */
-  --ground:#06080a;--surface:#0e1217;--raised:#151b23;--hover:#1d2633;
-  --border:#263244;--rule:#263244;--control:#324259;
-  --text:#f1f5f9;--muted:#cbd5e1;--faint:#94a3b8;
+  --ground:#06080a;--surface:#111827;--raised:#1f2937;--hover:#374151;
+  --border:#374151;--rule:#374151;--control:#4b5563;
+  --text:#ffffff;--muted:#e2e8f0;--faint:#cbd5e1;
   --primary:#6366f1;--accent:#14b8a6;
   --positive:#4ade80;--negative:#f87171;--warning:#fbbf24;
   --bg:var(--ground);--panel:var(--surface);--panel2:var(--raised);--panel3:var(--hover);
-  --line:var(--border);--line2:var(--control);--soft:var(--slate-700);
+  --line:var(--border);--line2:var(--control);--soft:#cbd5e1;
   --mint:#14b8a6;--blue:#38bdf8;--amber:#fbbf24;--red:#f87171;--green:#4ade80;--purple:#c084fc;
   
   /* Smooth corners */
