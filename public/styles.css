@@ -1,36 +1,37 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Public+Sans:wght@400;500;600;700&display=swap');
 /* ==========================================================================
-   KAIROS design system v3
-   Sources: taste-skill app-screen rules (flat, bordered, no glow/gradient),
-   design-systems (3-tier tokens), design-elevation (Tailwind slate scale, 4px grid),
-   interaction-design (sovereign posture: dense, muted, distinct states),
-   accessibility-audit (4.5:1 text, visible focus, 44px touch targets),
-   design-council (Rams: every element earns its place; three-step type).
+   KAIROS design system v4
+   Applied aesthetic: Minimal, modern corporate. Strict geometric layout.
    ========================================================================== */
 
 /* Tier 1 - reference values */
 :root{
-  --slate-50:#f8fafc;--slate-100:#f1f5f9;--slate-200:#e2e8f0;--slate-300:#cbd5e1;--slate-400:#94a3b8;
-  --slate-500:#64748b;--slate-600:#475569;--slate-700:#334155;--slate-900:#0f172a;
-  --teal-50:#f0fdfa;--teal-100:#ccfbf1;--teal-700:#0f766e;--teal-800:#115e59;
-  --green-50:#f0fdf4;--green-100:#dcfce7;--green-700:#15803d;--green-900:#14532d;
-  --red-50:#fef2f2;--red-100:#fee2e2;--red-700:#b91c1c;--red-900:#7f1d1d;
-  --amber-50:#fffbeb;--amber-100:#fef3c7;--amber-700:#b45309;--amber-900:#78350f;
-  --blue-50:#eff6ff;--blue-100:#dbeafe;--blue-700:#1d4ed8;--blue-900:#1e3a8a;
+  --slate-50:#fafafa;--slate-100:#f5f5f5;--slate-200:#e5e5e5;--slate-300:#d4d4d4;--slate-400:#a3a3a3;
+  --slate-500:#737373;--slate-600:#525252;--slate-700:#404040;--slate-900:#111111;
+  
+  /* Corporate / Vintage Muted Accents */
+  --teal-50:#f8fafc;--teal-100:#e2e8f0;--teal-700:#334155;--teal-800:#1e293b;
+  --green-50:#f3f7f4;--green-100:#e3eee6;--green-700:#2e4c38;--green-900:#1a2e20;
+  --red-50:#fdf5f5;--red-100:#fae6e6;--red-700:#6e2d2d;--red-900:#4a1b1b;
+  --amber-50:#fcf9f5;--amber-100:#f5ece1;--amber-700:#7b5628;--amber-900:#523716;
+  --blue-50:#f5f7fa;--blue-100:#e1e8f0;--blue-700:#2c3e50;--blue-900:#1a252f;
 
-  /* Tier 2 - semantic tokens (legacy names kept so ingestion.html and old rules still resolve) */
-  --ground:var(--slate-50);--surface:#fff;--raised:var(--slate-100);--hover:var(--slate-100);
-  --border:var(--slate-200);--rule:var(--slate-100);--control:var(--slate-300);
-  --text:var(--slate-900);--muted:var(--slate-600);--faint:var(--slate-500);
-  --primary:var(--slate-900);--accent:var(--teal-700);
+  /* Tier 2 - semantic tokens */
+  --ground:#f7f7f7;--surface:#ffffff;--raised:#f2f2f2;--hover:#f5f5f5;
+  --border:#e0e0e0;--rule:#ebebeb;--control:#cccccc;
+  --text:#111111;--muted:#555555;--faint:#888888;
+  --primary:#111111;--accent:#111111;
   --positive:var(--green-700);--negative:var(--red-700);--warning:var(--amber-700);
   --bg:var(--ground);--panel:var(--surface);--panel2:var(--slate-50);--panel3:var(--slate-100);
   --line:var(--border);--line2:var(--control);--soft:var(--slate-700);
-  --mint:var(--accent);--blue:var(--blue-700);--amber:var(--amber-700);--red:var(--red-700);--green:var(--green-700);--purple:var(--slate-600);
-  --radius:8px;--radius-control:6px;--radius-chip:4px;--sidebar:248px;--topbar:56px;
-  --font:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,monospace;
-  --fs-title:24px;--fs-section:15px;--fs-body:14px;--fs-small:12px;--fs-meta:11px;
-  --focus:0 0 0 2px #fff,0 0 0 4px var(--teal-700);
+  --mint:var(--green-700);--blue:var(--blue-700);--amber:var(--amber-700);--red:var(--red-700);--green:var(--green-700);--purple:var(--slate-600);
+  
+  /* Strict geometric corners */
+  --radius:0px;--radius-control:0px;--radius-chip:0px;--sidebar:248px;--topbar:56px;
+  
+  /* Clean typography */
+  --font:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;--font-mono:ui-monospace,Menlo,Monaco,'Cascadia Mono','Segoe UI Mono',monospace;
+  --fs-title:22px;--fs-section:14px;--fs-body:13px;--fs-small:12px;--fs-meta:11px;
+  --focus:0 0 0 1px #fff,0 0 0 3px #111;
   color-scheme:light;
 }
 
