@@ -492,6 +492,36 @@ td{color:var(--text)}
   from { stroke-dashoffset: 28; }
   to { stroke-dashoffset: 0; }
 }
+
+@keyframes pulseGlow {
+  0% { filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.4)); }
+  50% { filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.85)); }
+  100% { filter: drop-shadow(0 0 2px rgba(16, 185, 129, 0.4)); }
+}
+
+@keyframes floatNode {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
+  100% { transform: translateY(0px); }
+}
+
+.lineage-graph-svg path {
+  transition: stroke 0.25s cubic-bezier(0.16, 1, 0.3, 1), stroke-width 0.25s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
+}
+
+.lineage-graph-svg g[role="button"] {
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+}
+
+.lineage-graph-svg g[role="button"]:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.lineage-graph-svg g[role="button"]:focus-visible rect {
+  stroke: #5ff3c5 !important;
+  stroke-width: 3px !important;
+  filter: drop-shadow(0 0 8px rgba(95, 243, 197, 0.7));
+}
 .asset-glyph.transform{color:#b8c4d8}
 .state-unknown{color:#b8c4d8}
 .health-foot b{color:var(--text)}
