@@ -19,13 +19,21 @@ export default async function (req, res) {
     const hasManifestSections = ["nodes","sources","exposures"].some(key => payload[key] && typeof payload[key] === "object" && !Array.isArray(payload[key]));
     if (!hasManifestSections) return res.status(400).json({ok:false,error:"invalid_dbt_manifest",message:"This does not look like a dbt manifest. Expected at least one object section: nodes, sources, or exposures."});
   }
+  if (kind === "metadata_graph") {
+    if (!Array.isArray(payload.assets) || !Array.isArray(payload.relationships || [])) return res.status(400).json({ok:false,error:"invalid_metadata_graph",message:"Provide assets: [] and relationships: [] arrays. Each asset needs a stable id and name; each relationship needs source and target asset IDs."});
+    const invalidAsset = payload.assets.findIndex(a => !a || typeof a !== "object" || !String(a.id||"").trim() || !String(a.name||a.qualified_name||"").trim());
+    if (invalidAsset !== -1) return res.status(400).json({ok:false,error:"invalid_metadata_asset",message:"Each asset must have id and name (or qualified_name). Invalid asset at index "+invalidAsset+"."});
+    const ids = new Set(payload.assets.map(a=>String(a.id)));
+    const invalidRelationship = (payload.relationships||[]).findIndex(e => !e || typeof e !== "object" || !String(e.source_id||"").trim() || !String(e.target_id||"").trim());
+    if (invalidRelationship !== -1) return res.status(400).json({ok:false,error:"invalid_metadata_relationship",message:"Each relationship must have source_id and target_id. Invalid relationship at index "+invalidRelationship+"."});
+  }
   if (kind === "openlineage_event") {
     const events = Array.isArray(payload) ? payload : [payload];
     const invalidIndex = events.findIndex(event => !event || typeof event !== "object" || Array.isArray(event) || !event.job || typeof event.job.name !== "string" || !event.job.name.trim() || !event.run || typeof event.run.runId !== "string" || !event.run.runId.trim());
     if (invalidIndex !== -1) return res.status(400).json({ok:false,error:"invalid_openlineage_event",message:"Every event must include job.name and run.runId. Invalid event at index "+invalidIndex+"."});
     if (!events.length) return res.status(400).json({ok:false,error:"empty_event_batch",message:"Choose a non-empty array of OpenLineage events."});
   }
-  if (kind !== "dbt_manifest" && kind !== "openlineage_event") return res.status(400).json({ok:false,error:"unsupported_kind",message:"kind must be dbt_manifest or openlineage_event."});
+  if (kind !== "dbt_manifest" && kind !== "openlineage_event" && kind !== "metadata_graph") return res.status(400).json({ok:false,error:"unsupported_kind",message:"kind must be dbt_manifest, openlineage_event, or metadata_graph."});
   try {
     if (kind === "dbt_manifest") {
       const nodes = payload.nodes || {}, sources = payload.sources || {}, exposures = payload.exposures || {};
