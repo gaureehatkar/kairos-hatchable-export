@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1020">
+<title>Kairos — Metadata Lineage Platform</title>
+<link rel="stylesheet" href="/styles.css">
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">K<span>·</span></div><div><strong>KAIROS</strong><small>METADATA PLATFORM</small></div><button class="icon-btn mobile-close" id="closeNav" aria-label="Close navigation">×</button></div>
+    <div class="workspace-switch"><div class="workspace-icon">R</div><div><strong>Research workspace</strong><small>Production environment</small></div><span class="chevron">⌄</span></div>
+    <div class="nav-label">WORKSPACE</div>
+    <nav class="nav-list" aria-label="Main navigation">
+      <button class="nav-item active" data-view="overview"><span class="nav-icon">◫</span>Overview</button>
+      <button class="nav-item" data-view="assets"><span class="nav-icon">▤</span>Data assets <span class="nav-count">24</span></button>
+      <button class="nav-item" data-view="lineage"><span class="nav-icon">⌘</span>Lineage explorer</button>
+      <button class="nav-item" data-view="sql"><span class="nav-icon">‹ ›</span>SQL analysis</button>
+      <button class="nav-item" data-view="evidence"><span class="nav-icon">◈</span>Evidence & reasoning</button>
+      <button class="nav-item" data-view="runs"><span class="nav-icon">↻</span>Pipeline runs</button>
+      <button class="nav-item" data-view="history"><span class="nav-icon">◷</span>Time travel</button>
+      <button class="nav-item" data-view="observatory"><span class="nav-icon">◎</span>3D observatory <span class="nav-tag">BETA</span></button>
+    </nav>
+    <div class="nav-label nav-label-spaced">GOVERNANCE</div>
+    <nav class="nav-list">
+      <button class="nav-item" data-view="quality"><span class="nav-icon">◇</span>Data quality</button>
+      <button class="nav-item" data-view="catalog"><span class="nav-icon">▦</span>Catalog & schemas</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="health-card"><div class="health-top"><span class="status-dot"></span><strong>System status</strong><span class="health-live">DEMO</span></div><p>Sample workspace · not connected to production</p><div class="health-meter"><i></i></div><div class="health-foot"><span>Services represented</span><b>4 / 4</b></div></div>
+      <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span>Settings</button>
+      <div class="user-row"><div class="avatar">JS</div><div><strong>Workspace admin</strong><small>Local demo session</small></div><span class="more">•••</span></div>
+    </div>
+  </aside>
+  <div class="main-area">
+    <header class="topbar"><button class="icon-btn menu-toggle" id="openNav" aria-label="Open navigation">☰</button><div class="breadcrumbs"><span>Workspace</span><b>/</b><strong id="breadcrumbTitle">Overview</strong></div><div class="top-actions"><div class="environment"><span class="status-dot"></span>DEMO DATA</div><button class="top-icon" title="Search" id="globalSearchButton">⌕</button><button class="top-icon" title="Help" id="helpButton">?</button><div class="top-avatar">JS</div></div></header>
+    <main id="mainContent" class="content"><div class="loading-state">Loading workspace…</div></main>
+    <footer class="footer"><span><i class="status-dot"></i> Kairos metadata engine <b>·</b> Demo mode</span><span>Evidence-first lineage <b>·</b> v0.1 prototype</span></footer>
+  </div>
+</div>
+<div class="toast-region" id="toastRegion" aria-live="polite"></div>
+<div class="modal-backdrop" id="modalBackdrop" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><div class="eyebrow" id="modalEyebrow">KAIROS</div><h2 id="modalTitle">Details</h2></div><button class="icon-btn" id="modalClose" aria-label="Close dialog">×</button></div><div id="modalBody"></div></section></div>
+<script src="/app.js"></script>
+</body></html>
