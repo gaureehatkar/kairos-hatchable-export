@@ -61,10 +61,16 @@ button,[role="button"],.nav-item,.btn,.icon-btn,.top-icon,.clickable{touch-actio
 
 /* Shell: labelled sidebar on the ground, hairline edge */
 .app-shell{min-height:100dvh}
-.sidebar{position:fixed;inset:0 auto 0 0;z-index:30;display:flex;flex-direction:column;width:var(--sidebar);padding:16px 12px 12px;overflow-y:auto;background:var(--ground);border-right:1px solid var(--border)}
-.main-area{display:flex;flex-direction:column;min-width:0;min-height:100dvh;margin-left:var(--sidebar)}
+.sidebar{position:fixed;inset:0 auto 0 0;z-index:30;display:flex;flex-direction:column;width:var(--sidebar);padding:16px 12px 12px;overflow-y:auto;background:var(--ground);border-right:1px solid var(--border);transition:transform .25s var(--ease-out);transform:translateX(0)}
+	.sidebar.collapsed{transform:translateX(-100%)}
+	@media (max-width:768px){.sidebar{width:100%;max-width:280px}.sidebar:not(.collapsed){box-shadow:0 4px 24px rgba(0,0,0,.3)}}
+.main-area{display:flex;flex-direction:column;min-width:0;min-height:100dvh;margin-left:var(--sidebar);transition:margin-left .25s var(--ease-out)}
+	@media (max-width:768px){.main-area{margin-left:0}}
+	.sidebar.collapsed~.main-area{margin-left:0}
 .content{flex:1;width:100%;max-width:1680px;margin:0 auto;padding:24px var(--pad) 40px}
 .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:16px;height:var(--topbar);padding:0 var(--pad);background:var(--ground);border-bottom:1px solid var(--border)}
+	.menu-toggle{display:none}
+	@media (max-width:768px){.menu-toggle{display:flex}}
 .footer{display:flex;justify-content:space-between;gap:12px;padding:12px var(--pad);border-top:1px solid var(--border);font-size:12px;color:var(--faint)}
 .footer b{padding:0 4px;font-weight:400;color:var(--control)}.footer .status-dot{margin-right:6px}
 .loading-state{padding:64px;text-align:center;color:var(--muted)}
@@ -1781,6 +1787,81 @@ button,select{
 }
 
 /* Transition curves defined */
+
+/* ========================================================================
+   PHASE 2: Mobile & Interaction Bundle
+   1. Sidebar Collapse Toggle (responsive drawer on mobile)
+   2. Graph Tooltips (GPU-only reveal animation)
+   3. Toast Swipe-to-Dismiss (momentum gesture feedback)
+   4. Table Row Hover Lift (desktop-only subtle shadow + scale)
+   ======================================================================== */
+
+/* IMPROVEMENT 1: Sidebar Collapse Toggle */
+.sidebar { transition: transform 0.25s var(--ease-out); }
+.sidebar.collapsed { transform: translateX(-100%); }
+
+@media (max-width: 768px) {
+  .menu-toggle { display: flex !important; }
+  .sidebar { position: fixed; width: 100%; max-width: 280px; inset: 0 auto 0 0; }
+  .sidebar:not(.collapsed) { box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3); }
+  .main-area { margin-left: 0; }
+  .mobile-close { display: flex !important; }
+}
+
+/* IMPROVEMENT 2: Graph Tooltips */
+.graph-tooltip {
+  position: absolute; bottom: 100%; left: 50%;
+  transform: translateX(-50%) translateY(-8px) scale(0.95);
+  opacity: 0; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 8px 12px; font-size: 12px;
+  white-space: nowrap; pointer-events: none;
+  transition: opacity 0.15s var(--ease-out), transform 0.15s var(--ease-out);
+  z-index: 50;
+}
+.graph-tooltip.visible {
+  opacity: 1; transform: translateX(-50%) translateY(-12px) scale(1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .graph-tooltip { transition: none; }
+  .graph-tooltip.visible { opacity: 1; transform: translateX(-50%) translateY(-12px) scale(1); }
+}
+
+/* IMPROVEMENT 3: Toast Swipe-to-Dismiss */
+.toast-region {
+  touch-action: pan-y; position: fixed; bottom: 16px; right: 16px; z-index: 100;
+  display: flex; flex-direction: column; gap: 8px; max-width: 360px;
+}
+.toast {
+  position: relative; overflow: hidden; background: var(--surface);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 12px 16px; font-size: 13px; color: var(--text);
+  display: flex; align-items: center; gap: 12px;
+  animation: toastSlideIn 0.2s var(--ease-out);
+  transition: transform 0.2s var(--ease-out), opacity 0.2s var(--ease-out);
+  will-change: transform; cursor: grab;
+}
+.toast.active { cursor: grabbing; }
+.toast.swipe-out { transform: translateX(120%); opacity: 0; pointer-events: none; }
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translateX(120%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.toast.error { background: rgba(229, 86, 111, 0.08); border-color: var(--red-500); }
+
+/* IMPROVEMENT 4: Table Row Hover Lift */
+@media (hover: hover) and (pointer: fine) {
+  table tbody tr {
+    transition: background 0.15s var(--ease-out), transform 0.15s var(--ease-out), box-shadow 0.15s var(--ease-out);
+  }
+  table tbody tr:hover { background: var(--hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); }
+}
+@media (prefers-reduced-motion: reduce) {
+  table tbody tr:hover { transform: none; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08); }
+}
+@media (max-width: 768px) {
+  table tbody tr { border-bottom: 1px solid var(--border); }
+  table tbody tr:active { background: var(--hover); }
+}
 :root{
   --ease-out-slow:cubic-bezier(0.23,1,0.32,1);
 }
