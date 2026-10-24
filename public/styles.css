@@ -409,22 +409,22 @@ td .subline{margin-top:2px;font-size:var(--fs-small);color:var(--faint)}
 
 /* Gallery-Grade Motion & Interactive Micro-Interactions (Awwwards / Linear / Vercel grade) */
 .btn, .nav-item, .top-icon, .icon-btn, .stat-card, .room-card, .reasoning-item, .impact-score-tile, select, input {
-  transition: transform 0.25s var(--ease-spring), background 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease, opacity 0.2s ease;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.2s ease, border-color 0.2s ease, box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
 }
 .btn:hover, .top-icon:hover, .icon-btn:hover {
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 24px rgba(124, 140, 255, 0.18);
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 12px 32px rgba(124, 140, 255, 0.28), 0 0 0 1px var(--accent);
 }
 .btn:active, .top-icon:active, .icon-btn:active {
-  transform: translateY(1px) scale(0.98);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  transform: translateY(1px) scale(0.96);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.4);
 }
 .nav-item:hover {
-  transform: translateX(4px);
+  transform: translateX(6px);
 }
 .stat-card:hover, .room-card:hover, .impact-score-tile:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.35);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.4), 0 0 16px rgba(94, 234, 212, 0.15);
   border-color: var(--accent);
 }
 .btn.primary {
@@ -434,13 +434,16 @@ td .subline{margin-top:2px;font-size:var(--fs-small);color:var(--faint)}
 .btn.primary::after {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(120deg, transparent, rgba(255,255,255,0.25), transparent);
-  transform: translateX(-100%);
-  transition: transform 0.6s ease;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.35), transparent);
+  transform: rotate(45deg) translateX(-100%);
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .btn.primary:hover::after {
-  transform: translateX(100%);
+  transform: rotate(45deg) translateX(100%);
 }
 body{background:var(--ground);color:var(--text);line-height:1.55}
 .panel,.stat-grid,.stat-card,.table-wrap,.workspace-switch,.health-card,.reasoning-item,.room-card,.column-graph-scroll,.column-map-detail,.impact-scorecard,.impact-score-tile{border-color:var(--border)}
