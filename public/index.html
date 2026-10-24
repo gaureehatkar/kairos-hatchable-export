@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b1020">
+<meta name="theme-color" content="#f5f7fa">
 <title>Kairos — Metadata Lineage Platform</title>
 <link rel="stylesheet" href="/styles.css">
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
@@ -41,7 +41,7 @@
   <div class="main-area">
     <header class="topbar"><button class="icon-btn menu-toggle" id="openNav" aria-label="Open navigation">☰</button><div class="breadcrumbs"><span>Workspace</span><b>/</b><strong id="breadcrumbTitle">Overview</strong></div><div class="top-actions"><label class="data-mode-control" for="dataModeSelect"><span>DATA</span><select id="dataModeSelect" aria-label="Choose data source"><option value="demo">Demo workspace</option><option value="postgresql">PostgreSQL catalog</option></select></label><div class="environment" id="environmentBadge"><span class="status-dot"></span>DEMO DATA</div><button class="top-icon" title="Search" id="globalSearchButton">⌕</button><button class="top-icon" title="Help" id="helpButton">?</button><div class="top-avatar">JS</div></div></header>
     <main id="mainContent" class="content"><div class="loading-state">Loading workspace…</div></main>
-    <footer class="footer"><span><i class="status-dot"></i> Kairos metadata engine <b>·</b> Demo mode</span><span>Evidence-first lineage <b>·</b> v0.1 prototype</span></footer>
+    <footer class="footer"><span><i class="status-dot"></i> Kairos metadata engine <b>·</b> <span id="footerModeLabel">Demo mode</span></span><span>Evidence-first lineage <b>·</b> v0.1 prototype</span></footer>
   </div>
 </div>
 <div class="toast-region" id="toastRegion" aria-live="polite"></div>
