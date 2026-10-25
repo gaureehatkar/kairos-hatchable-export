@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#0b1120">
+<meta name="theme-color" content="#F3F4F6">
 <title>Kairos — Metadata Lineage Platform</title>
-<link rel="stylesheet" href="/styles.css?v=10">
+<script>try{var t=localStorage.getItem('kairos_theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
+<link rel="stylesheet" href="/styles.neo.css?v=1">
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="/observatory.js?v=5"></script>
@@ -17,7 +18,7 @@
 <a class="skip-link" href="#mainContent">Skip to main content</a>
 <div class="app-shell">
   <aside class="sidebar" id="sidebar">
-    <div class="brand"><img src="/logo.png" alt="Kairos Logo" style="width:32px; height:32px; border-radius:4px; filter: grayscale(100%);"><div><strong>KAIROS</strong><small>METADATA PLATFORM</small></div><button class="icon-btn mobile-close" id="closeNav" aria-label="Close navigation">×</button><button class="icon-btn" id="sidebarToggleBtn" aria-label="Toggle sidebar" title="Collapse sidebar" style="margin-left:auto; width:28px; height:28px; font-size:12px;">◀</button></div>
+    <div class="brand"><img class="brand-logo" src="/logo.png" alt="Kairos logo"><div><strong>KAIROS</strong><small>METADATA PLATFORM</small></div><button class="icon-btn mobile-close" id="closeNav" aria-label="Close navigation">×</button><button class="icon-btn" id="sidebarToggleBtn" aria-label="Toggle sidebar" title="Collapse sidebar" style="margin-left:auto; width:28px; height:28px; font-size:12px;">◀</button></div>
     <div class="workspace-switch"><div class="workspace-icon">R</div><div><strong>Research workspace</strong><small>Sample environment</small></div><span class="chevron">⌄</span></div>
     <div class="nav-label">Workspace</div>
     <nav class="nav-list nav-groups" aria-label="Main navigation">
@@ -60,15 +61,10 @@
     </div>
   </aside>
   <div class="main-area">
-    <header class="topbar"><button class="icon-btn menu-toggle" id="openNav" aria-label="Open navigation">☰</button><div class="breadcrumbs"><span>Workspace</span><b>/</b><strong id="breadcrumbTitle">Overview</strong></div><div class="top-actions"><label class="data-mode-control" for="dataModeSelect"><span>DATA</span><select id="dataModeSelect" aria-label="Choose data source"><option value="demo">Demo workspace</option><option value="postgresql">PostgreSQL catalog</option></select></label><div class="environment" id="environmentBadge"><span class="status-dot"></span>DEMO DATA</div><button class="top-icon" title="Search (Ctrl+K)" aria-label="Search workspace (Ctrl+K)" id="globalSearchButton">⌕</button><button class="top-icon" title="Help" aria-label="Help" id="helpButton">?</button><button class="top-avatar profile-avatar" type="button" data-view="settings" aria-label="Open profile and workspace settings">JS</button></div></header>
+    <header class="topbar"><button class="icon-btn menu-toggle" id="openNav" aria-label="Open navigation">☰</button><div class="breadcrumbs"><span>Workspace</span><b>/</b><strong id="breadcrumbTitle">Overview</strong></div><div class="top-actions"><label class="data-mode-control" for="dataModeSelect"><span>DATA</span><select id="dataModeSelect" aria-label="Choose data source"><option value="demo">Demo workspace</option><option value="postgresql">PostgreSQL catalog</option></select></label><div class="environment" id="environmentBadge"><span class="status-dot"></span>DEMO DATA</div><button class="top-icon" id="themeToggle" title="Switch light / dark" aria-label="Switch between light and dark theme">◐</button><button class="top-icon" title="Search (Ctrl+K)" aria-label="Search workspace (Ctrl+K)" id="globalSearchButton">⌕</button><button class="top-icon" title="Help" aria-label="Help" id="helpButton">?</button><button class="top-avatar profile-avatar" type="button" data-view="settings" aria-label="Open profile and workspace settings">JS</button></div></header>
     <main id="mainContent" class="content"><div class="loading-state">Loading workspace…</div></main>
     <footer class="footer"><span><i class="status-dot"></i> Kairos metadata engine <b>·</b> <span id="footerModeLabel">Demo mode</span></span><span>Evidence-first lineage <b>·</b> v0.1 prototype <b>·</b> build v128</span></footer>
-    <!-- Phase 5: Worst-case data demo toggle -->
-    <label class="worst-case-toggle" title="Show worst-case data: long names, missing fields, huge numbers, edge cases">
-      <input type="checkbox" id="worstCaseToggle" aria-label="Toggle worst-case data demo" />
-      <span>Worst case</span>
-    </label>
-  </div>
+    </div>
 </div>
 <div class="toast-region" id="toastRegion" aria-live="polite"></div>
 <div class="modal-backdrop" id="modalBackdrop" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><h2 id="modalTitle">Details</h2></div><button class="icon-btn" id="modalClose" aria-label="Close dialog">×</button></div><div id="modalBody"></div></section></div>
