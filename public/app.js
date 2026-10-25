@@ -198,58 +198,7 @@ else if(a==='schema'){S.assetSearch=b.dataset.schema;S.assetFilter='all';go('ass
 else if(a==='reset-3d'){render()}
 else if(a==='room'){if($('#roomMode'))$('#roomMode').value=b.dataset.room;three();toast('Room layout changed.')}
 
-/* SVG Graph Enhancements: Add data attributes for CSS styling & interactions */
-function enhanceSVGGraphs(){
-  /* Node rectangles: add kind-based styling */
-  $$('.graph-stage svg rect').forEach(rect=>{
-    const nodeId=rect.getAttribute('id')||rect.parentElement.getAttribute('id');
-    const sourceAsset=A.find(a=>a.id===nodeId);
-    if(sourceAsset){
-      rect.setAttribute('data-node',sourceAsset.kind);
-      rect.setAttribute('data-id',sourceAsset.id);
-    }
-  });
-  /* Edge lines: add state-based coloring */
-  $$('.graph-stage svg line').forEach(line=>{
-    const fromAttr=line.getAttribute('data-from');
-    const toAttr=line.getAttribute('data-to');
-    if(fromAttr&&toAttr){
-      const evidence=V.find(ev=>ev.source===A.find(a=>a.id===fromAttr)?.path&&ev.target===A.find(a=>a.id===toAttr)?.path);
-      line.setAttribute('data-edge',evidence?.state.toLowerCase()||'unknown');
-      line.style.cursor='pointer';
-    }
-  });
-  /* Column lineage: semantic data attributes */
-  $$('.column-lineage-svg rect').forEach(rect=>rect.setAttribute('data-column','true'));
-  $$('.column-lineage-svg line').forEach(line=>line.setAttribute('data-edge','column'));
-}
-setTimeout(enhanceSVGGraphs,100);
-const origRender=render;
-render=function(){
-  origRender.apply(this,arguments);
-  setTimeout(enhanceSVGGraphs,50);
-};
-
-/* Keyboard navigation */
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'&&S.selected){S.selected=null;render();return}
-  if(e.key==='Tab'&&S.lineageView){const rows=$$('.lineage-row');const idx=rows.indexOf($('.lineage-row.selected'));const next=e.shiftKey?Math.max(0,idx-1):Math.min(rows.length-1,idx+1);if(next>=0){rows[next].focus();rows[next].click()}e.preventDefault()}
-  if((e.key==='ArrowUp'||e.key==='ArrowDown')&&S.lineageView){const rows=$$('.lineage-row');const idx=rows.indexOf($('.lineage-row.selected'));const next=e.key==='ArrowUp'?Math.max(0,idx-1):Math.min(rows.length-1,idx+1);if(next>=0){rows[next].focus();rows[next].click()}e.preventDefault()}
-  if(e.key==='Enter'&&$('.lineage-row:focus')){$('.lineage-row:focus').click()}
-  if(e.key==='+'||e.key==='='&&e.ctrlKey){if(S.observatoryMode)window.KairosObservatory?.mount?.({host:$('.observatory-stage'),zoom:(window.zoomLevel||1)*1.15})} 
-  if(e.key==='-'&&e.ctrlKey){if(S.observatoryMode)window.KairosObservatory?.mount?.({host:$('.observatory-stage'),zoom:(window.zoomLevel||1)/1.15})}
-  if(e.key==='r'&&e.ctrlKey&&S.observatoryMode){window.KairosObservatory?.mount?.({host:$('.observatory-stage'),zoom:1});e.preventDefault()}
-});
-
-/* Worst-case data toggle enhancement */
-const toggleWorstCase=()=>{
-  const isWorstCase=$('#worstCaseToggle').checked;
-  localStorage.setItem('kairos_worstCase',isWorstCase?'true':'false');
-  document.body.classList.toggle('show-worst-case',isWorstCase);
-  render();
-};
-$('#worstCaseToggle')?.addEventListener('change',toggleWorstCase);
-if(localStorage.getItem('kairos_worstCase')==='true'){$('#worstCaseToggle').checked=true;toggleWorstCase();}
+/* Removed: decorative SVG enhancement layer plus duplicate keyboard and worst-case wiring. It sat inside the click handler (re-wrapping render() on every click) and only fed glow/scale styles. */
 else if(a==='toggle-pref'){const k='kairos_'+b.dataset.pref,n=localStorage.getItem(k)!=='true';localStorage.setItem(k,String(n));render();toast('Preference '+(n?'enabled':'disabled')+'.')}
 else if(a==='save-profile'){const name=$('#profileName')?.value.trim()||'Workspace admin';try{localStorage.setItem('kairos_profileName',name);if(profileDraftImage!==null){if(profileDraftImage)localStorage.setItem('kairos_profilePicture',profileDraftImage);else localStorage.removeItem('kairos_profilePicture')}profileDraftImage=null;syncProfileAvatars();const msg=$('#profileMessage');if(msg)msg.textContent='Profile saved in this browser.';toast('Profile saved on this browser.')}catch(err){toast('Could not save the profile picture in this browser. Try a smaller image.',true)}}else if(a==='remove-profile-picture'){profileDraftImage='';const initials=profileInitials($('#profileName')?.value||localStorage.getItem('kairos_profileName')||'Workspace admin');$$('.profile-avatar').forEach(el=>paintAvatar(el,'',initials));const input=$('#profileImageInput');if(input)input.value='';const msg=$('#profileMessage');if(msg)msg.textContent='Picture removal is previewed. Select Save profile to confirm.';toast('Picture removal previewed. Save profile to confirm.')}else if(a==='save-settings'){const label=$('#workspaceLabel')?.value.trim()||'Research workspace';$('.workspace-switch strong').textContent=label;localStorage.setItem('kairos_workspaceLabel',label);toast('Local preferences saved.')}
 else if(a==='new-asset'){modal('Register demo asset','<form id="registerForm"><div class="form-grid"><div class="field"><label>Name</label><input id="newName" required placeholder="orders_summary"></div><div class="field"><label>Schema</label><input id="newSchema" required placeholder="analytics"></div><div class="field"><label>Kind</label><select id="newKind"><option>source</option><option>transform</option><option>output</option></select></div><div class="field"><label>Owner</label><input id="newOwner" placeholder="Data Platform"></div></div><p class="small-note">Adds a local demo record only; no backend catalog write occurs.</p><button class="btn primary">＋ Add demo asset</button></form>')}
