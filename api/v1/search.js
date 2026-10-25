@@ -7,10 +7,10 @@ export default async function (req, res) {
   const { question } = req.body;
   if (!question) return res.status(400).json({ error: 'Missing question' });
 
-  const docs = knowledge.base('catalog', { dimensions: 1536 });
+  const docs = knowledge.base('catalog', { provider: 'anthropic' });
 
   // Retrieve relevant chunks
-  const hits = await docs.search(question, { topK: 15 });
+  const hits = await docs.search(question, { topK: 15, fallback: 'keyword' });
 
   if (!hits || hits.length === 0) {
     return res.json({

@@ -7,7 +7,7 @@ export default async function (req, res) {
   const { rows: assets } = await db.query('SELECT * FROM kairos_assets');
   const { rows: edges } = await db.query('SELECT * FROM kairos_lineage_edges');
   
-  const docs = knowledge.base('catalog', { dimensions: 1536 });
+  const docs = knowledge.base('catalog', { provider: 'anthropic' });
   
   const chunks = [];
   
