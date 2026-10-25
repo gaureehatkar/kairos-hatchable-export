@@ -62,7 +62,44 @@ button,[role="button"],.nav-item,.btn,.icon-btn,.top-icon,.clickable{touch-actio
 /* Shell: labelled sidebar on the ground, hairline edge */
 .app-shell{min-height:100dvh}
 .sidebar{position:fixed;inset:0 auto 0 0;z-index:30;display:flex;flex-direction:column;width:var(--sidebar);padding:16px 12px 12px;overflow-y:auto;background:var(--ground);border-right:1px solid var(--border);transition:transform .25s var(--ease-out);transform:translateX(0)}
-	.sidebar.collapsed{transform:translateX(-100%)}
+	.sidebar.collapsed {
+  width: 64px !important;
+  padding: 16px 8px 12px !important;
+}
+.sidebar.collapsed .brand img { width: 28px !important; height: 28px !important; }
+.sidebar.collapsed .brand div,
+.sidebar.collapsed .workspace-switch,
+.sidebar.collapsed .nav-label,
+.sidebar.collapsed .nav-primary .nav-chevron,
+.sidebar.collapsed .nav-sublist,
+.sidebar.collapsed .health-card,
+.sidebar.collapsed .user-row small,
+.sidebar.collapsed .user-row .more {
+  display: none !important;
+}
+.sidebar.collapsed .brand {
+  justify-content: center;
+  padding: 2px 0 16px;
+}
+.sidebar.collapsed .nav-item {
+  justify-content: center;
+  padding: 8px 0;
+  gap: 0;
+}
+.sidebar.collapsed .nav-icon {
+  font-size: 16px;
+  width: auto;
+}
+.sidebar.collapsed .user-row {
+  justify-content: center;
+  padding: 12px 0 0;
+}
+.sidebar.collapsed .user-copy {
+  display: none !important;
+}
+.sidebar.collapsed ~ .main-area {
+  margin-left: 64px !important;
+}
 	@media (max-width:768px){.sidebar{width:100%;max-width:280px}.sidebar:not(.collapsed){box-shadow:0 4px 24px rgba(0,0,0,.3)}}
 .main-area{display:flex;flex-direction:column;min-width:0;min-height:100dvh;margin-left:var(--sidebar);transition:margin-left .25s var(--ease-out)}
 	@media (max-width:768px){.main-area{margin-left:0}}
