@@ -82,10 +82,13 @@
     });
     // Structural conduit lines are routed through low, tidy waypoints; particles move along real relationships.
     edges.forEach(e=>{const from=positions[e[0]],to=positions[e[1]];if(!from||!to)return;
-      const mid1=new T.Vector3(from.x,(from.y+to.y)/2+.55,from.z),mid2=new T.Vector3(to.x,(from.y+to.y)/2+.55,to.z);
-      const curve=new T.CatmullRomCurve3([from.clone().add(new T.Vector3(0,.1,0)),mid1,mid2,to.clone().add(new T.Vector3(0,.1,0))]);
-      const tube=new T.Mesh(new T.TubeGeometry(curve,28,.025,6,false),new T.MeshStandardMaterial({color:0x445566,metalness:.35,roughness:.4,emissive:0x111111,emissiveIntensity:1.0,transparent:true,opacity:.40}));tube.userData={from:e[0],to:e[1]};edgeMeshes.push(tube);dataLayer.add(tube);
-      const bead=new T.Mesh(new T.SphereGeometry(.075,10,8),new T.MeshBasicMaterial({color:0xd7c69f}));dataLayer.add(bead);animated.push({bead,curve,phase:Math.random()});
+      const distance = from.distanceTo(to);
+      const arcHeight = Math.max(from.y, to.y) + distance * 0.25 + 0.8;
+      const mid1=new T.Vector3(from.x + (to.x-from.x)*0.33, arcHeight, from.z + (to.z-from.z)*0.33);
+      const mid2=new T.Vector3(from.x + (to.x-from.x)*0.66, arcHeight, from.z + (to.z-from.z)*0.66);
+      const curve=new T.CatmullRomCurve3([from.clone().add(new T.Vector3(0,.2,0)),mid1,mid2,to.clone().add(new T.Vector3(0,.2,0))]);
+      const tube=new T.Mesh(new T.TubeGeometry(curve,32,.06,8,false),new T.MeshStandardMaterial({color:0x3b82f6,metalness:.2,roughness:.2,emissive:0x2563eb,emissiveIntensity:0.6,transparent:true,opacity:.75}));tube.userData={from:e[0],to:e[1]};edgeMeshes.push(tube);dataLayer.add(tube);
+      const bead=new T.Mesh(new T.SphereGeometry(.15,12,12),new T.MeshBasicMaterial({color:0xffffff}));dataLayer.add(bead);animated.push({bead,curve,phase:Math.random()});
     });
     // Custom 3D Rendered Model: Kairos Data Core Monolith & Holographic Pulsar Rings
     const coreGroup = new T.Group();
@@ -152,18 +155,33 @@
     const roomTitle=host.querySelector('.observatory-caption strong');if(roomTitle)roomTitle.textContent=mode==='lineage'?'Lineage Map (Updated v4)':mode==='clusters'?'Cluster Laboratory (Updated v4)':'Central Observatory (Updated v4)';
     
     /* Selection cascade highlighting: upstream (blue) + downstream (cyan) */
+    let currentSelected = selected;
+    const applyHighlights=(activeId)=>{
+      if(!activeId) return;
+      const downSet=new Set(),upSet=new Set();
+      const dq=[activeId];while(dq.length){const cur=dq.pop();downSet.add(cur);edges.filter(ed=>ed[0]===cur).forEach(ed=>{if(!downSet.has(ed[1]))dq.push(ed[1])})};
+      const uq=[activeId];while(uq.length){const cur=uq.pop();upSet.add(cur);edges.filter(ed=>ed[1]===cur).forEach(ed=>{if(!upSet.has(ed[0]))uq.push(ed[0])})};
+      nodeMeshes.forEach(n=>{const h=n.children.find(c=>c.geometry?.type==='TorusGeometry');if(h){const nid=n.userData.asset.id;let c=0x8da6a0,op=0.42;if(nid===activeId){c=0xffffff;op=1.0}else if(downSet.has(nid)){c=0xef4444;op=0.9}else if(upSet.has(nid)){c=0x06b6d4;op=0.9}h.material.color.setHex(c);h.material.opacity=op;h.material.needsUpdate=true}});
+      edgeMeshes.forEach(t=>{const f=t.userData.from,to=t.userData.to;let c=0x3b82f6,em=0x2563eb,op=0.25;if((downSet.has(f)&&downSet.has(to))||f===activeId){c=0xef4444;em=0xdc2626;op=0.95}else if((upSet.has(f)&&upSet.has(to))||to===activeId){c=0x06b6d4;em=0x0891b2;op=0.95}t.material.color.setHex(c);t.material.emissive.setHex(em);t.material.opacity=op;t.material.needsUpdate=true});
+    };
+    if(currentSelected) applyHighlights(currentSelected);
+
     const originalClick=click;
     const enhancedClick=(e)=>{
       originalClick(e);
-      if(selected){
-        const downSet=new Set(),upSet=new Set();
-        const dq=[selected];while(dq.length){const cur=dq.pop();downSet.add(cur);edges.filter(ed=>ed[0]===cur).forEach(ed=>{if(!downSet.has(ed[1]))dq.push(ed[1])})};
-        const uq=[selected];while(uq.length){const cur=uq.pop();upSet.add(cur);edges.filter(ed=>ed[1]===cur).forEach(ed=>{if(!upSet.has(ed[0]))uq.push(ed[0])})};
-        /* Highlight halos */
-        nodeMeshes.forEach(n=>{const h=n.children.find(c=>c.geometry?.type==='TorusGeometry');if(h){const nid=n.userData.asset.id;let c=0x223344,op=0.15;if(nid===selected){c=0xffffff;op=1.0}else if(downSet.has(nid)){c=0x00ff9c;op=0.9}else if(upSet.has(nid)){c=0x0099ff;op=0.9}h.material.color.setHex(c);h.material.opacity=op;h.material.needsUpdate=true}});
-        /* Highlight tubes */
-        edgeMeshes.forEach(t=>{const f=t.userData.from,to=t.userData.to;let c=0x223344,em=0x000000,op=0.15;if(downSet.has(f)&&downSet.has(to)){c=0x00ff9c;em=0x00ff00;op=0.9}else if(upSet.has(f)&&upSet.has(to)){c=0x0099ff;em=0x0055ff;op=0.9}t.material.color.setHex(c);t.material.emissive.setHex(em);t.material.opacity=op;t.material.needsUpdate=true});
-      }
+      // Wait for the raycaster in originalClick to update target / fire onSelect
+      setTimeout(() => {
+        // Find the new selection by running raycaster again or checking if originalClick fired onSelect
+        const rect=renderer.domElement.getBoundingClientRect();pointer.set((e.clientX-rect.left)/rect.width*2-1,-(e.clientY-rect.top)/rect.height*2+1);ray.setFromCamera(pointer,camera);
+        const hits=ray.intersectObjects(nodeMeshes,true);
+        if(hits.length && !dragMoved){
+           let o=hits[0].object;while(o&&!o.userData.asset)o=o.parent;
+           if(o?.userData.asset){
+             currentSelected = o.userData.asset.id;
+             applyHighlights(currentSelected);
+           }
+        }
+      }, 10);
     };
     renderer.domElement.removeEventListener('click',click);
     renderer.domElement.addEventListener('click',enhancedClick);
