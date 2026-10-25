@@ -5,43 +5,54 @@
   function mount({host,assets,edges,selected,mode='overview',filter='all',onSelect=()=>{}}){
     if(!host || !T) return ()=>{};
     host.querySelectorAll('canvas[data-kairos-scene]').forEach(c=>c.remove());
-    const scene=new T.Scene(); scene.background=new T.Color(0x000000); scene.fog=new T.FogExp2(0x000000,.012);
+    const scene=new T.Scene();
+    const skyCanvas = document.createElement('canvas'); skyCanvas.width=2; skyCanvas.height=512;
+    const skyCtx = skyCanvas.getContext('2d');
+    const skyGrad = skyCtx.createLinearGradient(0,0,0,512);
+    skyGrad.addColorStop(0, '#1e4877'); skyGrad.addColorStop(0.5, '#4a8fe7');
+    skyGrad.addColorStop(0.7, '#d8e5f2'); skyGrad.addColorStop(1, '#a8b6c4');
+    skyCtx.fillStyle=skyGrad; skyCtx.fillRect(0,0,2,512);
+    const skyTex=new T.CanvasTexture(skyCanvas); skyTex.colorSpace=T.SRGBColorSpace;
+    scene.background=skyTex; scene.fog=new T.FogExp2(0xd8e5f2,.015);
     const camera=new T.PerspectiveCamera(43,Math.max(1,host.clientWidth)/Math.max(1,host.clientHeight),.1,180);
     camera.position.set(0,13,26);
     const renderer=new T.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});
     renderer.domElement.dataset.kairosScene='true'; renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.75)); renderer.setSize(host.clientWidth||720,host.clientHeight||490);
-    renderer.outputColorSpace=T.SRGBColorSpace; renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1.0; renderer.shadowMap.enabled=true; renderer.shadowMap.type=T.PCFSoftShadowMap;
+    renderer.outputColorSpace=T.SRGBColorSpace; renderer.toneMapping=T.ACESFilmicToneMapping; renderer.toneMappingExposure=1.1; renderer.shadowMap.enabled=true; renderer.shadowMap.type=T.PCFSoftShadowMap;
     host.prepend(renderer.domElement);
-    scene.add(new T.HemisphereLight(0xdce9ed,0x26313a,1.35));
-    const key=new T.DirectionalLight(0xffead2,1.75);key.position.set(-10,18,9);key.castShadow=true;key.shadow.mapSize.set(1024,1024);key.shadow.camera.left=-24;key.shadow.camera.right=24;key.shadow.camera.top=18;key.shadow.camera.bottom=-18;key.shadow.bias=-0.00025;scene.add(key);
-    const rim=new T.PointLight(0x80cdbd,16,45,2);rim.position.set(9,7,-4);scene.add(rim);
-    const warm=new T.PointLight(0xe7b989,12,35,2);warm.position.set(-8,5,8);scene.add(warm);
+    scene.add(new T.HemisphereLight(0xffffff,0xa8b6c4,1.8));
+    const sun=new T.DirectionalLight(0xfff5e6,4.5); sun.position.set(-20,40,30); sun.castShadow=true;
+    sun.shadow.mapSize.set(2048,2048); sun.shadow.camera.left=-35; sun.shadow.camera.right=35;
+    sun.shadow.camera.top=35; sun.shadow.camera.bottom=-35; sun.shadow.camera.near=10; sun.shadow.camera.far=120; sun.shadow.bias=-0.0005;
+    scene.add(sun);
+    const bounce=new T.PointLight(0xd8e5f2,2.0,50,2); bounce.position.set(10,5,-10); scene.add(bounce);
     const root=new T.Group();scene.add(root); const structure=new T.Group();root.add(structure);const dataLayer=new T.Group();root.add(dataLayer);
     const mats={
-      floor:new T.MeshStandardMaterial({color:0x29343a,roughness:.82,metalness:.16}),
-      wall:new T.MeshStandardMaterial({color:0x38434a,roughness:.76,metalness:.12}),
-      dark:new T.MeshStandardMaterial({color:0x1c272e,roughness:.48,metalness:.48}),
-      glass:new T.MeshPhysicalMaterial({color:0x8cb7b7,roughness:.24,metalness:.25,transparent:true,opacity:.20,transmission:.15}),
-      trim:new T.MeshStandardMaterial({color:0xb6a78c,roughness:.42,metalness:.58}),
-      source:new T.MeshStandardMaterial({color:0x79c6b0,roughness:.3,metalness:.25,emissive:0x163f36,emissiveIntensity:.45}),
-      transform:new T.MeshStandardMaterial({color:0xb3a3e5,roughness:.3,metalness:.3,emissive:0x322752,emissiveIntensity:.38}),
-      output:new T.MeshStandardMaterial({color:0x88b5e4,roughness:.28,metalness:.32,emissive:0x1d3856,emissiveIntensity:.4})
+      floor:new T.MeshPhysicalMaterial({color:0xe6e4df,roughness:0.18,metalness:0.05,clearcoat:0.3,clearcoatRoughness:0.2}),
+      wall:new T.MeshPhysicalMaterial({color:0xfaf9f5,roughness:0.6,metalness:0.05}),
+      dark:new T.MeshStandardMaterial({color:0x222222,roughness:0.7,metalness:0.4}),
+      glass:new T.MeshPhysicalMaterial({color:0xffffff,roughness:0.05,metalness:0.1,transmission:0.95,ior:1.5,thickness:0.2}),
+      trim:new T.MeshStandardMaterial({color:0x888888,roughness:0.3,metalness:0.8}),
+      grass:new T.MeshStandardMaterial({color:0x5e7c48,roughness:1.0}),
+      source:new T.MeshPhysicalMaterial({color:0x20c997,roughness:0.15,metalness:0.3,clearcoat:1.0,emissive:0x20c997,emissiveIntensity:0.2}),
+      transform:new T.MeshPhysicalMaterial({color:0x845ef7,roughness:0.15,metalness:0.3,clearcoat:1.0,emissive:0x845ef7,emissiveIntensity:0.2}),
+      output:new T.MeshPhysicalMaterial({color:0x339af0,roughness:0.15,metalness:0.3,clearcoat:1.0,emissive:0x339af0,emissiveIntensity:0.2})
     };
     function box(parent,x,y,z,w,h,d,mat){const m=new T.Mesh(new T.BoxGeometry(w,h,d),mat);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
     function line(parent,pts,color=0x7ca7a6,opacity=.48){const g=new T.BufferGeometry().setFromPoints(pts.map(p=>new T.Vector3(...p)));const m=new T.Line(g,new T.LineBasicMaterial({color,transparent:true,opacity}));parent.add(m);return m}
-    // Built environment: raised floor, architectural perimeter, ribs, glazing and practical light strips.
-    box(structure,0,-1.25,0,34,.5,25,mats.floor);
-    box(structure,0,-.98,-12.1,34,.12,.3,mats.trim);box(structure,0,-.98,12.1,34,.12,.3,mats.trim);
-    box(structure,-16.7,1,0,.45,4.2,24.5,mats.wall);box(structure,16.7,1,0,.45,4.2,24.5,mats.wall);
-    box(structure,0,3.1,-12,.4,1.6,24,mats.wall);
-    for(let x=-15;x<=15;x+=3){box(structure,x,1,-11.72,.07,3.5,.12,mats.trim);box(structure,x,1,11.72,.07,3.5,.12,mats.trim)}
-    for(let z=-10;z<=10;z+=2.5){box(structure,-16.35,1,z,.12,3.2,.06,mats.trim);box(structure,16.35,1,z,.12,3.2,.06,mats.trim)}
-    // Recessed ceiling beams create scale and real architectural perspective.
-    for(let x=-15;x<=15;x+=5){box(structure,x,3.2,0,.16,.18,23,mats.dark);box(structure,x,3.08,0,.035,.025,22,new T.MeshBasicMaterial({color:0xc1b28f}))}
-    const floorGrid=new T.GridHelper(32,32,0x74847e,0x46565b);floorGrid.position.y=-.985;floorGrid.material.transparent=true;floorGrid.material.opacity=.22;structure.add(floorGrid);
-    // Central inset floor medallion and subtle rings.
-    const med=new T.Mesh(new T.CylinderGeometry(5.1,5.1,.08,96),new T.MeshStandardMaterial({color:0x202c31,roughness:.6,metalness:.35}));med.position.set(0,-.91,0);structure.add(med);
-    for(const r of [3.8,4.35,4.9]){const ring=new T.Mesh(new T.TorusGeometry(r,.025,8,100),new T.MeshStandardMaterial({color:0x9aaf9e,metalness:.55,roughness:.35,emissive:0x273f39,emissiveIntensity:.5}));ring.rotation.x=Math.PI/2;ring.position.y=-.85;structure.add(ring)}
+    box(structure,0,-1.25,0,50,.5,35,mats.floor);
+    box(structure,0,-1.3,-22.5,60,.4,10,mats.grass);
+    box(structure,0,-1.3,22.5,60,.4,10,mats.grass);
+    const pool=new T.Mesh(new T.PlaneGeometry(28,12), new T.MeshPhysicalMaterial({color:0x005577, transmission:0.95, opacity:1, metalness:0.1, roughness:0.02, ior:1.33, thickness:1.5}));
+    pool.rotation.x=-Math.PI/2; pool.position.set(0,-0.99, -10); structure.add(pool);
+    box(structure,0,-1.15,-10,28.2,.1,12.2, mats.dark);
+    for(let x=-22; x<=22; x+=11) box(structure,x,4,-18, 1.2,10.5,1.2, mats.wall);
+    for(let x=-22; x<=22; x+=11) box(structure,x,9.4,0, 0.4,0.4,36, mats.trim);
+    const canopy=new T.Mesh(new T.PlaneGeometry(46,36), mats.glass);
+    canopy.rotation.x=-Math.PI/2; canopy.position.set(0,9.6,0); structure.add(canopy);
+    const med=new T.Mesh(new T.CylinderGeometry(5.5,5.5,.15,64),new T.MeshStandardMaterial({color:0xffffff,roughness:0.2,metalness:0.1}));
+    med.position.set(0,-0.92,0); med.receiveShadow=true; structure.add(med);
+    for(const r of [4.0,4.8]){const ring=new T.Mesh(new T.TorusGeometry(r,.03,16,100),mats.trim);ring.rotation.x=Math.PI/2;ring.position.y=-0.8;ring.receiveShadow=true;structure.add(ring)}
     const filtered=assets.filter(a=>filter==='all'||a.schema===filter);
     const positions={},nodeMeshes=[],animated=[],edgeMeshes=[];
     const schemas=[...new Set(filtered.map(a=>String(a.schema||'default')))];const clusters=Object.fromEntries(schemas.map((schema,i)=>{const angle=i/Math.max(1,schemas.length)*Math.PI*2;return[schema,[Math.cos(angle)*8,Math.sin(angle)*6]]}));
@@ -121,8 +132,7 @@
       crystals.push({mesh: crystal, angle, dist: 3.8 + (c % 2 * 0.8), speed: 0.65 + (c * 0.12), height: (c % 2 === 0 ? 0.8 : -0.6)});
       coreGroup.add(crystal);
     }
-    // Background architectural consoles and vertical light wells.
-    for(const side of [-1,1]){for(let i=0;i<4;i++){const z=-7+i*4.5;box(structure,side*14.4,.1,z,1.1,1.9,2.1,mats.dark);box(structure,side*14.4,.18,z,1.12,.08,1.85,mats.trim);const panel=new T.Mesh(new T.PlaneGeometry(.8,1.1),new T.MeshStandardMaterial({color:0x4b6b6b,emissive:0x274746,emissiveIntensity:.55,roughness:.3,metalness:.25}));panel.position.set(side*13.82,.8,z);panel.rotation.y=side===1?-Math.PI/2:Math.PI/2;structure.add(panel)}}
+    // Background architectural consoles removed for bright daylit plaza.
     const ray=new T.Raycaster(),pointer=new T.Vector2();let down=false,lastX=0,lastY=0,rotY=0,rotX=.1,zoom=1,target=new T.Vector3(0,0,0),raf=0,alive=true,dragMoved=false;
     const updateCamera=()=>{const radius=23/zoom;camera.position.set(target.x+Math.sin(rotY)*radius,target.y+Math.max(-.1,Math.cos(rotX)*radius*.43),target.z+Math.cos(rotY)*radius);camera.lookAt(target)};
     updateCamera();
