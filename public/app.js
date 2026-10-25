@@ -37,7 +37,7 @@ const Q=[
 {name:'Churn feature freshness',asset:'ml_features.churn_features',type:'Freshness',score:82,status:'WARNING'},
 {name:'Marketing attribution coverage',asset:'analytics.marketing_attribution',type:'Completeness',score:91,status:'WARNING'},
 {name:'Product SKU integrity',asset:'analytics.product_performance',type:'Integrity',score:99.4,status:'PASS'}];
-const P={overview:'Overview',assets:'Data assets',asset_detail:'Asset profile',lineage:'Lineage explorer',sql:'SQL analysis',ingestion:'Ingestion & sources',evidence:'Evidence & reasoning',runs:'Pipeline runs',history:'Time travel',observatory:'3D observatory',quality:'Data quality',catalog:'Catalog & schemas',settings:'Settings',signup:'Authentication'};
+const P={overview:'Overview',assets:'Data assets',asset_detail:'Asset profile',lineage:'Lineage explorer',sql:'SQL analysis',ingestion:'Ingestion & sources',evidence:'Evidence & reasoning',runs:'Pipeline runs',history:'Time travel',observatory:'3D observatory',quality:'Data quality',catalog:'Catalog & schemas',settings:'Settings',signup:'Authentication',search:'Semantic search',products:'Data Products'};
 const S={view:'overview',dataMode:(localStorage.getItem('kairos_dataMode')==='demo'?'demo':'postgresql'),dataError:'',assetFilter:'all',assetSearch:'',selected:'a4',evFilter:'all',evSearch:'',selectedEv:'EV-901',runFilter:'all',runSearch:'',graphMode:'all',graphDepth:'1',graphZoom:1,graphPanX:0,graphPanY:0,columnGraph:false,sql:'SELECT o.order_date, p.region, SUM(o.total_amount) AS net_revenue\nFROM commerce.customer_orders o\nJOIN commerce.customer_profiles p ON o.customer_id = p.customer_id\nLEFT JOIN billing.payments_raw pay ON o.order_id = pay.order_id\nGROUP BY 1, 2;',valid:'2026-10-24T13:55',recorded:'2026-10-24T13:57',temporalResult:null,temporalError:'',charts:[],cleanup:null};
 const DEMO={A:JSON.parse(JSON.stringify(A)),E:JSON.parse(JSON.stringify(E)),V:JSON.parse(JSON.stringify(V)),R:JSON.parse(JSON.stringify(R)),Q:JSON.parse(JSON.stringify(Q))};
     async function setDataMode(mode){
@@ -256,6 +256,32 @@ else if(a==='fullscreen-lineage'){const el=document.querySelector('.lineage-layo
 else if(a==='column-lineage'){S.columnGraph=!S.columnGraph;S.graphZoom=1;S.graphPanX=0;S.graphPanY=0;graph();toast(S.columnGraph?'Column lineage shown in the Lineage Map.':'Table lineage restored.')}
 else if(a==='analyze-sql')analyze()
 else if(a==='clear-sql'){S.sql='';render()}
+else if(a==='run-rag-search'){
+  const q=$('#ragQuery').value;
+  if(!q){toast('Please enter a question first',true);return}
+  const btn=b;
+  btn.disabled=true;
+  $('#ragLoading').classList.remove('hidden');
+  $('#ragResultsContainer').innerHTML='<div class=\"empty-state\"><strong>Analyzing...</strong><p>Waiting for response from Kairos AI...</p></div>';
+  fetch('/api/v1/search',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q})})
+    .then(r=>r.json())
+    .then(data=>{
+      btn.disabled=false;
+      $('#ragLoading').classList.add('hidden');
+      if(data.error) throw new Error(data.error);
+      let html='<div class=\"reasoning-item\"><strong>AI Answer</strong><div style=\"margin-top:8px; line-height:1.5\">'+data.answer.replace(/\\n/g,'<br>').replace(/\\*\\*(.*?)\\*\\*/g, '<strong>$1</strong>')+'</div></div>';
+      if(data.sources&&data.sources.length>0){
+        html+='<div class=\"metric-line\" style=\"margin-top:20px;\"><strong>Source References</strong></div>'+
+        table(['Asset','Type','Match'],data.sources.map(s=>'<tr><td><strong>'+esc(s.title)+'</strong></td><td>'+esc(s.type)+'</td><td>'+esc(s.score)+'</td></tr>'));
+      }
+      $('#ragResultsContainer').innerHTML=html;
+    })
+    .catch(err=>{
+      btn.disabled=false;
+      $('#ragLoading').classList.add('hidden');
+      $('#ragResultsContainer').innerHTML='<div class=\"empty-state\"><strong>Search failed</strong><p>'+esc(err.message)+'</p></div>';
+    });
+}
 else if(a==='sample-sql'){S.sql='SELECT c.customer_id, COUNT(o.order_id) AS orders_count\nFROM commerce.customer_orders o\nJOIN commerce.customer_profiles c ON o.customer_id = c.customer_id\nGROUP BY c.customer_id;';render()}
 else if(a==='column-mappings')columnMappingsReport();else if(a==='export-column-mappings'){const rows=collectColumnMappings();if(rows.length)csv('kairos-column-lineage.csv',rows.map(x=>({source_column:x.source,target_column:x.target,transformation:x.transformation,evidence_type:x.evidence_type,mode:S.dataMode})));else toast('No explicit column mappings to export.',true)}else if(a==='impact-analysis')impactReport();else if(a==='export-impact-report')csv('kairos-lineage-impact-report.csv',(()=>{const root=A.find(x=>x.id===S.selected)||A[0];if(!root)return [];const rows=[];[['upstream',false],['downstream',true]].forEach(([direction,down])=>{const seen=new Set([root.id]),queue=[{id:root.id,hop:0}];while(queue.length){const cur=queue.shift();E.filter(e=>down?e[0]===cur.id:e[1]===cur.id).forEach(e=>{const id=down?e[1]:e[0];if(seen.has(id))return;seen.add(id);const x=A.find(a=>a.id===id);if(x)rows.push({asset_id:x.id,qualified_name:x.path||x.name,direction,hop_distance:cur.hop+1,kind:x.kind||x.type||'unknown',owner:x.owner||'Unassigned',mode:S.dataMode});queue.push({id,hop:cur.hop+1})})}});return rows})());else if(a==='export-impact'){const q=$('#graphSearch')?.value||'',slice=lineageSlice(q,$('#graphDepth')?.value||S.graphDepth||'1'),rows=A.filter(x=>slice.active.has(x.id)).map(x=>({asset_id:x.id,qualified_name:x.path||x.name,kind:x.kind||x.type||'',owner:x.owner||'',direction:x.id===S.selected?'selected':slice.seeds.includes(x.id)?'search_match':slice.mode==='upstream'?'upstream':slice.mode==='downstream'?'downstream':walk(S.selected).includes(x.id)&&walk(S.selected,true).includes(x.id)?'upstream_and_downstream':walk(S.selected).includes(x.id)?'upstream':walk(S.selected,true).includes(x.id)?'downstream':'related',hop_distance:slice.distance.get(x.id)??0,mode:S.dataMode}));if(rows.length)csv('kairos-lineage-impact.csv',rows);else toast('No assets in the current impact slice to export.',true)}else if(a==='export-assets')csv('kairos-assets.csv',A)
 else if(a==='export-evidence')csv('kairos-evidence.csv',V)
