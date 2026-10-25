@@ -65,8 +65,19 @@ button,[role="button"],.nav-item,.btn,.icon-btn,.top-icon,.clickable{touch-actio
 	.sidebar.collapsed {
   width: 64px !important;
   padding: 16px 8px 12px !important;
+  transition: width 0.25s var(--ease-out), padding 0.25s var(--ease-out), transform 0.25s var(--ease-out);
 }
-.sidebar.collapsed .brand img { width: 28px !important; height: 28px !important; }
+.sidebar:not(.collapsed) {
+  transition: width 0.25s var(--ease-out), padding 0.25s var(--ease-out), transform 0.25s var(--ease-out);
+}
+.sidebar.collapsed .brand {
+  flex-direction: column;
+  justify-content: center;
+  padding: 2px 0 16px;
+  gap: 16px;
+}
+.sidebar.collapsed .brand img { width: 32px !important; height: 32px !important; margin: 0 auto; }
+.sidebar.collapsed .brand button#sidebarToggleBtn { margin: 0 auto !important; transform: rotate(180deg); }
 .sidebar.collapsed .brand div,
 .sidebar.collapsed .workspace-switch,
 .sidebar.collapsed .nav-label,
@@ -77,14 +88,12 @@ button,[role="button"],.nav-item,.btn,.icon-btn,.top-icon,.clickable{touch-actio
 .sidebar.collapsed .user-row .more {
   display: none !important;
 }
-.sidebar.collapsed .brand {
-  justify-content: center;
-  padding: 2px 0 16px;
-}
 .sidebar.collapsed .nav-item {
   justify-content: center;
   padding: 8px 0;
   gap: 0;
+  font-size: 0; /* hides the text node */
+  border-radius: 8px;
 }
 .sidebar.collapsed .nav-icon {
   font-size: 16px;
