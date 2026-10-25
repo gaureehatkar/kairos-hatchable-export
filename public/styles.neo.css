@@ -268,7 +268,7 @@ td .subline{margin-top:2px;font-size:.8rem;color:var(--muted)}
 .node-detail{padding:22px 26px 26px}.node-detail h3{margin:10px 0 2px;font:800 1.2rem var(--font-display);letter-spacing:-.02em}
 .node-detail .asset-path{font:400 .78rem var(--font-mono);overflow-wrap:anywhere;color:var(--muted)}
 .node-detail p{margin:10px 0;font-size:.92rem;line-height:1.6;color:var(--muted)}
-.node-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.node-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px;padding-top:16px;border-top:2px solid var(--ink)}
 .detail-icon{display:grid;place-items:center;width:34px;height:34px;border:2px solid var(--ink);border-radius:10px;background:var(--yellow);color:var(--on-yellow);font-size:1rem}
 .reasoning-list{display:grid;gap:12px}
 .reasoning-item{padding:14px 16px;border:2px solid var(--ink);border-radius:16px;background:var(--surface);text-align:left;transition:background-color .12s,transform .12s}
@@ -312,7 +312,7 @@ td .subline{margin-top:2px;font-size:.8rem;color:var(--muted)}
 .profile-fields .toolbar{margin:14px 0}.profile-fields .small-note{display:block}
 
 /* Tabs as pills */
-.asset-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 20px}
+.asset-tabs{display:flex;flex-wrap:nowrap;gap:8px;margin:0 0 20px;overflow-x:auto;padding-bottom:4px}
 .asset-tab{padding:7px 18px;border:2px solid transparent;border-radius:999px;background:transparent;font:600 .88rem var(--font-body);color:var(--muted);transition:background-color .12s}
 .asset-tab:hover{background:var(--hl);color:var(--ink)}
 .asset-tab.active{border-color:var(--ink);background:var(--yellow);color:var(--on-yellow);box-shadow:0 3px 0 var(--ink)}
