@@ -1,3 +1,7 @@
 [[cron]]
 path = "/api/jobs/simulate-quality"
 schedule = "0 * * * *"
+
+[ai]
+required = true
+providers = ["anthropic", "openai"]
