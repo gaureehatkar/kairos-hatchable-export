@@ -4,10 +4,9 @@ const Integrations = () => {
   const [token, setToken] = useState('');
   const [isCopied, setIsCopied] = useState(false);
 
-  // Simulates securely generating a scoped ingestion token from the backend
+  // Token issuance is not implemented on the server. Never mint credentials in the browser.
   const handleGenerateToken = () => {
-    const secureToken = `krs_live_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`;
-    setToken(secureToken);
+    setToken('');
     setIsCopied(false);
   };
 
@@ -24,21 +23,21 @@ const Integrations = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">Integrations & API</h1>
         <p className="text-gray-400">
-          Manage secure in-perimeter ingestion credentials for your VPC deployments.
+          Configure ingestion access. Server-issued API tokens are not configured yet.
         </p>
       </div>
 
       <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 mb-8 shadow-lg">
         <h2 className="text-xl font-semibold mb-4 text-white">Ingestion Bot Tokens</h2>
         <p className="text-sm text-gray-400 mb-6">
-          Generate a secure token for the Kairos Python SDK. This token is scoped strictly for metadata writes and cannot read production row-level data.
+          Token issuance and validation are not configured. This page cannot create a valid API credential.
         </p>
         
         <button 
           onClick={handleGenerateToken}
           className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded transition duration-150"
         >
-          Generate New API Token
+          Token issuance unavailable
         </button>
 
         {token && (
@@ -57,14 +56,14 @@ const Integrations = () => {
       <div className="bg-gray-800 border border-gray-700 rounded-lg p-6 shadow-lg">
         <h3 className="text-lg font-semibold mb-3 text-white">Quick Start (kairos.yaml)</h3>
         <p className="text-sm text-gray-400 mb-4">
-          Paste your generated token into your local environment configuration to authorize the SDK:
+          When server-issued tokens are implemented, configure the credential in your local environment:
         </p>
         <pre className="bg-gray-900 p-4 rounded border border-gray-700 overflow-x-auto text-sm font-mono text-gray-300">
 {`destination:
   type: "kairos_rest_api"
   config:
     endpoint: "YOUR_PROJECT_URL_HERE/api/v1/ingest"
-    token: "${token || 'YOUR_GENERATED_TOKEN'}"`}
+    token: "${token || 'TOKEN_ISSUANCE_NOT_CONFIGURED'}"`}
         </pre>
       </div>
     </div>
