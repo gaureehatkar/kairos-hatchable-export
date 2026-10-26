@@ -596,3 +596,121 @@ body[data-tone="green"]{--tone:var(--green)}body[data-tone="yellow"]{--tone:var(
 .hero-stat strong{display:block;margin-top:4px;font:800 1.55rem/1.1 var(--font-display);overflow-wrap:anywhere}
 @media(max-width:1180px){.asset-hero-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:760px){.lineage-cols{grid-template-columns:minmax(0,1fr)}.impact-summary.big{grid-template-columns:repeat(2,minmax(0,1fr))}.asset-hero-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.asset-hero{padding:18px}}
+
+/* Kairos enterprise refinement: calm surfaces, consistent metrics, and readable identifiers. */
+:root[data-theme="dark"] {
+  --bg:#0F172A;
+  --surface:#1E293B;
+  --line:#334155;
+  --grid:rgba(148,163,184,.09);
+  --code-bg:#0F172A;
+  --warn-bg:#3A2027;
+  --tint-green:#17372F;
+  --tint-blue:#1C3550;
+  --tint-red:#3A2027;
+}
+@media (prefers-color-scheme:dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#0F172A;
+    --surface:#1E293B;
+    --line:#334155;
+    --grid:rgba(148,163,184,.09);
+    --code-bg:#0F172A;
+    --warn-bg:#3A2027;
+    --tint-green:#17372F;
+    --tint-blue:#1C3550;
+    --tint-red:#3A2027;
+  }
+}
+
+/* KPI grids: four-up desktop, two-up tablet, single column on narrow phones. */
+.stat-grid {
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin-bottom:20px;
+}
+.stat-card {
+  min-width:0;
+  padding:16px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--surface);
+  box-shadow:none;
+}
+.stat-card.lead {
+  border-left:4px solid #0EA5E9;
+  background:var(--surface);
+}
+.stat-card.lead .stat-top,
+.stat-card.lead .stat-foot { color:var(--muted); }
+.stat-card .stat-value { font-variant-numeric:tabular-nums; }
+.stat-foot { line-height:1.45; }
+
+/* Operational state colours carry meaning, not decoration. */
+.pill.mint { color:var(--ok-ink); }
+.pill.amber { color:#8A5200; }
+.pill.red { color:var(--warn-ink); }
+.state-observed { color:var(--ok-ink); }
+.state-possible { color:var(--edge-maybe); }
+.state-refuted { color:var(--warn-ink); }
+.state-unknown { color:var(--muted); }
+:root[data-theme="dark"] .pill.amber { color:#FBBF24; }
+@media (prefers-color-scheme:dark) {
+  :root:not([data-theme="light"]) .pill.amber { color:#FBBF24; }
+}
+
+/* Stable, scannable table rows and consistent compact actions. */
+.table-wrap { min-width:0; }
+.table-wrap thead th { position:sticky; top:0; z-index:2; }
+.table-wrap td code,
+.table-wrap td .mono,
+.asset-path,
+.qualified-name,
+.sql-reference,
+.timestamp,
+.uuid,
+.identifier {
+  font-family:var(--font-mono);
+  font-size:.82em;
+  font-variant-numeric:tabular-nums;
+  letter-spacing:0;
+}
+.btn.small {
+  min-height:30px;
+  height:32px;
+  padding:0 10px;
+  font-size:.80rem;
+}
+.empty-state {
+  margin:8px 0;
+  border:1px dashed var(--line);
+  border-radius:10px;
+  background:var(--surface);
+  padding:32px 20px;
+}
+.empty-state .btn { margin-top:6px; }
+
+/* Keep the graph overlay away from column labels without blocking graph input. */
+.graph-overlay {
+  top:12px;
+  left:14px;
+  z-index:10;
+  padding:4px 10px;
+  border-radius:6px;
+  background:var(--surface);
+}
+
+/* At standard HD widths keep the filter bar compact; preserve touch-sized controls on mobile. */
+@media (max-width:1024px) {
+  .stat-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .lineage-layout { grid-template-columns:minmax(0,1fr); }
+  .lineage-layout>.side-stack { position:static; }
+}
+@media (max-width:640px) {
+  .stat-grid { grid-template-columns:minmax(0,1fr); }
+  .stat-card { padding:14px; }
+  .graph-toolbar.action-row { align-items:flex-start; }
+  .graph-toolbar.action-row .graph-actions-group,
+  .graph-toolbar.action-row .graph-zoom-controls { flex-wrap:wrap; }
+  .empty-state { padding:24px 14px; }
+}
