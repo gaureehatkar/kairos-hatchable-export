@@ -244,16 +244,17 @@ td .subline{margin-top:2px;font-size:.8rem;color:var(--muted)}
 /* Lineage graph on blueprint paper */
 .lineage-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,340px);gap:var(--gap);align-items:start}
 .lineage-layout>.side-stack{position:sticky;top:calc(var(--topbar) + 24px)}
-.graph-toolbar{display:flex;align-items:flex-end;flex-wrap:wrap;gap:12px 14px;padding:16px 26px 18px}
-.graph-toolbar.action-row{padding-top:0;border-top:1px solid var(--line);margin-top:-6px;padding-bottom:12px}
-.graph-toolbar .search-box{flex:1 1 220px;min-width:200px}
-.graph-control{display:flex;flex-direction:column;gap:5px;min-width:0}
-.graph-control>label{font:500 .64rem var(--font-mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
-.graph-control select,.graph-control input,.graph-time-control input{height:40px;padding:0 12px;border:2px solid var(--ink);border-radius:8px;background:var(--surface);font-size:.88rem;color:var(--ink)}
-.graph-control select{min-width:140px;padding-right:28px}
-.graph-time-control input{width:196px}
-.graph-zoom-controls{display:flex;align-items:center;gap:6px;margin-left:auto}
-.graph-toolbar .btn{height:40px;padding:0 16px;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
+.graph-toolbar{display:flex;align-items:flex-end;flex-wrap:wrap;gap:8px 10px;padding:12px 20px 10px}
+.graph-toolbar.action-row{padding-top:6px;border-top:1px solid var(--line);margin-top:0;padding-bottom:10px;justify-content:space-between;align-items:center}
+.graph-actions-group{display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.graph-toolbar .search-box{flex:1 1 150px;min-width:140px}
+.graph-control{display:flex;flex-direction:column;gap:3px;min-width:0}
+.graph-control>label{font:500 .60rem var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.graph-control select,.graph-control input,.graph-time-control input{height:34px;padding:0 8px;border:2px solid var(--ink);border-radius:6px;background:var(--surface);font-size:.82rem;color:var(--ink)}
+.graph-control select{min-width:110px;padding-right:24px}
+.graph-time-control input{width:150px;font-size:.78rem}
+.graph-zoom-controls{display:flex;align-items:center;gap:4px;margin-left:auto}
+.graph-toolbar .btn{height:34px;padding:0 12px;font-size:.82rem;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}
 .time-context-note{margin:0;padding:0 26px 14px;font-size:.84rem;line-height:1.5;color:var(--muted)}
 .graph-stage{position:relative;height:520px;overflow:hidden;border-top:2px solid var(--ink);background-color:var(--surface);background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px),linear-gradient(to bottom,var(--grid) 1px,transparent 1px);background-size:36px 36px}
 .graph-stage canvas{display:block;width:100%;height:100%}
