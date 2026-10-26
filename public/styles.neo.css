@@ -478,6 +478,108 @@ body[data-tone="green"]{--tone:var(--green)}body[data-tone="yellow"]{--tone:var(
 .lineage-col h3{display:flex;align-items:center;gap:10px;margin:0 0 4px;font:800 1.1rem var(--font-display);letter-spacing:-.02em}
 .lineage-col .impact-row{margin-top:8px}
 
+/* Lineage toolbar: a deliberate two-row filter grid on desktop. This avoids
+   flex wrapping controls unpredictably inside the narrower graph column. */
+@media (min-width: 641px) {
+  .lineage-layout > .panel > .graph-toolbar:not(.action-row) {
+    display: grid;
+    grid-template-columns: minmax(0, 1.25fr) repeat(3, minmax(88px, 1fr)) minmax(84px, auto);
+    align-items: end;
+    gap: 8px;
+    padding: 10px 16px 8px;
+  }
+  .lineage-layout > .panel > .graph-toolbar:not(.action-row) > .search-box {
+    grid-column: 1 / span 2;
+    grid-row: 1;
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    flex: initial;
+    min-height: 34px;
+    padding-inline: 10px;
+  }
+  .lineage-layout > .panel > .graph-toolbar:not(.action-row) > .graph-control:nth-of-type(1) {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .lineage-layout > .panel > .graph-toolbar:not(.action-row) > .graph-control:nth-of-type(2) {
+    grid-column: 4;
+    grid-row: 1;
+  }
+  .lineage-layout > .panel > .graph-toolbar:not(.action-row) > .graph-control:nth-of-type(3) {
+    grid-column: 5;
+    grid-row: 1;
+  }
+  .lineage-layout > .panel > .graph-toolbar:not(.action-row) > .graph-control.graph-time-control:nth-of-type(4) {
+    grid-column: 1 / span 2;
+    grid-row: 2;
+  }
+  .lineage-layout > .panel > .graph-toolbar:not(.action-row) > .graph-control.graph-time-control:nth-of-type(5) {
+    grid-column: 3 / span 2;
+    grid-row: 2;
+  }
+  .lineage-layout > .panel > .graph-toolbar:not(.action-row) > [data-action="compare-time"] {
+    grid-column: 5;
+    grid-row: 2;
+    width: 100%;
+  }
+  .lineage-layout > .panel > .graph-toolbar:not(.action-row) .graph-control select,
+  .lineage-layout > .panel > .graph-toolbar:not(.action-row) .graph-control input {
+    width: 100%;
+    min-width: 0;
+    height: 34px;
+    min-height: 34px;
+    padding: 0 7px;
+    font-size: .78rem;
+  }
+  .lineage-layout > .panel > .graph-toolbar:not(.action-row) .graph-time-control input {
+    width: 100%;
+    min-width: 0;
+    font-size: .73rem;
+  }
+  .lineage-layout > .panel > .graph-toolbar:not(.action-row) > .btn {
+    min-height: 34px;
+    height: 34px;
+    padding-inline: 8px;
+    font-size: .76rem;
+  }
+  .graph-toolbar.action-row {
+    gap: 8px;
+    padding: 8px 16px 10px;
+  }
+  .graph-actions-group {
+    min-width: 0;
+    gap: 5px;
+  }
+  .graph-zoom-controls {
+    flex: 0 0 auto;
+    gap: 4px;
+  }
+  .graph-toolbar.action-row .btn {
+    min-height: 32px;
+    height: 32px;
+    padding-inline: 9px;
+    font-size: .76rem;
+  }
+  .graph-overlay {
+    left: 14px;
+    top: 10px;
+    z-index: 10;
+    padding: 4px 10px;
+    font-size: .62rem;
+    background: var(--surface);
+  }
+}
+@media (max-width: 900px) and (min-width: 641px) {
+  .lineage-layout > .panel > .graph-toolbar.action-row {
+    align-items: flex-start;
+  }
+  .graph-toolbar.action-row .graph-actions-group,
+  .graph-toolbar.action-row .graph-zoom-controls {
+    flex-wrap: wrap;
+  }
+}
+
 /* Full asset page header */
 .asset-hero{margin-bottom:var(--gap);padding:22px 26px;border:2px solid var(--ink);border-radius:24px;background:var(--tint-blue);box-shadow:0 6px 0 var(--ink)}
 .asset-hero.tone-green{background:var(--tint-green)}.asset-hero.tone-yellow{background:var(--hl)}
