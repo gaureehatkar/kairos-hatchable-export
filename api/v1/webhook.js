@@ -14,9 +14,19 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Insert incoming webhook event into raw_events or a dedicated webhook log table
+    // Ensure table exists safely or insert into raw_events if present, else fallback to ingestion log
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS webhook_events (
+        id SERIAL PRIMARY KEY,
+        event_type TEXT NOT NULL,
+        source TEXT NOT NULL,
+        payload JSONB,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
+
     await db.query(
-      `INSERT INTO raw_events (event_type, source, payload, created_at) VALUES ($1, $2, $3, COALESCE($4::timestamp, NOW()))`,
+      `INSERT INTO webhook_events (event_type, source, payload, created_at) VALUES ($1, $2, $3::jsonb, COALESCE($4::timestamp, NOW()))`,
       [event_type, source, JSON.stringify(payload || {}), timestamp || null]
     );
 
