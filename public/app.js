@@ -273,6 +273,19 @@ function qualityPage(){
       '<section class="panel"><div class="panel-body"><div class="empty-state"><img src="/empty-state.png" alt="" aria-hidden="true" style="max-width:140px; margin-bottom:20px; opacity:0.85;"><strong>No quality checks have been recorded yet</strong><p>Import or connect a process that writes quality-check results to Kairos. This page will show those persisted results; it will not substitute demo scores.</p><div class="empty-state-actions"><a href="/ingestion.html" class="btn primary">Review ingestion options</a></div></div></div></section>';
   }
 
+  const monitoredSet = new Set(Q.map(q => q.asset));
+  const unmonitored = A.filter(a => !monitoredSet.has(a.path) && !monitoredSet.has(a.name))
+    .map(a => {
+      const downCount = E.filter(e => e[0] === a.id).length;
+      return { ...a, downCount };
+    })
+    .sort((a, b) => b.downCount - a.downCount);
+  const globalCoverage = Math.round((monitoredSet.size / Math.max(1, A.length)) * 100);
+  const coreDimensionsMissing = A.filter(a => monitoredSet.has(a.path) || monitoredSet.has(a.name)).filter(a => {
+      const checks = Q.filter(q => q.asset === a.path || q.asset === a.name);
+      return !checks.some(c => c.type === 'Freshness' || c.type === 'Integrity');
+  }).length;
+
   return head('Data quality','Observe assertion results, coverage, and table health thresholds.','<button class="btn" data-action="export-quality">\u21e9 Export CSV</button><button class="btn primary" data-action="run-quality">\u25b6 Run checks</button>') +
     '<section class="panel" style="margin-bottom:20px;">' +
       '<div class="panel-head"><div><h2>Quality Scorecard</h2><p>High-level workspace quality metrics</p></div><span class="pill mint">ACTIVE SCORE</span></div>' +
@@ -332,6 +345,46 @@ function qualityPage(){
             '<td>'+pill(q.status)+'</td>' +
             '<td>'+(q.score?'> 95%':'< 24h')+'</td>' +
             '<td><button class="btn small" data-action="view-quality-evidence" data-id="'+esc(q.id)+'" style="height:24px; padding:0 8px;">View Evidence</button></td>' +
+          '</tr>')
+        ) +
+      '</div>' +
+    '</section>' +
+    '<section class="panel" style="margin-top:20px; margin-bottom:20px;">' +
+      '<div class="panel-head"><div><h2>Coverage Scorecard</h2><p>Monitoring presence across the catalog</p></div></div>' +
+      '<div class="panel-body" style="padding:16px 20px;">' +
+        '<div style="display:flex; justify-content:space-between; align-items:flex-end;">' +
+          '<div>' +
+            '<div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Global Coverage</div>' +
+            '<div style="font-size:2rem; font-weight:700; color:var(--ink); line-height:1;">'+globalCoverage+'%</div>' +
+          '</div>' +
+          '<div>' +
+            '<div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Unmonitored Assets</div>' +
+            '<div style="font-size:2rem; font-weight:700; color:var(--ink); line-height:1;">'+unmonitored.length+'</div>' +
+          '</div>' +
+          '<div>' +
+            '<div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Missing Core Dimensions</div>' +
+            '<div style="font-size:2rem; font-weight:700; color:var(--amber, #F59E0B); line-height:1;"><span class="status-dot"></span>'+coreDimensionsMissing+'</div>' +
+          '</div>' +
+          '<div>' +
+            '<div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Tier-1 Monitored</div>' +
+            '<div style="font-size:2rem; font-weight:700; color:var(--ink); line-height:1;">85%</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</section>' +
+    '<section class="panel">' +
+      '<div class="panel-head">' +
+        '<div><h2>Unmonitored Assets</h2><p>Prioritized by downstream impact</p></div>' +
+        '<button class="btn small" data-view="lineage">View in Lineage Map</button>' +
+      '</div>' +
+      '<div class="panel-body">' +
+        table(['Asset', 'Schema', 'Type', 'Direct Consumers', 'Action'], 
+          unmonitored.slice(0,10).map(u=>'<tr>' +
+            '<td><button class="inline-link" data-action="trace-asset-name" data-name="'+esc(u.path||u.name)+'">'+esc(u.path||u.name)+'</button></td>' +
+            '<td>'+esc(u.schema)+'</td>' +
+            '<td>'+esc(u.kind||u.type)+'</td>' +
+            '<td>'+u.downCount+' dependent assets</td>' +
+            '<td><button class="btn small" style="height:24px; padding:0 8px;">Create Test</button></td>' +
           '</tr>')
         ) +
       '</div>' +
