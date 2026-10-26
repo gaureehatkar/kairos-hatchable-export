@@ -37,7 +37,127 @@ const Q=[
 {name:'Churn feature freshness',asset:'ml_features.churn_features',type:'Freshness',score:82,status:'WARNING'},
 {name:'Marketing attribution coverage',asset:'analytics.marketing_attribution',type:'Completeness',score:91,status:'WARNING'},
 {name:'Product SKU integrity',asset:'analytics.product_performance',type:'Integrity',score:99.4,status:'PASS'}];
-const P={overview:'Overview',assets:'Data assets',asset_detail:'Asset profile',lineage:'Lineage explorer',sql:'SQL analysis',ingestion:'Ingestion & sources',evidence:'Evidence & reasoning',runs:'Pipeline runs',history:'Time travel',observatory:'3D observatory',quality:'Data quality',incidents:'Incident console',stewardship:'Stewardship',stewardship:'Stewardship',catalog:'Catalog & schemas',settings:'Preferences',integrations:'Integrations & API',signup:'Authentication',search:'Semantic search',products:'Data Products',profile:'User Profile'};
+function profilePage(){
+  const name=localStorage.getItem('kairos_profileName')||'Jatin Shende',
+        title=localStorage.getItem('kairos_profileTitle')||'Data Engineer / Steward',
+        domain=localStorage.getItem('kairos_profileDomain')||'Finance',
+        team=localStorage.getItem('kairos_profileTeam')||'Data Platform',
+        email=localStorage.getItem('kairos_profileEmail')||'jatinshende2006@gmail.com',
+        manager=localStorage.getItem('kairos_profileManager')||'Manoj Shende',
+        location=localStorage.getItem('kairos_profileLocation')||'Pune, India',
+        tab=S.profileTab||'overview';
+
+  const ownedAssets=A.filter(a=>a.owner===team||a.owner==='Data Platform'||a.owner==='Finance Analytics'||a.id==='a1'||a.id==='a4'||a.id==='a5');
+  const followedAssets=A.slice(0,3);
+  const openTasks=[
+    {id:'tsk-101',title:'Review PII access request for commerce.customer_profiles',priority:'High',due:'Today'},
+    {id:'tsk-102',title:'Certify analytics.orders_enriched contract v1.2',priority:'Medium',due:'Tomorrow'},
+    {id:'tsk-103',title:'Resolve freshness incident on ml_features.churn_features',priority:'High',due:'Overdue'},
+    {id:'tsk-104',title:'Approve glossary term definition for Net Revenue',priority:'Low',due:'Oct 28'},
+    {id:'tsk-105',title:'Audit evidence coverage on bi.revenue_dashboard',priority:'Medium',due:'Oct 30'}
+  ];
+  const activities=[
+    {icon:'✓',title:'Certified data product',desc:'analytics.orders_enriched marked as Certified (v1.2)',time:'2 hours ago'},
+    {icon:'↻',title:'Triggered lineage refresh',desc:'Executed pipeline run run-2841 via webhook ingestion',time:'1 day ago'},
+    {icon:'⚠',title:'Created incident',desc:'Flagged stale freshness on ml_features.churn_features',time:'2 days ago'},
+    {icon:'+',title:'Updated glossary term',desc:'Added strict definition for customer lifetime value (LTV)',time:'3 days ago'},
+    {icon:'✓',title:'Approved access request',desc:'Granted steward access to commerce.customer_orders',time:'4 days ago'}
+  ];
+  const responsibilities=[
+    {scope:'finance.* tables',role:'Technical Owner',status:'Active',evidence:'82%'},
+    {scope:'Customer PII assets',role:'Data Steward',status:'Active',evidence:'67%'},
+    {scope:'Billing domain',role:'Incident Responder',status:'Active',evidence:'91%'},
+    {scope:'Revenue Data Product',role:'Contract Owner',status:'Active',evidence:'88%'}
+  ];
+  const permissions=[
+    {role:'Workspace Administrator',scope:'Global / All Projects',status:'Assigned',granted:'Sep 7, 2025'},
+    {role:'Data Steward',scope:'Finance & Billing Domains',status:'Assigned',granted:'Nov 1, 2025'},
+    {role:'Pipeline Executor',scope:'Webhook & Airflow Integration',status:'Active',granted:'Jul 15, 2026'}
+  ];
+
+  let tabContent='';
+  if(tab==='overview'){
+    tabContent=`
+      <div class="grid-2">
+        <section class="panel">
+          <div class="panel-head"><h2>Accountability & Information</h2></div>
+          <div class="panel-body">
+            <div class="metric-line"><span>Full name</span><strong>${esc(name)}</strong></div>
+            <div class="metric-line"><span>Title</span><strong>${esc(title)}</strong></div>
+            <div class="metric-line"><span>Email</span><strong class="mono">${esc(email)}</strong></div>
+            <div class="metric-line"><span>Team</span><strong>${esc(team)}</strong></div>
+            <div class="metric-line"><span>Domain</span><strong>${esc(domain)}</strong></div>
+            <div class="metric-line"><span>Manager</span><strong>${esc(manager)}</strong></div>
+            <div class="metric-line"><span>Location</span><strong>${esc(location)}</strong></div>
+          </div>
+        </section>
+        <section class="panel">
+          <div class="panel-head"><h2>Governance Responsibilities & Active Incidents</h2></div>
+          <div class="panel-body">
+            <h4>Ownership Roles</h4>
+            <div class="metric-line"><span>Primary Role</span><strong>Data Steward & Technical Owner</strong></div>
+            <div class="metric-line"><span>Domain Governance</span><strong>Finance, Billing, ML Features</strong></div>
+            <h4 style="margin-top:20px;">Active Incidents Owned</h4>
+            <div class="activity-item" style="padding:8px 0; border-bottom:1px solid var(--line);">
+              <div class="activity-icon red">!</div>
+              <div class="activity-copy"><strong>Freshness SLA Overdue</strong><p>ml_features.churn_features is 12h behind schedule</p><small>Severity: High · Assigned to you</small></div>
+            </div>
+            <h4 style="margin-top:20px;">Recent Metadata Changes</h4>
+            <div class="activity-item" style="padding:8px 0;">
+              <div class="activity-icon blue">✓</div>
+              <div class="activity-copy"><strong>Schema update committed</strong><p>Added payment_status column to orders_enriched</p><small>Recorded via webhook · 3 hours ago</small></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    `;
+  } else if(tab==='assets'){
+    tabContent=panel('Owned Assets', table(['Asset','Domain','Type','Health','Freshness','Open Incidents','Evidence Coverage','Certification'], ownedAssets.map(a=>`<tr><td><button class="inline-link" data-action="asset" data-id="${a.id}"><strong>${esc(a.name)}</strong></button></td><td>${esc(a.schema)}</td><td>${esc(a.type)}</td><td>${pill('Degraded')}</td><td>2h overdue</td><td class="num">1</td><td class="num">${Math.floor(60+Math.random()*35)}%</td><td>${pill('Pending')}</td></tr>`)), 'Assets owned by your team and domain roles.');
+  } else if(tab==='followed'){
+    tabContent=panel('Followed Assets', table(['Asset','Domain','Type','Owner','Quality'], followedAssets.map(a=>`<tr><td><button class="inline-link" data-action="asset" data-id="${a.id}"><strong>${esc(a.name)}</strong></button></td><td>${esc(a.schema)}</td><td>${esc(a.type)}</td><td>${esc(a.owner)}</td><td class="num">${a.quality}%</td></tr>`)), 'Assets you are tracking for changes and quality updates.');
+  } else if(tab==='activity'){
+    tabContent=panel('Activity Feed', '<div class="activity-list">'+activities.map(x=>`<div class="activity-item"><div class="activity-icon blue">${x.icon}</div><div class="activity-copy"><strong>${x.title}</strong><p>${x.desc}</p><small>${x.time}</small></div></div>`).join('')+'</div>', 'Governance and operational events recorded for your user ID.');
+  } else if(tab==='tasks'){
+    tabContent=panel('Open Tasks & Approvals', table(['Task ID','Description','Priority','Due Date','Action'], openTasks.map(t=>`<tr><td class="mono"><strong>${t.id}</strong></td><td>${t.title}</td><td>${pill(t.priority)}</td><td>${t.due}</td><td><button class="btn small primary" data-action="resolve-task" data-id="${t.id}">Resolve</button></td></tr>`)), 'Governance items requiring your review or approval.');
+  } else if(tab==='responsibilities'){
+    tabContent=panel('Responsibilities & Scope', table(['Scope','Role','Status','Evidence Coverage'], responsibilities.map(r=>`<tr><td><strong>${r.scope}</strong></td><td>${r.role}</td><td>${pill(r.status)}</td><td class="num">${r.evidence}</td></tr>`)), 'Formal governance scope and accountability mappings.');
+  } else if(tab==='permissions'){
+    tabContent=panel('Permissions & Access Tiers', table(['Role / Permission','Scope','Status','Granted Date'], permissions.map(p=>`<tr><td><strong>${p.role}</strong></td><td>${p.scope}</td><td>${pill(p.status)}</td><td>${p.granted}</td></tr>`)), 'Assigned platform access tiers and security boundaries.');
+  }
+
+  const tabs=['overview','assets','followed','activity','tasks','responsibilities','permissions'];
+  const tabLabels={overview:'Overview',assets:'Owned Assets',followed:'Followed',activity:'Activity',tasks:'Tasks',responsibilities:'Responsibilities',permissions:'Permissions'};
+
+  return head('User Profile & Workspace Identity','Manage accountability, stewardship roles, owned assets, and governance responsibilities.', '<button class="btn primary" data-action="save-profile">Save Profile</button><button class="btn" data-view="settings">Preferences</button>') +
+    `<section class="asset-hero tone-blue" style="margin-bottom:24px;">
+       <div class="asset-hero-main">
+         <div class="asset-hero-id">
+           <div class="profile-avatar profile-preview" id="userProfileAvatar" style="width:64px; height:64px; font-size:24px; border-radius:50%; border:2px solid var(--ink); background:var(--tint-blue); display:flex; align-items:center; justify-content:center; font-weight:700;">JS</div>
+           <div>
+             <h2>${esc(name)}</h2>
+             <div class="asset-path mono">${esc(title)} · ${esc(email)}</div>
+           </div>
+         </div>
+         <div class="asset-hero-pills">
+           <span class="pill blue">Domain: ${esc(domain)}</span>
+           <span class="pill mint">Team: ${esc(team)}</span>
+           <span class="pill amber">Location: ${esc(location)}</span>
+         </div>
+       </div>
+       <div class="asset-hero-stats">
+         <div class="hero-stat"><span>Owned Assets</span><strong>24</strong></div>
+         <div class="hero-stat"><span>Followed Assets</span><strong>8</strong></div>
+         <div class="hero-stat down"><span>Open Tasks</span><strong>5</strong></div>
+         <div class="hero-stat"><span>Evidence Coverage</span><strong>86%</strong></div>
+       </div>
+     </section>
+     <div style="display:flex; gap:8px; margin-bottom:20px; overflow-x:auto; padding-bottom:4px;">
+       ${tabs.map(t=>`<button class="btn ${tab===t?'primary':''}" data-action="set-profile-tab" data-tab="${t}">${tabLabels[t]}</button>`).join('')}
+     </div>
+     ${tabContent}`;
+}
+
+const P={overview:'Overview',assets:'Data assets',asset_detail:'Asset profile',lineage:'Lineage explorer',sql:'SQL analysis',ingestion:'Ingestion & sources',evidence:'Evidence & reasoning',runs:'Pipeline runs',history:'Time travel',observatory:'3D observatory',quality:'Data quality',incidents:'Incident console',stewardship:'Stewardship',catalog:'Catalog & schemas',settings:'Preferences',integrations:'Integrations & API',signup:'Authentication',search:'Semantic search',products:'Data Products',profile:'User Profile'};
 const localDateTime=()=>{const d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,16)};const S={view:'overview',columnMapSearch:'',dataMode:(localStorage.getItem('kairos_dataMode')==='demo'?'demo':'postgresql'),dataError:'',assetFilter:'all',assetSearch:'',selected:'a4',evFilter:'all',evSearch:'',selectedEv:'EV-901',runFilter:'all',runSearch:'',graphMode:'all',graphDepth:'1',stateFilter:'all',graphZoom:1,graphPanX:0,graphPanY:0,columnGraph:false,sql:'SELECT o.order_date, p.region, SUM(o.total_amount) AS net_revenue\nFROM commerce.customer_orders o\nJOIN commerce.customer_profiles p ON o.customer_id = p.customer_id\nLEFT JOIN billing.payments_raw pay ON o.order_id = pay.order_id\nGROUP BY 1, 2;',valid:localDateTime(),recorded:localDateTime(),temporalResult:null,temporalError:'',columnMappings:[],columnMappingsUndatedCount:0,columnMappingsError:'',charts:[],cleanup:null};
 const DEMO={A:JSON.parse(JSON.stringify(A)),E:JSON.parse(JSON.stringify(E)),V:JSON.parse(JSON.stringify(V)),R:JSON.parse(JSON.stringify(R)),Q:JSON.parse(JSON.stringify(Q))};
     async function setDataMode(mode){
