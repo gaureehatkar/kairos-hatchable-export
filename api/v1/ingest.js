@@ -36,6 +36,17 @@ export default async function (req, res) {
     if (new Set(qualifiedNames).size !== qualifiedNames.length) return res.status(400).json({ok:false,error:"duplicate_metadata_qualified_name",message:"Each asset must resolve to a unique qualified_name within the import batch. Duplicate names would otherwise merge distinct assets."});
     const invalidRelationship = relationships.findIndex(e => !e || typeof e !== "object" || Array.isArray(e) || !String(e.source_id||"").trim() || !String(e.target_id||"").trim());
     if (invalidRelationship !== -1) return res.status(400).json({ok:false,error:"invalid_metadata_relationship",message:"Each relationship must have source_id and target_id. Invalid relationship at index "+invalidRelationship+"."});
+    const invalidColumnMapping = relationships.findIndex(rel => {
+      if (rel.column_mappings != null && !Array.isArray(rel.column_mappings)) return true;
+      if (!Array.isArray(rel.column_mappings)) return false;
+      return rel.column_mappings.some(m => {
+        if (!m || typeof m !== "object" || Array.isArray(m) || !String(m.source_column||"").trim() || !String(m.target_column||"").trim()) return true;
+        if (m.valid_from != null && Number.isNaN(Date.parse(String(m.valid_from)))) return true;
+        if (m.valid_to != null && (m.valid_from == null || Number.isNaN(Date.parse(String(m.valid_to))))) return true;
+        return m.valid_from != null && m.valid_to != null && Date.parse(String(m.valid_to)) <= Date.parse(String(m.valid_from));
+      });
+    });
+    if (invalidColumnMapping !== -1) return res.status(400).json({ok:false,error:"invalid_column_mapping",message:"column_mappings must be an array; each mapping needs source_column and target_column; date bounds must be valid, valid_to requires valid_from, and valid_to must be later than valid_from. Invalid mapping under relationship index "+invalidColumnMapping+"."});
     const missingEndpoint = relationships.findIndex(e => !ids.has(String(e.source_id).trim()) || !ids.has(String(e.target_id).trim()));
     if (missingEndpoint !== -1) return res.status(400).json({ok:false,error:"unknown_metadata_relationship_endpoint",message:"Every relationship endpoint must reference an asset included in this import batch. Invalid relationship at index "+missingEndpoint+"."});
     const invalidEvidence = relationships.findIndex(e => e.evidence != null && (typeof e.evidence !== "object" || Array.isArray(e.evidence)));
@@ -61,7 +72,7 @@ export default async function (req, res) {
   try {
     if (kind === "metadata_graph") {
       const assets = payload.assets || [], relationships = payload.relationships || [], idMap = new Map();
-      let assetsUpserted=0, edgesUpserted=0, evidenceUpserted=0, skipped=0;
+      let assetsUpserted=0, edgesUpserted=0, evidenceUpserted=0, columnMappingsUpserted=0, skipped=0;
       for (const a of assets) {
         const externalId=safe(String(a.id).trim(),900), name=safe(String(a.name||a.qualified_name).trim(),900), namespace=safe(a.namespace||a.domain||a.provider||"general",300);
         const qualifiedName=safe(a.qualified_name||((namespace?namespace+"/":"")+name),1200);
@@ -78,13 +89,30 @@ export default async function (req, res) {
         const metadata={source_system:safe(rel.source_system||payload.source_system||"generic_metadata",100),relationship_type:edgeType,activity:rel.activity||null,confidence:rel.confidence??null,description:rel.description||null,provenance:rel.provenance||"Supplied relationship metadata; not independently verified execution proof",external_metadata:rel.metadata||{}};
         await db.query("INSERT INTO kairos_lineage_edges (id,source_asset_id,target_asset_id,edge_type,evidence_ref,metadata) VALUES ($1,$2,$3,$4,$5,$6::jsonb) ON CONFLICT (source_asset_id,target_asset_id,edge_type) DO UPDATE SET evidence_ref=EXCLUDED.evidence_ref,metadata=EXCLUDED.metadata",[edgeId,source.id,target.id,edgeType,evidenceRef,jsonText(metadata)]);
         edgesUpserted++;
+        for (const mapping of (Array.isArray(rel.column_mappings) ? rel.column_mappings : [])) {
+          const sourceColumn=safe(String(mapping.source_column).trim(),500);
+          const targetColumn=safe(String(mapping.target_column).trim(),500);
+          const mappingType=safe(mapping.mapping_type||mapping.type||"static_candidate",100);
+          const transformation=mapping.transformation||mapping.expression||null;
+          const evidenceRef=mapping.evidence_ref||null;
+          const validFrom=mapping.valid_from||null, validTo=mapping.valid_to||null;
+          const mappingMetadata={...(mapping.metadata&&typeof mapping.metadata==="object"&&!Array.isArray(mapping.metadata)?mapping.metadata:{}),source_system:safe(mapping.source_system||rel.source_system||payload.source_system||"generic_metadata",100),provenance:mapping.provenance||"Supplied column mapping; not independently verified execution proof"};
+          const metadataJson=jsonText(mappingMetadata);
+          const mappingKey="generic-column:"+await stableFingerprint({edgeId,sourceColumn,targetColumn});
+          const mappingId="generic-column-version:"+await stableFingerprint({mappingKey,mappingType,transformation,evidenceRef,validFrom,validTo,metadata:mappingMetadata,nonce:crypto.randomUUID()});
+          const mappingWrite=await db.query(
+            "WITH lock_key AS MATERIALIZED (SELECT pg_advisory_xact_lock(hashtext($1))), ts AS MATERIALIZED (SELECT clock_timestamp() AS recorded_at FROM lock_key), existing AS MATERIALIZED (SELECT 1 FROM kairos_column_lineage CROSS JOIN ts WHERE mapping_key=$1 AND recorded_to IS NULL AND mapping_type=$7 AND transformation IS NOT DISTINCT FROM $8 AND evidence_ref IS NOT DISTINCT FROM $9 AND valid_from IS NOT DISTINCT FROM $10::timestamptz AND valid_to IS NOT DISTINCT FROM $11::timestamptz AND metadata=$12::jsonb LIMIT 1), closed AS (UPDATE kairos_column_lineage SET recorded_to=ts.recorded_at FROM ts WHERE mapping_key=$1 AND recorded_to IS NULL AND NOT EXISTS (SELECT 1 FROM existing) RETURNING id), gate AS (SELECT count(*) FROM closed) INSERT INTO kairos_column_lineage (id,mapping_key,source_asset_id,source_column,target_asset_id,target_column,mapping_type,transformation,evidence_ref,valid_from,valid_to,recorded_from,metadata) SELECT $2,$1,$3,$4,$5,$6,$7,$8,$9,$10,$11,ts.recorded_at,$12::jsonb FROM ts CROSS JOIN gate WHERE NOT EXISTS (SELECT 1 FROM existing) RETURNING id",
+            [mappingKey,mappingId,source.id,sourceColumn,target.id,targetColumn,mappingType,transformation,evidenceRef,validFrom,validTo,metadataJson]
+          );
+          if(mappingWrite.rows?.length) columnMappingsUpserted++;
+        }
         if (rel.evidence && typeof rel.evidence==="object") {
           const ev=rel.evidence, evId=safe(ev.id||"generic-evidence:"+edgeId,1800);
           await db.query("INSERT INTO kairos_evidence (id,source_name,target_name,state,evidence_type,run_id,coverage,rule_name,explanation,valid_from,valid_to,recorded_from,metadata) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,now(),$12::jsonb) ON CONFLICT (id) DO UPDATE SET state=EXCLUDED.state,evidence_type=EXCLUDED.evidence_type,explanation=EXCLUDED.explanation,metadata=EXCLUDED.metadata",[evId,source.qualifiedName,target.qualifiedName,safe(String(ev.state||"UNKNOWN").toUpperCase(),40),safe(ev.type||rel.source_system||payload.source_system||"supplied_metadata",120),ev.run_id||null,ev.coverage||null,ev.rule_name||null,safe(ev.explanation||"Evidence supplied with generic metadata; inspect its scope before drawing conclusions.",2000),ev.valid_from||null,ev.valid_to||null,jsonText({...((ev.metadata&&typeof ev.metadata==="object"&&!Array.isArray(ev.metadata))?ev.metadata:{}),source_system:payload.source_system||"generic_metadata",relationship_id:edgeId,details:ev.metadata||{}})]);
           evidenceUpserted++;
         }
       }
-      return res.status(200).json({ok:true,kind,source:payload.source_system||"generic_metadata",assets_upserted:assetsUpserted,relationships_upserted:edgesUpserted,evidence_upserted:evidenceUpserted,relationships_skipped:skipped,disclosure:"Generic assets and supplied relationships were stored without SQL parsing. Relationship records are not automatically proof of runtime execution; inspect attached evidence and scope."});
+      return res.status(200).json({ok:true,kind,source:payload.source_system||"generic_metadata",assets_upserted:assetsUpserted,relationships_upserted:edgesUpserted,column_mappings_upserted:columnMappingsUpserted,evidence_upserted:evidenceUpserted,relationships_skipped:skipped,disclosure:"Generic assets, supplied relationships, and explicit column mappings were stored without SQL parsing. Mapping records are not automatically proof of runtime execution; inspect attached evidence and scope."});
     }
     if (kind === "dbt_manifest") {
       const nodes = payload.nodes || {}, sources = payload.sources || {}, exposures = payload.exposures || {};
