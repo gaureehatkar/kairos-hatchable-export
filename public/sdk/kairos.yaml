@@ -1,0 +1,11 @@
+source:
+  type: "postgresql"
+  schema: "commerce"
+  extract_lineage: true
+  
+destination:
+  type: "kairos_rest_api"
+  config:
+    endpoint: "YOUR_PROJECT_URL_HERE/api/v1/ingest"
+    # Paste the token generated from your Integrations UI here:
+    token: "krs_live_EXAMPLE_TOKEN"

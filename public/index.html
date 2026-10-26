@@ -56,10 +56,16 @@
           <button class="nav-item nav-child" data-view="history">Time travel</button>
         </div>
       </div>
+      <div class="nav-group" data-nav-group="settings">
+        <button class="nav-item nav-primary" data-view="integrations" aria-expanded="false"><span class="nav-icon">⚙</span>System<span class="nav-chevron" aria-hidden="true">⌄</span></button>
+        <div class="nav-sublist" hidden>
+          <button class="nav-item nav-child" data-view="integrations">Integrations & API</button>
+          <button class="nav-item nav-child" data-view="settings">Preferences</button>
+        </div>
+      </div>
     </nav>
     <div class="sidebar-bottom">
       <div class="health-card"><div class="health-top"><span class="status-dot"></span><strong>Workspace mode</strong><span class="health-live" id="sidebarModeBadge">DEMO</span></div><p id="sidebarModeDescription">Synthetic sample records; not production data.</p><div class="health-foot"><span>Data source</span><b id="sidebarSourceLabel">Demo</b></div></div>
-      <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span>Settings</button>
       <button class="user-row profile-shortcut" type="button" data-view="settings" aria-label="Open profile and workspace settings"><span class="avatar profile-avatar">JS</span><span class="user-copy"><strong class="profile-display-name">Workspace admin</strong><small>Profile & settings</small></span><span class="more" aria-hidden="true">•••</span></button>
     </div>
   </aside>
