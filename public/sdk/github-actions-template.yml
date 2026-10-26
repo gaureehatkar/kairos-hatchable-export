@@ -1,0 +1,31 @@
+name: "Kairos Metadata Ingestion"
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: '0 */6 * * *' # Run every 6 hours
+
+jobs:
+  ingest_metadata:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          pip install requests pyyaml
+
+      - name: Run Kairos Ingestion SDK
+        env:
+          KAIROS_API_TOKEN: ${{ secrets.KAIROS_API_TOKEN }}
+        run: |
+          # Replace placeholder token in kairos.yaml with GitHub Secret before running
+          sed -i "s/krs_live_EXAMPLE_TOKEN/${KAIROS_API_TOKEN}/g" public/sdk/kairos.yaml
+          python public/sdk/kairos_ingest.py --run public/sdk/kairos.yaml
