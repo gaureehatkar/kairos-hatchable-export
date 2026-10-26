@@ -344,32 +344,27 @@ function qualityPage(){
         ) +
       '</div>' +
     '</section>' +
-    '<section class="panel" style="margin-top:20px; margin-bottom:20px;">' +
-      '<div class="panel-head"><div><h2>Coverage Scorecard</h2><p>Monitoring presence across the catalog</p></div></div>' +
-      '<div class="panel-body" style="padding:16px 20px;">' +
-        '<div style="display:flex; justify-content:space-between; align-items:flex-end;">' +
-          '<div>' +
-            '<div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Global Coverage</div>' +
-            '<div style="font-size:2rem; font-weight:700; color:var(--ink); line-height:1;">'+globalCoverage+'%</div>' +
-          '</div>' +
-          '<div>' +
-            '<div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Unmonitored Assets</div>' +
-            '<div style="font-size:2rem; font-weight:700; color:var(--ink); line-height:1;">'+unmonitored.length+'</div>' +
-          '</div>' +
-          '<div>' +
-            '<div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Missing Core Dimensions</div>' +
-            '<div style="font-size:2rem; font-weight:700; color:var(--amber, #F59E0B); line-height:1;"><span class="status-dot"></span>'+coreDimensionsMissing+'</div>' +
-          '</div>' +
-          '<div>' +
-            '<div style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Tier-1 Monitored</div>' +
-            '<div style="font-size:2rem; font-weight:700; color:var(--ink); line-height:1;">85%</div>' +
-          '</div>' +
-        '</div>' +
+    '<div class="stat-grid" style="margin-top:20px; margin-bottom:20px;">' +
+      '<div class="stat-card lead">' +
+        '<div class="stat-top"><span>Global Coverage</span></div>' +
+        '<div class="stat-value">'+globalCoverage+'%</div>' +
       '</div>' +
-    '</section>' +
+      '<div class="stat-card">' +
+        '<div class="stat-top"><span>Unmonitored Assets</span></div>' +
+        '<div class="stat-value">'+unmonitored.length+'</div>' +
+      '</div>' +
+      '<div class="stat-card">' +
+        '<div class="stat-top"><span>Missing Core Dimensions</span></div>' +
+        '<div class="stat-value" style="color:var(--amber, #F59E0B);"><span class="status-dot"></span>'+coreDimensionsMissing+'</div>' +
+      '</div>' +
+      '<div class="stat-card">' +
+        '<div class="stat-top"><span>Tier-1 Monitored</span></div>' +
+        '<div class="stat-value">85%</div>' +
+      '</div>' +
+    '</div>' +
     '<section class="panel">' +
       '<div class="panel-head">' +
-        '<div><h2>Unmonitored Assets</h2><p>Prioritized by downstream impact</p></div>' +
+        '<div><h2>Unmonitored Assets Triage</h2><p>Prioritized by downstream impact count</p></div>' +
         '<button class="btn small" data-view="lineage">View in Lineage Map</button>' +
       '</div>' +
       '<div class="panel-body">' +
@@ -379,7 +374,7 @@ function qualityPage(){
             '<td>'+esc(u.schema)+'</td>' +
             '<td>'+esc(u.kind||u.type)+'</td>' +
             '<td>'+u.downCount+' dependent assets</td>' +
-            '<td><button class="btn small" style="height:24px; padding:0 8px;">Create Test</button></td>' +
+            '<td><button class="btn small">Create Test</button></td>' +
           '</tr>')
         ) +
       '</div>' +
