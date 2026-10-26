@@ -1,4 +1,4 @@
-const db = require('../../lib/db.js');
+import { db } from 'hatchable';
 
 export const access = 'public';
 
