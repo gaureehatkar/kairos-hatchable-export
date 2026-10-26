@@ -598,7 +598,7 @@ body[data-tone="green"]{--tone:var(--green)}body[data-tone="yellow"]{--tone:var(
 @media(max-width:760px){.lineage-cols{grid-template-columns:minmax(0,1fr)}.impact-summary.big{grid-template-columns:repeat(2,minmax(0,1fr))}.asset-hero-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.asset-hero{padding:18px}}
 
 /* Reverted latest CSS refinement; previous stylesheet rules remain active.
-/* Kairos enterprise refinement: calm surfaces, consistent metrics, and readable identifiers. */
+Kairos enterprise refinement: calm surfaces, consistent metrics, and readable identifiers.
 :root[data-theme="dark"] {
   --bg:#0F172A;
   --surface:#1E293B;
@@ -624,7 +624,7 @@ body[data-tone="green"]{--tone:var(--green)}body[data-tone="yellow"]{--tone:var(
   }
 }
 
-/* KPI grids: four-up desktop, two-up tablet, single column on narrow phones. */
+KPI grid rules below are disabled.
 .stat-grid {
   grid-template-columns:repeat(4,minmax(0,1fr));
   gap:12px;
@@ -647,7 +647,7 @@ body[data-tone="green"]{--tone:var(--green)}body[data-tone="yellow"]{--tone:var(
 .stat-card .stat-value { font-variant-numeric:tabular-nums; }
 .stat-foot { line-height:1.45; }
 
-/* Operational state colours carry meaning, not decoration. */
+Operational state colour rules below are disabled.
 .pill.mint { color:var(--ok-ink); }
 .pill.amber { color:#8A5200; }
 .pill.red { color:var(--warn-ink); }
@@ -660,7 +660,7 @@ body[data-tone="green"]{--tone:var(--green)}body[data-tone="yellow"]{--tone:var(
   :root:not([data-theme="light"]) .pill.amber { color:#FBBF24; }
 }
 
-/* Stable, scannable table rows and consistent compact actions. */
+Table and action rules below are disabled.
 .table-wrap { min-width:0; }
 .table-wrap thead th { position:sticky; top:0; z-index:2; }
 .table-wrap td code,
@@ -691,7 +691,7 @@ body[data-tone="green"]{--tone:var(--green)}body[data-tone="yellow"]{--tone:var(
 }
 .empty-state .btn { margin-top:6px; }
 
-/* Keep the graph overlay away from column labels without blocking graph input. */
+Graph overlay rules below are disabled.
 .graph-overlay {
   top:12px;
   left:14px;
@@ -701,7 +701,7 @@ body[data-tone="green"]{--tone:var(--green)}body[data-tone="yellow"]{--tone:var(
   background:var(--surface);
 }
 
-/* At standard HD widths keep the filter bar compact; preserve touch-sized controls on mobile. */
+Responsive refinement rules below are disabled.
 @media (max-width:1024px) {
   .stat-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
   .lineage-layout { grid-template-columns:minmax(0,1fr); }
