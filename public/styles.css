@@ -251,6 +251,7 @@ td .subline{margin-top:2px;font-size:12px;color:var(--faint)}
 .lineage-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,320px);gap:var(--gap);align-items:start}
 .lineage-layout>.side-stack{position:sticky;top:calc(var(--topbar) + 16px)}
 .graph-toolbar{display:flex;align-items:flex-end;flex-wrap:wrap;gap:8px;padding:8px 20px 16px}
+.graph-toolbar.action-row{padding-top:0;border-top:1px solid var(--border);margin-top:-8px;padding-bottom:12px}
 .graph-toolbar .search-box{flex:1 1 180px;min-width:170px}
 .graph-control{display:flex;flex-direction:column;gap:4px;min-width:0}
 .graph-control>label{font-size:11px;color:var(--faint)}
