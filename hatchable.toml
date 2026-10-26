@@ -1,7 +1,6 @@
-[[cron]]
-path = "/api/jobs/simulate-quality"
-schedule = "0 * * * *"
-
 [ai]
 required = true
-providers = ["anthropic", "openai"]
+
+[[cron]]
+path = "/api/v1/worker/process"
+schedule = "0 * * * *"
