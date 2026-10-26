@@ -250,7 +250,7 @@ td .subline{margin-top:2px;font-size:.8rem;color:var(--muted)}
 .graph-toolbar .search-box{flex:1 1 150px;min-width:140px}
 .graph-control{display:flex;flex-direction:column;gap:3px;min-width:0}
 .graph-control>label{font:500 .60rem var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
-.graph-control select,.graph-control input,.graph-time-control input{height:34px;padding:0 8px;border:2px solid var(--ink);border-radius:6px;background:var(--surface);font-size:.82rem;color:var(--ink)}
+.graph-control select,.graph-control input,.graph-time-control input{height:34px;min-height:34px;padding:0 8px;border:2px solid var(--ink);border-radius:6px;background:var(--surface);font-size:.82rem;color:var(--ink)}
 .graph-control select{min-width:110px;padding-right:24px}
 .graph-time-control input{width:150px;font-size:.78rem}
 .graph-zoom-controls{display:flex;align-items:center;gap:4px;margin-left:auto}
