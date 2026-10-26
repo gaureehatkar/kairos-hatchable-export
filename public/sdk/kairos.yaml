@@ -3,6 +3,11 @@ source:
   schema: "commerce"
   extract_lineage: true
   
+ml_tracking:
+  type: "mlflow"
+  tracking_uri: "http://localhost:5000"
+  extract_models: true
+  
 destination:
   type: "kairos_rest_api"
   config:
