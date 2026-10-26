@@ -7,6 +7,11 @@ ml_tracking:
   type: "mlflow"
   tracking_uri: "http://localhost:5000"
   extract_models: true
+
+ai_tracing:
+  type: "opentelemetry"
+  collector_endpoint: "http://localhost:4318"
+  extract_rag_traces: true
   
 destination:
   type: "kairos_rest_api"

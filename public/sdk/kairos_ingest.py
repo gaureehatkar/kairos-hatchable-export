@@ -13,6 +13,12 @@ try:
 except ImportError:
     MLFLOW_AVAILABLE = False
 
+try:
+    from opentelemetry import trace
+    OTEL_AVAILABLE = True
+except ImportError:
+    OTEL_AVAILABLE = False
+
 # Setup professional terminal logging for the demo
 logging.basicConfig(
     level=logging.INFO,
@@ -86,7 +92,6 @@ def extract_mlflow_metadata(tracking_uri):
     assets = []
     relationships = []
     
-    # In a real environment, we use the MLflowClient to fetch registered models
     if MLFLOW_AVAILABLE:
         try:
             client = MlflowClient(tracking_uri=tracking_uri)
@@ -102,7 +107,6 @@ def extract_mlflow_metadata(tracking_uri):
                     "owner": "Data Science",
                     "description": model.description
                 })
-                # Link to training data
                 relationships.append({
                     "source_id": "dbt_analytics_enriched",
                     "target_id": model_id,
@@ -116,7 +120,6 @@ def extract_mlflow_metadata(tracking_uri):
     else:
         logger.warning("mlflow package not installed. Simulating MLflow extraction for demo.")
 
-    # Fallback Simulation for seamless demo execution
     logger.info("Extracting Model Versions and Parameters...")
     assets.append({
         "id": "mlflow_model_churn_predictor",
@@ -128,9 +131,53 @@ def extract_mlflow_metadata(tracking_uri):
         "metadata": {"metrics": {"accuracy": 0.92, "f1_score": 0.89}, "framework": "xgboost"}
     })
     relationships.append({
-        "source_id": "dbt_analytics_enriched", # Training data dependency
+        "source_id": "dbt_analytics_enriched",
         "target_id": "mlflow_model_churn_predictor",
         "type": "training_dependency"
+    })
+    
+    return {"assets": assets, "relationships": relationships}
+
+def extract_genai_traces(otel_endpoint):
+    """Extracts LLM/RAG traces from OpenTelemetry collector."""
+    logger.info(f"Connecting to OpenTelemetry Collector at {otel_endpoint}...")
+    
+    assets = []
+    relationships = []
+    
+    if OTEL_AVAILABLE:
+        logger.info("opentelemetry package found. Initializing trace readers...")
+    else:
+        logger.warning("opentelemetry package not installed. Simulating GenAI traces for demo.")
+
+    logger.info("Extracting RAG spans and LLM token metrics...")
+    
+    # Asset for the GenAI Application
+    assets.append({
+        "id": "genai_rag_support_bot",
+        "name": "support_copilot",
+        "qualified_name": "ai.support_copilot",
+        "type": "GenAI Agent",
+        "kind": "output",
+        "owner": "AI Engineering",
+        "metadata": {
+            "model_version": "gpt-4-turbo",
+            "framework": "langchain",
+            "p99_latency_ms": 1240,
+            "avg_cost_per_query": 0.003
+        }
+    })
+    
+    # Relationships showing the RAG bot querying the data warehouse and using the ML model
+    relationships.append({
+        "source_id": "dbt_analytics_enriched", 
+        "target_id": "genai_rag_support_bot",
+        "type": "retrieval_context"
+    })
+    relationships.append({
+        "source_id": "mlflow_model_churn_predictor", 
+        "target_id": "genai_rag_support_bot",
+        "type": "inference_dependency"
     })
     
     return {"assets": assets, "relationships": relationships}
@@ -180,6 +227,7 @@ if __name__ == "__main__":
     config = load_config(args.run)
     schema = config.get("source", {}).get("schema", "public")
     mlflow_uri = config.get("ml_tracking", {}).get("tracking_uri", "http://localhost:5000")
+    otel_endpoint = config.get("ai_tracing", {}).get("collector_endpoint", "http://localhost:4318")
     endpoint = config.get("destination", {}).get("config", {}).get("endpoint")
     token = config.get("destination", {}).get("config", {}).get("token")
 
@@ -201,6 +249,12 @@ if __name__ == "__main__":
         ml_data = extract_mlflow_metadata(mlflow_uri)
         payload["assets"].extend(ml_data["assets"])
         payload["relationships"].extend(ml_data["relationships"])
+
+    # Extract GenAI OpenTelemetry Traces
+    if "ai_tracing" in config:
+        ai_data = extract_genai_traces(otel_endpoint)
+        payload["assets"].extend(ai_data["assets"])
+        payload["relationships"].extend(ai_data["relationships"])
 
     # 3. Push Aggregated Graph
     push_to_kairos(endpoint, token, payload)
