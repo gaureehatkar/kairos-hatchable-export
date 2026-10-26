@@ -597,6 +597,7 @@ body[data-tone="green"]{--tone:var(--green)}body[data-tone="yellow"]{--tone:var(
 @media(max-width:1180px){.asset-hero-stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:760px){.lineage-cols{grid-template-columns:minmax(0,1fr)}.impact-summary.big{grid-template-columns:repeat(2,minmax(0,1fr))}.asset-hero-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.asset-hero{padding:18px}}
 
+/* Reverted latest CSS refinement; previous stylesheet rules remain active.
 /* Kairos enterprise refinement: calm surfaces, consistent metrics, and readable identifiers. */
 :root[data-theme="dark"] {
   --bg:#0F172A;
@@ -713,4 +714,4 @@ body[data-tone="green"]{--tone:var(--green)}body[data-tone="yellow"]{--tone:var(
   .graph-toolbar.action-row .graph-actions-group,
   .graph-toolbar.action-row .graph-zoom-controls { flex-wrap:wrap; }
   .empty-state { padding:24px 14px; }
-}
+} */
