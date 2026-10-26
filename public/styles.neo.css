@@ -726,7 +726,7 @@ Responsive refinement rules below are disabled.
 .graph-stage>svg text{user-select:none;}
 .graph-toolbar.action-row .graph-actions-group{min-width:0;}
 .graph-toolbar.action-row .btn{max-width:100%;}
-.pii-overlay-toggle[aria-pressed="true"]{background:#ffe4e6;border-color:#be123c;color:#9f1239;box-shadow:0 2px 0 #be123c;}
-.pii-overlay-toggle[aria-pressed="true"]:hover{background:#fecdd3;color:#881337;}
+.pii-node-badge{paint-order:stroke;}
+.pii-node-label{pointer-events:none;}
 .pii-evidence-panel{color:var(--ink);}
 @media(max-width:640px){.graph-stage>svg{min-height:320px}.graph-toolbar.action-row .graph-actions-group{width:100%}.graph-toolbar.action-row .graph-actions-group .btn{flex:1 1 auto}.graph-toolbar.action-row .graph-zoom-controls{width:100%;margin-left:0}.graph-toolbar.action-row .graph-zoom-controls .btn{flex:1 1 auto;}}
