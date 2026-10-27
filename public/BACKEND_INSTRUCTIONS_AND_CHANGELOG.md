@@ -32,7 +32,7 @@ This document is the **canonical full-stack specification, contributor change lo
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
 
-### Version 270 — Consistent All Assets Title & Welcome Name Fallback (27 Oct 2026)
+### Version 271 — Force-Refreshed All Assets Title & Welcome Name Fallback (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by the project team
 * **Frontend UI Changes:** Aligned the navigation breadcrumb and page heading to **All assets** in both Demo and PostgreSQL catalog modes. The overview greeting now ignores generic placeholder profile values such as “Workspace” and falls back to the configured default name. Updated the JavaScript cache key and footer build label.
 * **AI Feature Rationale:** Consistent page naming reduces confusion between the Catalog navigation item and the page heading; filtering placeholder labels avoids greeting users as if “Workspace” were a person's name.
