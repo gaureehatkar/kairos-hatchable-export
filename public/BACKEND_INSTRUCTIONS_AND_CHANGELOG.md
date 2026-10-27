@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 260)  
+**Last Updated:** 27 October 2026 (Version 264)  
 
 ---
 
@@ -31,6 +31,13 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 264 — Interactive Transformation Inspection and SQL Analysis (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by the project team
+* **Frontend UI Changes:** In the Column dependency inspector, transformation values are now buttons using `data-action="inspect-transform"` that open the existing Column Lineage Logic modal. The modal's **Analyze in SQL View** button now uses `data-action="analyze-transform-sql"`; its handler transfers the selected transformation expression into `S.sql`, opens SQL Analysis, and runs the existing static reference parser.
+* **AI Feature Rationale:** Makes transformation provenance inspectable from the mapping inventory and reduces manual copy/paste when investigating a transformation. Reuses the existing modal and static parser rather than introducing a new analysis path.
+* **Backend Requirements:** None. This change uses the currently loaded column-mapping data and existing client-side SQL preview; no API, database, or migration changes were made.
+* **Backend Gap Note:** The SQL preview remains heuristic static analysis and does not execute SQL or prove runtime lineage.
 
 ### Version 261 — Personalized Metadata Overview Greeting (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by Jatin Shende
@@ -192,6 +199,7 @@ This document is the **canonical full-stack specification, contributor change lo
 | **Temporal Lineage Snapshot Export** | Jatin Shende / Kairos AI Developer | Lineage Explorer, `GET /api/v1/lineage/export` | **Problem:** Client-side export captures only visible graph slices.<br>**Rationale:** Exports the complete authorized snapshot payload and selected temporal values, while disclosing that table-level edges are not yet bitemporal. |
 | **19-View Full-Stack QA Verification** | Jatin Shende / AI Developer | All Workspace Views | **Problem:** Broken navigation links or unmapped buttons in UI views.<br>**Rationale:** Executed comprehensive audit across all 19 views and 11 sub-tabs to ensure complete API mapping or client-side fallback handling. |
 | **Metadata Attention Responsive Layout** | Kairos AI Developer / requested by Jatin Shende | Overview → Metadata attention (`public/app.js`, `public/styles.neo.css`) | **Problem:** Summary counts, common-gap controls, and long asset names could feel crowded or misalign at different widths.<br>**Rationale:** Separated the panel into a three-column metric summary, two-column common-gap grid, and wrapping asset cards that collapse on mobile; this makes discovery and ownership gaps easier to scan without changing the underlying coverage calculation. No backend changes were required. |
+| **Interactive Transformation Inspection & SQL Analysis** | Kairos AI Developer | Column dependency inspector and Column Lineage Logic modal (`public/app.js`) | **Problem:** Transformation text in the mapping inventory was not clickable, and SQL-view navigation relied on a generic view action. **Rationale:** Uses explicit `inspect-transform` and `analyze-transform-sql` actions to open transformation details and transfer the selected expression into the existing static SQL parser without changing backend behavior. |
 
 ---
 
