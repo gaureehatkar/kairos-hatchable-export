@@ -453,9 +453,11 @@ let profileDraftImage=null;function profileInitials(name){return String(name||'W
 function destroy(){if(S.cleanup){S.cleanup();S.cleanup=null}}
 function charts(){S.charts.forEach(c=>c.destroy());S.charts=[];if(!window.Chart)return;Chart.defaults.color=cv('--muted','#8a8c92');Chart.defaults.borderColor=cv('--line','#222224');Chart.defaults.font.family=cv('--font-body',"'Public Sans',system-ui,sans-serif");Chart.defaults.font.size=12;const add=(id,c)=>{const el=$('#'+id);if(el)S.charts.push(new Chart(el,c))};const dayLabels=[...new Set(R.map(r=>{const d=r.sourceMode==='postgresql'&&r.start&&r.start!=='—'?new Date(r.start):null;return d&&!Number.isNaN(d.getTime())?d.toLocaleDateString(undefined,{month:'short',day:'numeric'}):'Run data'}))].slice(-7);const observed=V.filter(e=>e.state==='OBSERVED').length,refuted=V.filter(e=>e.state==='REFUTED_FOR_RUN').length,possible=V.filter(e=>e.state==='POSSIBLE').length,unknown=V.filter(e=>e.state==='UNKNOWN').length;const typeKeys=[...new Set(A.map(a=>{
   const k=String(a.kind||a.type||'unknown').toLowerCase();
-  if(k.includes('source')||k.includes('table')||k.includes('seed'))return 'source';
-  if(k.includes('transform')||k.includes('model')||k.includes('view'))return 'transform';
-  if(k.includes('output')||k.includes('metric')||k.includes('report')||k.includes('bi'))return 'output';
+  if(k.includes('table')||k==='source')return 'table';
+  if(k.includes('view'))return 'view';
+  if(k.includes('model')||k.includes('transform'))return 'model';
+  if(k.includes('metric')||k.includes('kpi'))return 'metric';
+  if(k.includes('output')||k.includes('report')||k.includes('bi'))return 'output';
   return k;
 }))];const typeCounts=typeKeys.map(k=>A.filter(a=>{
   const ak=String(a.kind||a.type||'unknown').toLowerCase();
