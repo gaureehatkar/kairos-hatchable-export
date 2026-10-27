@@ -678,7 +678,52 @@ else if(a==='room'){if($('#roomMode'))$('#roomMode').value=b.dataset.room;three(
 /* Removed: decorative SVG enhancement layer plus duplicate keyboard and worst-case wiring. It sat inside the click handler (re-wrapping render() on every click) and only fed glow/scale styles. */
 else if(a==='toggle-pref'){const k='kairos_'+b.dataset.pref,n=localStorage.getItem(k)!=='true';localStorage.setItem(k,String(n));render();toast('Preference '+(n?'enabled':'disabled')+'.')}
 else if(a==='toggle-auth'){S.authMode=S.authMode==='login'?'signup':'login';render()}
-else if(a==='save-profile'){const name=$('#profileName')?.value.trim()||'Workspace user';try{localStorage.setItem('kairos_profileName',name);if(profileDraftImage!==null){if(profileDraftImage)localStorage.setItem('kairos_profilePicture',profileDraftImage);else localStorage.removeItem('kairos_profilePicture')}profileDraftImage=null;syncProfileAvatars();const msg=$('#profileMessage');if(msg)msg.textContent='Profile saved in this browser.';toast('Profile saved on this browser.')}catch(err){toast('Could not save the profile picture in this browser. Try a smaller image.',true)}}else if(a==='remove-profile-picture'){profileDraftImage='';const initials=profileInitials($('#profileName')?.value||localStorage.getItem('kairos_profileName')||'Workspace user');$$('.profile-avatar').forEach(el=>paintAvatar(el,'',initials));const input=$('#profileImageInput');if(input)input.value='';const msg=$('#profileMessage');if(msg)msg.textContent='Picture removal is previewed. Select Save profile to confirm.';toast('Picture removal previewed. Save profile to confirm.')}else if(a==='save-settings'){const label=$('#workspaceLabel')?.value.trim()||'Research workspace';localStorage.setItem('kairos_workspaceLabel',label);const sidebarLabel=$('.workspace-switch strong');if(sidebarLabel)sidebarLabel.textContent=label;const sidebarIcon=$('.workspace-icon');if(sidebarIcon)sidebarIcon.textContent=label.slice(0,1).toUpperCase();toast('Workspace label saved in this browser.');}
+else if(a==='save-profile'){
+      const name=$('#profileName')?.value.trim()||'Workspace user';
+      const titleInput=$('#profileTitleInput');
+      const domainInput=$('#profileDomainInput');
+      const teamInput=$('#profileTeamInput');
+      const emailInput=$('#profileEmailInput');
+      const managerInput=$('#profileManagerInput');
+      const locationInput=$('#profileLocationInput');
+      
+      try{
+        localStorage.setItem('kairos_profileName',name);
+        if(titleInput) localStorage.setItem('kairos_profileTitle', titleInput.value.trim());
+        if(domainInput) localStorage.setItem('kairos_profileDomain', domainInput.value.trim());
+        if(teamInput) localStorage.setItem('kairos_profileTeam', teamInput.value.trim());
+        if(emailInput) localStorage.setItem('kairos_profileEmail', emailInput.value.trim());
+        if(managerInput) localStorage.setItem('kairos_profileManager', managerInput.value.trim());
+        if(locationInput) localStorage.setItem('kairos_profileLocation', locationInput.value.trim());
+
+        if(profileDraftImage!==null){
+          if(profileDraftImage)localStorage.setItem('kairos_profilePicture',profileDraftImage);
+          else localStorage.removeItem('kairos_profilePicture');
+        }
+        profileDraftImage=null;
+        syncProfileAvatars();
+        const msg=$('#profileMessage');
+        if(msg)msg.textContent='Profile and workspace identity saved successfully.';
+        toast('Profile and workspace identity saved.');
+        render();
+      }catch(err){
+        toast('Could not save profile settings in this browser. Try a smaller image.',true);
+      }
+    }else if(a==='remove-profile-picture'){profileDraftImage='';const initials=profileInitials($('#profileName')?.value||localStorage.getItem('kairos_profileName')||'Workspace user');$$('.profile-avatar').forEach(el=>paintAvatar(el,'',initials));const input=$('#profileImageInput');if(input)input.value='';const msg=$('#profileMessage');if(msg)msg.textContent='Picture removal is previewed. Select Save profile to confirm.';toast('Picture removal previewed. Save profile to confirm.')}else if(a==='save-settings'){
+      const label=$('#workspaceLabel')?.value.trim()||'Research workspace';
+      localStorage.setItem('kairos_workspaceLabel',label);
+      const nameInput=$('#profileName');
+      if(nameInput && nameInput.value.trim()){
+        localStorage.setItem('kairos_profileName', nameInput.value.trim());
+      }
+      syncProfileAvatars();
+      const sidebarLabel=$('.workspace-switch strong');
+      if(sidebarLabel)sidebarLabel.textContent=label;
+      const sidebarIcon=$('.workspace-icon');
+      if(sidebarIcon)sidebarIcon.textContent=label.slice(0,1).toUpperCase();
+      toast('Workspace & profile saved in this browser.');
+      render();
+    }
 else if(a==='new-asset'){modal('Register demo asset','<form id="registerForm"><div class="form-grid"><div class="field"><label>Name</label><input id="newName" required placeholder="orders_summary"></div><div class="field"><label>Schema</label><input id="newSchema" required placeholder="analytics"></div><div class="field"><label>Kind</label><select id="newKind"><option>source</option><option>transform</option><option>output</option></select></div><div class="field"><label>Owner</label><input id="newOwner" placeholder="Data Platform"></div></div><p class="small-note">Adds a local demo record only; no backend catalog write occurs.</p><button class="btn primary">＋ Add demo asset</button></form>')}
 });
 document.addEventListener('input',e=>{const id=e.target.id;if(id==='assetSearch'){S.assetSearch=e.target.value;const p=e.target.selectionStart;render();$('#assetSearch')?.focus();$('#assetSearch')?.setSelectionRange(p,p)}else if(id==='graphSearch')graph();else if(id==='columnLineageSearch'){S.columnMapSearch=e.target.value;const p=e.target.selectionStart;render();$('#columnLineageSearch')?.focus();$('#columnLineageSearch')?.setSelectionRange(p,p)}else if(id==='evSearch'){S.evSearch=e.target.value;const p=e.target.selectionStart;render();$('#evSearch')?.focus();$('#evSearch')?.setSelectionRange(p,p)}else if(id==='runSearch'){S.runSearch=e.target.value;const p=e.target.selectionStart;render();$('#runSearch')?.focus();$('#runSearch')?.setSelectionRange(p,p)}else if(id==='profileName'){const preview=$('#profilePreview');if(preview)paintAvatar(preview,profileDraftImage||localStorage.getItem('kairos_profilePicture')||'',profileInitials(e.target.value))}});
