@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 279)  
+**Last Updated:** 27 October 2026 (Version 281)  
 
 ---
 
@@ -31,6 +31,12 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 281 — Dedicated All Assets UI & Responsive Styling (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by the project team
+* **Frontend UI Changes:** Added a dedicated `public/assets.css` stylesheet and a prominent All Assets inventory overview showing total assets, filtered result count, ownership coverage, data mode, and asset-kind counts. Loaded the stylesheet from `public/index.html`, added the overview to demo and persisted catalog views, and bumped the app cache version to 280.
+* **Backend API & DB Requirements:** No schema changes. Demo mode continues to use the synthetic sample list in `public/app.js`; PostgreSQL mode continues to use the persisted catalog response. The UI labels the selected mode so sample data is not confused with persisted records.
+* **AI Feature Rationale:** Makes the catalog destination visually distinct and discoverable instead of relying only on a generic table layout; responsive CSS supports desktop and mobile layouts.
 
 ### Version 279 — Reset All Filters When Opening Demo Assets (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by the project team
