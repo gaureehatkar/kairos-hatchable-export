@@ -32,6 +32,12 @@ This document is the **canonical full-stack specification, contributor change lo
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
 
+### Version 261 — Personalized Metadata Overview Greeting (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by Jatin Shende
+* **Frontend UI Changes:** Added a large, bold “Hi, [first name] 👋” welcome banner above the Metadata overview. The greeting uses the locally saved profile display name and falls back to Jatin Shende on a fresh browser; the name can be changed from the Profile page. Added responsive styling and updated asset cache-busting/build labels to v261.
+* **AI Feature Rationale:** Gives the workspace a more personal, welcoming entry point without assuming a platform-authenticated identity that the app does not currently expose.
+* **Backend Requirements:** None. The current profile is browser-local, not a verified Hatchable account identity; no backend or database behavior changed.
+
 ### Version 260 — Metadata Attention Responsive Layout (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by Jatin Shende
 * **Frontend UI Changes:** Reworked the Metadata attention panel into a three-metric summary row, a two-column grid of common documentation gaps, and responsive asset cards. Long qualified names now wrap instead of colliding with coverage badges; narrow screens collapse the grids cleanly. Updated cache-busting references and footer build label to v260.
