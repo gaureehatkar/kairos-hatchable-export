@@ -18,4 +18,4 @@
 .asset-catalog-table .panel-body{padding:0}
 .asset-catalog-table .empty-state{margin:16px;border:1px dashed var(--line)}
 @media(max-width:1000px){.asset-catalog-overview{grid-template-columns:repeat(3,minmax(0,1fr))}.asset-catalog-intro{grid-column:1/-1}}
-@media(max-width:640px){.asset-catalog-overview{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.asset-catalog-intro{grid-column:1/-1}.asset-catalog-intro,.asset-overview-metric{padding:14px}.asset-overview-metric strong{font-size:1.7rem}.asset-catalog-controls{padding:10px}.asset-catalog-table .table-wrap table{min-width:760px}}
+@media(max-width:640px){.asset-catalog-overview{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.asset-catalog-intro{grid-column:1/-1}.asset-catalog-intro,.asset-overview-metric{padding:14px}.asset-overview-metric strong{font-size:1.7rem}.asset-catalog-controls{padding:10px}.asset-catalog-table .table-wrap table{min-width:760px}}\n[hidden]{display:none!important}\n.nav-group[hidden],.nav-item[hidden]{display:none!important}
