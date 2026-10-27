@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 273)  
+**Last Updated:** 27 October 2026 (Version 274)  
 
 ---
 
@@ -31,6 +31,12 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 274 — Workspace Label and Home Greeting Sync (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by the project team
+* **Frontend UI Changes:** The Home greeting now reads the saved workspace label before falling back to the profile display name. Saving preferences synchronizes the sidebar label and icon with that same saved value.
+* **AI Feature Rationale:** Ensures the name a user saves is reflected consistently in the workspace navigation and Home greeting instead of reading unrelated settings.
+* **Backend Requirements:** None. The workspace label remains browser-local in `localStorage`; it is not account-level or cross-device persistence.
 
 ### Version 273 — Dedicated All Assets Navigation Action (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by the project team
