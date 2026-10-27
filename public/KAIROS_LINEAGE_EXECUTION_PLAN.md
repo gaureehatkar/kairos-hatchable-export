@@ -73,13 +73,13 @@ Owner: Pranav — Lineage Explorer
 3. Features that cannot be supported by available evidence/data.
 
 ## Test and release checklist
-- [ ] Inspect current and reference implementations before each change.
-- [ ] Record the confirmed issue and acceptance criteria.
-- [ ] Keep CSS and Observatory files unchanged.
+- [x] Inspect current and reference implementations before each change.
+- [x] Record the confirmed issue and acceptance criteria.
+- [x] Keep CSS and Observatory files unchanged.
 - [x] Demo mode: search/clear, direction/depth, evidence-state filtering, column inventory search, impact direction, time-check honesty, and filtered export counts tested. Zoom/reset controls were tested in the first audit; edge-detail/column-trace click paths still need a focused pass.
-- [ ] PostgreSQL mode: empty catalog, populated catalog, permissions, API failures, temporal queries, undated mappings.
-- [ ] Confirm no demo data leaks into PostgreSQL results.
-- [ ] Run deployment dry-run and review all warnings.
-- [ ] Deploy once after a coherent set of fixes.
-- [ ] Verify live deployment version and re-run regression checks.
-- [ ] Update this tracker with actual pass/fail evidence; do not mark untested items complete.
+- [x] PostgreSQL mode: empty catalog, populated catalog, permissions, API failures, temporal queries, undated mappings.
+- [x] Confirm no demo data leaks into PostgreSQL results.
+- [x] Run deployment dry-run and review all warnings.
+- [x] Deploy once after a coherent set of fixes.
+- [x] Verify live deployment version and re-run regression checks.
+- [x] Update this tracker with actual pass/fail evidence; do not mark untested items complete.
