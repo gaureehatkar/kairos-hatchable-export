@@ -1,5 +1,9 @@
 # Kairos Metadata Lineage — implementation backlog
 
+## Official Backend Specification & Deployment Changelog
+The canonical backend architecture, API route contracts, database migration references, deploy logging instructions, and backend sync checklist are documented in:
+👉 [`public/BACKEND_INSTRUCTIONS_AND_CHANGELOG.md`](public/BACKEND_INSTRUCTIONS_AND_CHANGELOG.md)
+
 ## Product contract
 Kairos is a technology-neutral metadata lineage, evidence, and temporal reasoning system. SQL is one optional parser/provider, never the canonical asset or relationship model. Do not infer execution from a declared dependency or from the absence of events. Do not blend synthetic demo records into the persisted catalog.
 
