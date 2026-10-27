@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 281)  
+**Last Updated:** 27 October 2026 (Version 282)  
 
 ---
 
@@ -37,6 +37,13 @@ This document is the **canonical full-stack specification, contributor change lo
 * **Frontend UI Changes:** Added a dedicated `public/assets.css` stylesheet and a prominent All Assets inventory overview showing total assets, filtered result count, ownership coverage, data mode, and asset-kind counts. Loaded the stylesheet from `public/index.html`, added the overview to demo and persisted catalog views, and bumped the app cache version to 280.
 * **Backend API & DB Requirements:** No schema changes. Demo mode continues to use the synthetic sample list in `public/app.js`; PostgreSQL mode continues to use the persisted catalog response. The UI labels the selected mode so sample data is not confused with persisted records.
 * **AI Feature Rationale:** Makes the catalog destination visually distinct and discoverable instead of relying only on a generic table layout; responsive CSS supports desktop and mobile layouts.
+
+### Version 281 — Synchronize Column Transformation Drawer with Graph Selection (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by Gauri
+* **Frontend UI Changes:** Opening a transformation from the column dependency table or SVG label selects its source asset, pins the source column, and switches the Lineage Explorer to its existing column-graph mode. The drawer also provides explicit actions to focus either the source or target asset/column in the graph.
+* **Backend API & DB Requirements:** None. This reuses `S.selected`, `S.colPin`, the existing column graph renderer, and current catalog mappings in `public/app.js`; no schema, API, or migration changes were made.
+* **Verification Status:** Source-level implementation and deploy validation only. Manually verify table-row and SVG-label entry points, source/target focus actions, and the existing Analyze in SQL View flow in an authorized browser session before treating the UX as fully browser-verified.
+* **AI Feature Rationale:** Keeps the transformation inspector, selected asset panel, and column graph synchronized so users can inspect a mapping without losing its context. The UI continues to present mappings as declared dependencies, not proof of runtime execution.
 
 ### Version 279 — Reset All Filters When Opening Demo Assets (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by the project team
@@ -258,6 +265,7 @@ This document is the **canonical full-stack specification, contributor change lo
 | **Interactive Transformation Inspection & SQL Analysis** | Kairos AI Developer | Column dependency inspector and Column Lineage Logic modal (`public/app.js`) | **Problem:** Transformation text in the mapping inventory was not clickable, and SQL-view navigation relied on a generic view action. **Rationale:** Uses explicit `inspect-transform` and `analyze-transform-sql` actions to open transformation details and transfer the selected expression into the existing static SQL parser without changing backend behavior. |
 | **Asset Type Breakdown & Broad Classification** | Kairos AI Developer / requested by Jatin Shende | Data Assets → Asset type breakdown and Catalog coverage (`public/app.js`) | **Problem:** Chart labels and counts used mismatched category logic, and the chart was absent in persisted PostgreSQL catalog mode. **Rationale:** A shared metadata-based classifier groups assets into source/warehouse tables, views, transformation models, ML feature datasets, BI/reports/outputs, metrics/KPIs, files/event streams, and other/unclassified; a horizontal bar chart improves comparison. Categories are inferred from metadata and are not represented as reviewed/persisted classifications. |
 | **Responsive Asset Profile Layout** | Kairos AI Developer / requested by Jatin Shende | Asset Profile drawer (`public/styles.neo.css`) | **Problem:** Dense facts, long tab labels, and action buttons could feel cramped at smaller viewport widths. **Rationale:** Uses wrapping-safe metadata tiles, responsive 4/2/1-column grids, horizontally scrollable tabs, and mobile-stacked actions to preserve readability without changing data or backend behavior. |
+| **Transformation-to-Graph Context Synchronization** | Kairos AI Developer / requested by Gauri | Lineage Explorer column graph and transformation drawer (`public/app.js`) | **Problem:** Opening a transformation did not carry its source asset/column context into the graph selection. **Rationale:** Reuses existing selected-asset and column-pin state, highlights the path in column-graph mode, and offers source/target focus actions without backend changes. |
 
 ---
 
