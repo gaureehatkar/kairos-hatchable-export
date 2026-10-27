@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 294)  
+**Last Updated:** 27 October 2026 (Version 296)  
 
 ---
 
@@ -31,6 +31,161 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 296 — Consolidated Research Baseline, API Verification & Remaining Work (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by Jatin Shende.
+* **Intent:** Consolidate external competitor-research principles, repository/API audit findings, security risks, feature statuses, test requirements, and remaining implementation backlog in this canonical Hatchable document. This is a baseline; it does not claim outstanding fixes have been implemented.
+* **Scope / evidence boundary:** Inspected the Hatchable project registry, this canonical document, relevant frontend/backend files, and selected database migrations. Executed read-only API checks for catalog, metadata preview, competitor research, raw events, column lineage, evidence-at-time, search, and selected anonymous access paths. No application code, schema, or database records were changed during the audit. This is not a complete browser automation, penetration test, connector integration test, or exhaustive database audit.
+* **Version note:** Hatchable reported version 295 at the time of inspection. This document is saved as a draft until deployed; verify the actual version in Hatchable after publishing. A changelog heading is not proof of successful deployment.
+
+#### 296.1 External research baseline and design implications
+These research principles are design guidance, not proof of Kairos feature parity:
+* **DataHub metadata model:** Stable entity identity, independently modeled metadata aspects, and first-class relationships. Distinguish versioned descriptive metadata from time-series observations. Kairos implication: separate canonical asset identity, extensible metadata, relationships, and historical observations.
+* **DataHub ingestion/search architecture:** Ingestion, primary-key lookup, structured search, and relationship traversal are distinct concerns. Keyword search or RAG must not replace canonical catalog queries and graph traversal.
+* **OpenMetadata asset tabs:** Asset-detail capabilities differ by resource type and available data. Use a shared profile shell with type-specific sections, and only show tabs when the capability and supporting data are available.
+* **OpenMetadata lineage:** Table lineage, column lineage, manual relationships, depth-limited traversal, and previews are distinct. Declared mappings must not be presented as proof of runtime execution.
+* **OpenLineage events/facets:** Events can carry run, job, input/output, event time, producer, and extensible facets. Preserve source events as evidence artifacts; do not blindly convert every event into a confirmed edge. Kairos-specific facets, if introduced, should use a documented `kairos_` namespace and versioned schema URLs.
+* **Official references recorded in the research notes:** [DataHub metadata model](https://docs.datahub.com/docs/metadata-modeling/metadata-model), [DataHub ingestion architecture](https://docs.datahub.com/docs/architecture/metadata-ingestion), [OpenMetadata asset tabs](https://docs.open-metadata.org/v1.12.x/how-to-guides/guide-for-data-users/data-asset-tabs), [OpenLineage facets](https://openlineage.io/docs/spec/facets/), [Open Data Hub documentation](https://docs.opendatahub.com/), and [OpenMeter documentation](https://openmeter.io/docs/get-started/overview). Open Data Hub and OpenMeter are adjacent ecosystem/product patterns, not proof of direct universal-catalog parity.
+* **Research boundary:** These are research-derived principles. Revalidate official documentation versions when implementing integrations; this summary is not an exhaustive independent live web audit.
+
+#### 296.2 Latest read-only verification
+* **Persisted catalog:** `GET /api/v1/catalog` returned HTTP 200 for admin and identified PostgreSQL as its source. The response contains 4 assets and 2 table-level lineage edges. The prior audit also recorded 2 raw events, 0 evidence rows, 0 pipeline runs, 0 quality checks, and 0 column-lineage mappings. Persisted rows do not prove an active external connector or independently observed runtime lineage.
+* **Anonymous catalog access:** The latest anonymous catalog request returned HTTP 401. The prior audit recorded a member caller receiving HTTP 403. These results cover only the tested route and access tiers.
+* **Metadata preview:** `POST /api/v1/metadata-preview` returned HTTP 200 for synthetic image/document metadata. It classified one image and one document, preserved safe unknown metadata, and returned `is_persistent:false`. Warnings state preview is not persisted, relationships are passed through rather than inferred, and source freshness is not verified. Anonymous POST returned HTTP 401.
+* **Competitor research:** `GET /api/v1/competitor-research` returned HTTP 200 for admin and HTTP 401 for anonymous. Source inspection shows prepared/curated guidance, not live web research. Frontend integration remains unverified.
+* **Raw-event retrieval:** `GET /api/v1/raw-events` returned HTTP 200 for admin and HTTP 401 for anonymous. Source events are retrievable, but the small record count does not prove complete connector provenance.
+* **Column lineage:** `GET /api/v1/column-lineage` returned HTTP 200 with zero included and zero undated mappings in the tested snapshot. This is an honest empty result, not proof of a populated lineage experience.
+* **Evidence/time travel:** `GET /api/v1/evidence-at-time` returned HTTP 200 for valid and recorded timestamps, with zero included, zero undated, and zero total evidence. Temporal logic exists in source, but populated-history correctness remains unverified.
+* **Search:** `POST /api/v1/search` for `customer orders` returned two persisted keyword matches. The endpoint is PostgreSQL keyword search, not verified vector/semantic search or grounded RAG.
+* **Anonymous route checks:** `GET /api/v1/incidents` and `GET /api/v1/data-products` returned HTTP 200 anonymously. Their source declares public access and includes mutation paths. Anonymous mutations were not invoked; no exploit or successful unauthorized write is claimed. These route declarations require an explicit permission decision and controlled tests.
+* **No mutation tests:** No write-path test, duplicate import, incident/product mutation, or database mutation was performed during this consolidated baseline.
+
+#### 296.3 Current feature-status matrix
+Use `VERIFIED` for directly checked behavior; `PARTIALLY_VERIFIED` for a narrow component/path; `MOCK_ONLY` for simulated/curated behavior; `EMPTY_BUT_WORKING` for a working query against an empty store; `UNVERIFIED` when end-to-end evidence is missing; and `GAP_CONFIRMED` for a limitation confirmed in source/schema.
+* Hatchable registry/version: `VERIFIED` at version 295 at audit time; deployment of this documentation update must be separately confirmed.
+* PostgreSQL-backed catalog reads: `VERIFIED` for the tested authorized endpoint.
+* Canonical identity across imports/namespaces: `UNVERIFIED`; batch validation exists, but cross-import behavior needs tests.
+* Generic JSON preview: `VERIFIED` for tested normalization and explicit non-persistence; actual file bytes and live discovery were not tested.
+* Persistent ingestion/idempotency: `PARTIALLY_VERIFIED`; handlers/upsert logic exist, but duplicate non-empty imports have not been executed and compared.
+* dbt/OpenLineage ingestion: `PARTIALLY_VERIFIED` at source/route level; authenticated upstream integration and event-to-graph correctness are unproven.
+* Table lineage: `PARTIALLY_VERIFIED`; two persisted edges exist, but provenance/completeness are unverified.
+* Column lineage: `EMPTY_BUT_WORKING` in the tested snapshot.
+* Evidence states and temporal history: `EMPTY_BUT_WORKING` for the empty evidence store; populated-history correctness remains `UNVERIFIED`.
+* Quality metrics: `MOCK_ONLY` for `api/jobs/simulate-quality.js`, which uses `Math.random()` and does not persist measured historical results.
+* Competitor research: `MOCK_ONLY` for live research; the endpoint serves prepared guidance.
+* Search: `VERIFIED` for persisted keyword matching; semantic search/RAG, embeddings, citation grounding, and permission-filtered retrieval are `UNVERIFIED`.
+* Incidents/data products: anonymous GET is `VERIFIED`; authorization correctness for mutations is a `GAP_CONFIRMED` concern requiring controlled tests.
+* Tenant isolation: `GAP_CONFIRMED` in inspected RLS migration policies; tenant-specific isolation is not implemented/verified by policies using `USING (true)`.
+* Demo-mode separation: explicit demo fixtures and a persisted mode exist in frontend source. Complete browser-level behavior across screens remains `UNVERIFIED`; recheck error handling after frontend changes.
+* Asset profiles, 2D lineage, 3D Observatory, PII propagation, incidents correlated to real runs, and all UI controls: `UNVERIFIED` end to end until rendered values are traced and exercised.
+
+#### 296.4 Canonical source-to-UI audit contract
+For each major displayed value/action, trace:
+```
+User action
+  -> frontend component and event handler
+  -> frontend state
+  -> HTTP request and parameters
+  -> backend route and declared access
+  -> authentication and authorization
+  -> validation and normalization
+  -> canonical identity resolution
+  -> database / connector / parser / external API
+  -> computation and persistence (or explicitly transient preview)
+  -> response serialization
+  -> frontend response/error handling
+  -> rendered result and visible provenance
+```
+A route existing in source, an HTTP 200, a fixture record, or a populated database row alone is not enough to mark a complete feature end-to-end verified.
+
+#### 296.5 Proposed generalized resource contract — design reference only
+Do not replace the current schema without compatibility and migration review. The target contract should include:
+* Stable internal ID and canonical `urn` based on resource type, namespace, and source-native ID; display name is not identity.
+* Extensible `resource_type` values such as table, column, file, document, image, dataset, pipeline, job, model, feature, dashboard, and data product.
+* Separate namespace and environment fields.
+* Source type/system/native ID and optional connection ID.
+* Normalized metadata/schema plus `custom_metadata` preserving unfamiliar safe fields.
+* Backend-derived capabilities distinguishing what a resource type supports from what is available for a particular record now, with reasons for unavailable capabilities.
+* Provenance including source-updated time, ingestion time/run ID, and evidence state when known.
+* Relationships with separate identity, endpoint validation, source/provenance, evidence, and validity intervals.
+* Structured validation status and errors.
+* Same display name in different namespaces remains distinct. Missing evidence means `UNKNOWN`, not proof of no relationship. Historical observations remain queryable; current state is a projection.
+* Capabilities cannot be inferred merely from a frontend tab or the existence of a database table.
+
+#### 296.6 Security and integrity backlog
+**P0 — before public/sensitive or multi-tenant use**
+1. Review `api/v1/data-products.js`, `api/v1/incidents.js`, and `api/v1/webhook.js`. Decide intended roles, restrict mutations as required, and test anonymous/member/admin behavior in an isolated environment. Do not use anonymous production mutations as an audit shortcut.
+2. Define tenant/workspace identity and replace tenant-agnostic RLS policies where isolation is required. Enforce scope in database policies and privileged API queries. Test cross-tenant reads/writes through catalog, lineage, incidents, products, search, embeddings, and derived endpoints.
+3. For every live-request failure, show an explicit error; never silently substitute demo fixtures unless demo mode was explicitly selected and visibly labeled.
+4. Every displayed edge must trace to an explicit persisted/source-supplied relationship or supported analyzer output with provenance. Missing evidence remains `UNKNOWN`.
+5. Remove random quality/freshness metrics from production views or visibly isolate them as simulation. Real metrics require named inputs, calculation, run timestamp, and stored result.
+6. Ensure keyword/vector/graph retrieval follows the same authorization and tenant restrictions as direct asset reads.
+7. Audit frontend bundles, API responses, logs, previews, stored metadata, and error messages for secret leakage. Existing key-name filtering is defensive, not comprehensive.
+8. Validate relationship endpoints against persisted or explicitly staged assets. Reject or quarantine unresolved endpoints with a reason.
+9. Repeat the same non-empty import in an isolated namespace; verify no duplicate assets, edges, evidence, or raw events and stable identity across retries/partial failures.
+
+**P1 — correctness and provenance**
+1. Define/version canonical URNs and source-native identity; prove identical names in different namespaces remain distinct.
+2. Preserve unfamiliar safe fields through preview -> ingestion -> database -> API -> UI.
+3. Test malformed payloads, coercion, size limits, duplicate IDs, and visible errors.
+4. Validate `OBSERVED`, `POSSIBLE`, `REFUTED_FOR_RUN`, and `UNKNOWN` against documented evidence requirements. Refutation must be run-scoped and supported by complete negative-evaluation coverage.
+5. Test valid-time/recorded-time boundaries, undated records, corrections, and historical snapshots using populated test records.
+6. Keep catalog, detail, lineage, search, and profile IDs consistent.
+7. Define capability contracts and prevent unsupported tabs from appearing functional.
+8. Expose provenance and freshness limitations for metrics and relationships.
+
+**P2 — generalization and integrations**
+1. Build a shared profile shell and type-specific renderers for tables, files, documents, images, pipelines/jobs, models/features, dashboards, and data products.
+2. Add a backend capability registry distinguishing type support from per-record availability.
+3. Implement actual connectors incrementally for agreed sources; separate configured, authenticated, reachable, discovered, normalized, persisted, and tested states.
+4. Prioritize dbt/OpenLineage if they remain in project scope. Do not imply arbitrary authenticated connectors or scheduled scans already exist.
+5. Add deterministic acceptance datasets for SQL catalogs, file/image inventories, workflow/run metadata, and ML/model metadata.
+6. Test pagination, rate limits, retries, timeouts, source freshness, incremental updates, schema drift, and secret handling.
+
+**P3 — advanced capabilities**
+1. Hybrid keyword + vector + graph retrieval with permission filtering.
+2. Grounded answers where claims are tied to retrieved evidence/citations and unsupported claims are withheld.
+3. Queryable dataset -> feature -> model-version -> prediction lineage.
+4. OpenLineage ingestion that upgrades edge evidence only when event semantics and identity resolution justify it.
+5. A connector SDK/adapter contract with conformance tests and versioned source facets.
+
+#### 296.7 Required acceptance-test suite
+Run these in an isolated/test namespace or database, not against production records without approval:
+1. **Catalog truth:** API totals agree with authorized database counts; refresh retains persisted records.
+2. **Import idempotency:** Import the same non-empty graph twice; counts and identities remain stable.
+3. **Namespace collision:** Same display name in different namespaces remains distinct.
+4. **Unknown metadata:** Safe custom fields survive preview, ingestion, database retrieval, and UI rendering.
+5. **Credential filtering:** Token/password/private-key-like fields are excluded from previews/logs/responses; test nested fields and alternate casing.
+6. **Relationship validation:** Missing endpoints and malformed column mappings are rejected or quarantined with explicit reasons.
+7. **Provenance:** Each edge/evidence item identifies source, ingestion/run ID where applicable, timestamps, and state semantics.
+8. **Evidence states:** Empty evidence yields `UNKNOWN`; `OBSERVED` requires support; `REFUTED_FOR_RUN` requires run ID, coverage, and complete negative-evaluation metadata.
+9. **Temporal history:** Queries before/during/after validity and recorded intervals return expected immutable observations.
+10. **Failure integrity:** Simulate timeout/401/500; verify explicit error, no silent fixture substitution, and no false success.
+11. **Permissions:** Test public/member/admin and cross-tenant access for every read/write route, including search and derived stores.
+12. **Resource profiles:** Only real capabilities render; empty sections explain why data is unavailable.
+13. **Search/RAG:** Keyword results are labeled correctly; enable RAG only after retrieval, citation, and authorization tests pass.
+14. **Quality:** Every score traces to deterministic assertion input and persisted run; simulations remain labeled.
+15. **Browser smoke test:** Verify navigation, filters, search, asset detail, 2D/3D lineage, preview/import, temporal controls, incidents, products, empty/error states against actual APIs.
+
+#### 296.8 Implementation and release procedure
+1. Finish source-to-UI mapping and the complete feature matrix before broad refactoring.
+2. Address P0 security and demo-integrity findings first using controlled data and an explicit permission model.
+3. Add deterministic tests before changing ingestion identity/schema.
+4. Propose migrations and rollback strategy separately; do not replace existing contracts wholesale without review.
+5. Implement small, reviewable increments and update this document after meaningful changes.
+6. Run Hatchable dry-run validation before deployment and inspect warnings as well as errors.
+7. Deploy only when intended to go live and validation is acceptable; verify deployed version and smoke-test changed paths afterward.
+8. Every changelog entry must distinguish changes made, tests run, and remaining unverified behavior.
+
+#### 296.9 Remaining deliverables
+* **A — Executive audit:** consolidated baseline recorded here.
+* **B — Complete feature matrix:** each feature with status, source paths, endpoint, backing table/source, test evidence, and missing link.
+* **C — Source-to-UI traces:** catalog, profiles, ingestion, table/column lineage, evidence/time travel, quality, incidents, products, search/RAG, PII, and Observatory.
+* **D — Controlled test results:** idempotency, identity, metadata preservation, temporal correctness, authorization, and error/fallback tests.
+* **E — P0 remediation plan:** approved permission model, tenant isolation design, no-silent-fallback proof, and real-metric policy.
+* **F — Generalization design:** versioned asset/relationship contract, capability registry, type-specific profiles, and connector boundary.
+* **G — Release readiness:** browser smoke-test evidence, actual deployment version, known limitations, rollback plan, and updated changelog.
+* **Explicit non-claims:** Until the corresponding tests pass, do not claim universal connector support, full semantic/RAG search, real-time quality metrics, verified end-to-end lineage, tenant isolation, or complete browser verification.
 
 ### Version 295 — Live Repository Verification & Demo-Readiness Audit (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by Jatin Shende
