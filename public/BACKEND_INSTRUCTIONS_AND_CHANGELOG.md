@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 282)  
+**Last Updated:** 27 October 2026 (Version 294)  
 
 ---
 
@@ -31,6 +31,32 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 293 — Universal Metadata Preview API & Competitor Research Synchronization (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by Jatin Shende
+* **User request / intent:** Make the project reflect the fact that metadata can vary by user and source, and record how comparable metadata/lineage platforms handle extensible metadata and asset-specific capabilities. This work is in the Hatchable project, not the GitHub repository.
+* **Backend API additions:**
+  * Added `api/v1/metadata-preview.js`, exposed as `POST /api/v1/metadata-preview`. The handler accepts JSON object/array payloads and common nested record collections, normalizes records into generic preview assets, preserves unfamiliar safe fields, reports discovered fields and capability hints, handles duplicate identifiers, and limits each preview to 1,000 records.
+  * The preview infers only a broad record type when the source supplies a recognized type or MIME type; otherwise it uses the generic `json_record` label. It passes through an explicit top-level `relationships` array only. It does not invent lineage, persist preview records, or verify source freshness.
+  * Obvious credential-like keys (for example keys containing token, secret, password, credential, private key, or API key) are filtered recursively from preview metadata. This is a defensive key-name filter, not a complete secrets or sensitive-data protection system.
+  * Added `api/v1/competitor-research.js`, exposed as `GET /api/v1/competitor-research`, to serve the competitor findings, design principles, implementation boundaries, and next-step roadmap as JSON for the hosted project.
+* **Frontend UI modifications:** No UI screen was changed in this version. These additions expose backend endpoints and document the research; connecting the research response to a new frontend screen remains a separate UI task.
+* **Competitor research and architecture rationale:**
+  * **DataHub:** its entity/aspect model and ingestion architecture support separating stable identity from extensible source-specific metadata. Kairos implication: preserve safe unknown fields and add source adapters incrementally.
+  * **OpenMetadata:** asset details/tabs vary by asset type and available information. Kairos implication: use a shared asset inspector but show schema, lineage, quality, run, and governance features only when relevant data/capabilities exist.
+  * **OpenLineage / Marquez:** standard job/run/dataset concepts and extensible facets support richer event metadata. Kairos implication: keep provenance and execution evidence explicit; absence of an event is not negative proof.
+  * **Open Data Hub:** dataset discovery and data-access APIs illustrate separating discovery/catalog metadata from access paths and UI rendering.
+  * **OpenMeter:** focuses on usage metering and billing, so it is an adjacent product pattern rather than a direct universal metadata-catalog competitor.
+  * Official references: [DataHub metadata model](https://docs.datahub.com/docs/metadata-modeling/metadata-model), [DataHub ingestion architecture](https://docs.datahub.com/docs/architecture/metadata-ingestion), [OpenMetadata asset tabs](https://docs.open-metadata.org/v1.12.x/how-to-guides/guide-for-data-users/data-asset-tabs), [OpenLineage facets](https://openlineage.io/docs/spec/facets/), [Open Data Hub documentation](https://docs.opendatahub.com/), and [OpenMeter documentation](https://openmeter.io/docs/get-started/overview).
+* **Implementation boundaries (must remain explicit in demos):**
+  * The generic JSON preview and existing generic metadata-graph import are not equivalent to authenticated live connectors for every possible external system.
+  * Arbitrary authenticated connectors, automatic discovery, scheduled scans, source-specific adapters, universal SQL parsing, and universal lineage inference are not delivered by this change.
+  * Preview output is not persisted. To persist data, a caller must use the existing ingestion workflow with a validated metadata graph. Relationships should only be included when actually supplied or established by a supported analyzer.
+  * Do not populate a connected user's catalog with synthetic records. Empty states must remain honest, and capability-specific tabs should not imply unsupported features.
+* **Verification performed:** The deployed `POST /api/v1/metadata-preview` endpoint returned HTTP 200 for a synthetic two-record image metadata payload, preserved width/height/path/MIME fields, classified both records as images, reported zero relationships, and omitted an `api_token` field from the response. The deployed `GET /api/v1/competitor-research` endpoint returned HTTP 200 and returned the competitor findings and implementation roadmap. These are endpoint smoke tests, not full browser/UI tests or proof of real third-party connector interoperability.
+* **Database / migration requirements:** No database schema change or migration was added for the preview endpoints. Preview records are transient and are not written to PostgreSQL.
+* **Follow-up backlog:** (1) define and version the common asset/relationship contract; (2) introduce a connector capability registry; (3) implement and test selected real adapters incrementally (prioritize sources required by the project scope, such as dbt/OpenLineage); (4) add acceptance fixtures for structurally different source types such as files/images, workflow runs, and SQL catalogs; (5) validate auth, provenance, pagination, rate limits, source freshness, retries, secret handling, and empty states; (6) connect the competitor-research endpoint to a suitable UI section if the team wants it surfaced in-app.
+* **AI feature rationale:** A source-neutral metadata preview makes the project demonstrably less tied to a financial or database-only sample shape while keeping the distinction between metadata normalization and actual connectivity honest. Competitor patterns inform the design, but they do not imply that Kairos already has feature parity with those products.
 
 ### Version 281 — Dedicated All Assets UI & Responsive Styling (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by the project team
