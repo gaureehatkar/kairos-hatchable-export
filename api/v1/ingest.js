@@ -77,7 +77,9 @@ export default async function (req, res) {
         const externalId=safe(String(a.id).trim(),900), name=safe(String(a.name||a.qualified_name).trim(),900), namespace=safe(a.namespace||a.domain||a.provider||"general",300);
         const qualifiedName=safe(a.qualified_name||((namespace?namespace+"/":"")+name),1200);
         const type=safe(a.type||a.asset_type||a.kind||"asset",120), rawKind=String(a.kind||a.asset_kind||a.type||a.asset_type||"source").toLowerCase(), kindValue=/(output|dashboard|semantic|report|exposure)/.test(rawKind)?"output":/(transform|model|view|derived|pipeline|job|script|workflow)/.test(rawKind)?"transform":"source";
-        const metadata={...(a.metadata&&typeof a.metadata==="object"?a.metadata:{}),source_system:safe(a.source_system||payload.source_system||"generic_metadata",100),external_id:externalId,namespace,resource_type:type,format:a.format||null,uri:a.uri||a.path||null,columns:Array.isArray(a.columns)?a.columns:undefined};
+        const knownAssetFields=new Set(["id","name","qualified_name","namespace","domain","provider","type","asset_type","kind","asset_kind","owner","description","columns","column_count","metadata","source_system","format","uri","path"]);
+        const sourceFields=Object.fromEntries(Object.entries(a).filter(([key])=>!knownAssetFields.has(key.toLowerCase())&&!['token','secret','password','credential','api_key','private_key'].some(s=>key.toLowerCase().includes(s))));
+        const metadata={...sourceFields,...(a.metadata&&typeof a.metadata==="object"&&!Array.isArray(a.metadata)?a.metadata:{}),source_system:safe(a.source_system||payload.source_system||"generic_metadata",100),external_id:externalId,namespace,resource_type:type,format:a.format||null,uri:a.uri||a.path||null,columns:Array.isArray(a.columns)?a.columns:undefined};
         const persisted=await upsertAsset({id:safe("generic:"+externalId,1200),qualifiedName,schemaName:namespace,kind:kindValue,type,owner:a.owner||null,description:a.description||null,columnCount:Array.isArray(a.columns)?a.columns.length:Number(a.column_count||0),metadata});
         idMap.set(externalId,{id:persisted.id,qualifiedName}); assetsUpserted++;
       }
@@ -86,7 +88,9 @@ export default async function (req, res) {
         if (!source || !target) { skipped++; continue; }
         const edgeType=safe(rel.type||rel.relationship_type||"dependency",100), edgeId=safe("generic-edge:"+source.id+"->"+target.id+":"+edgeType,1800);
         const evidenceRef=rel.evidence_id?safe(rel.evidence_id,500):null;
-        const metadata={source_system:safe(rel.source_system||payload.source_system||"generic_metadata",100),relationship_type:edgeType,activity:rel.activity||null,confidence:rel.confidence??null,description:rel.description||null,provenance:rel.provenance||"Supplied relationship metadata; not independently verified execution proof",external_metadata:rel.metadata||{}};
+        const knownRelationshipFields=["source_id","target_id","type","relationship_type","evidence_id","column_mappings","evidence","metadata","source_system","activity","confidence","description","provenance"];
+        const relationshipFields=Object.fromEntries(Object.entries(rel).filter(([key])=>!knownRelationshipFields.includes(key.toLowerCase())&&!['token','secret','password','credential','api_key','private_key'].some(s=>key.toLowerCase().includes(s))));
+        const metadata={source_system:safe(rel.source_system||payload.source_system||"generic_metadata",100),relationship_type:edgeType,activity:rel.activity||null,confidence:rel.confidence??null,description:rel.description||null,provenance:rel.provenance||"Supplied relationship metadata; not independently verified execution proof",external_metadata:{...relationshipFields,...(rel.metadata&&typeof rel.metadata==="object"&&!Array.isArray(rel.metadata)?rel.metadata:{})}};
         await db.query("INSERT INTO kairos_lineage_edges (id,source_asset_id,target_asset_id,edge_type,evidence_ref,metadata) VALUES ($1,$2,$3,$4,$5,$6::jsonb) ON CONFLICT (source_asset_id,target_asset_id,edge_type) DO UPDATE SET evidence_ref=EXCLUDED.evidence_ref,metadata=EXCLUDED.metadata",[edgeId,source.id,target.id,edgeType,evidenceRef,jsonText(metadata)]);
         edgesUpserted++;
         for (const mapping of (Array.isArray(rel.column_mappings) ? rel.column_mappings : [])) {
