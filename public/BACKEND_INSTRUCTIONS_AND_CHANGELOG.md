@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 277)  
+**Last Updated:** 27 October 2026 (Version 278)  
 
 ---
 
@@ -31,6 +31,12 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 278 — Stop Aggressive Catalog Polling (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by the project team
+* **Frontend UI Changes:** Removed the 3.5-second timer's repeated PostgreSQL catalog and column-lineage reload. The timer now only pulses the demo-mode live indicator; persisted data refresh remains event-driven and throttled on focus/visibility changes.
+* **Backend API & DB Requirements:** No schema change. The previous polling loop called `/api/v1/catalog` and `/api/v1/column-lineage` repeatedly; these endpoints fan out into multiple database queries, causing Hatchable's per-project query rate limit to be exceeded and pages to fail with HTTP 500 / health HTTP 503.
+* **AI Feature Rationale:** Prevents request storms, reduces unnecessary database load, and stops the app from repeatedly wiping/re-rendering persisted views when refresh calls fail.
 
 ### Version 277 — Full Workspace Label Greeting (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by the project team
