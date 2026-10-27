@@ -281,6 +281,23 @@ td .subline{margin-top:2px;font-size:.8rem;color:var(--muted)}
 .reasoning-item .reason-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .reasoning-item strong{font:700 .95rem var(--font-display)}.reasoning-item p{margin:6px 0 0;font-size:.86rem;line-height:1.55;color:var(--muted)}
 
+/* Metadata attention: keep summary, gap counts and asset names aligned at every width. */
+.metadata-attention-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.metadata-attention-metrics .metric-line{min-width:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface-alt,var(--surface))}
+.metadata-attention-metrics .metric-line span{font-size:.84rem;line-height:1.35;color:var(--muted)}
+.metadata-attention-metrics .metric-line strong{font:800 1.35rem/1 var(--font-display);font-variant-numeric:tabular-nums}
+.metadata-attention-subhead{margin:22px 0 12px;font:800 1rem var(--font-display)}
+.metadata-attention-gaps{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:22px}
+.metadata-attention-gaps .reasoning-item{width:100%;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:12px;overflow-wrap:anywhere}
+.metadata-attention-gaps .reasoning-item strong{min-width:0;overflow-wrap:anywhere}
+.metadata-attention-assets .reasoning-item{min-width:0}
+.metadata-attention-assets .reason-head{min-width:0;flex-wrap:wrap;align-items:flex-start}
+.metadata-attention-assets .reason-head .inline-link{min-width:0;max-width:100%;text-align:left;overflow-wrap:anywhere;word-break:break-word}
+.metadata-attention-assets .reason-head .inline-link strong{overflow-wrap:anywhere;word-break:break-word}
+.metadata-attention-assets .reason-head .pill{flex:0 0 auto}
+.metadata-attention-assets .reasoning-item p{overflow-wrap:anywhere}
+@media(max-width:760px){.metadata-attention-metrics{grid-template-columns:1fr}.metadata-attention-gaps{grid-template-columns:minmax(0,1fr)}.metadata-attention-metrics .metric-line{padding:12px 14px}.metadata-attention-assets .reason-head{gap:8px}}
+
 /* SQL */
 .sql-editor{overflow:hidden;border:2px solid var(--ink);border-radius:16px;background:var(--code-bg)}
 .editor-head{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:2px solid var(--ink);background:var(--surface);font:500 .7rem var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}

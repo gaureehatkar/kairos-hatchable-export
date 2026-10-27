@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 259)  
+**Last Updated:** 27 October 2026 (Version 260)  
 
 ---
 
@@ -32,12 +32,18 @@ This document is the **canonical full-stack specification, contributor change lo
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
 
+### Version 260 — Metadata Attention Responsive Layout (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by Jatin Shende
+* **Frontend UI Changes:** Reworked the Metadata attention panel into a three-metric summary row, a two-column grid of common documentation gaps, and responsive asset cards. Long qualified names now wrap instead of colliding with coverage badges; narrow screens collapse the grids cleanly. Updated cache-busting references and footer build label to v260.
+* **AI Feature Rationale:** Improves the scan path from overall coverage to recurring gaps to specific assets, while keeping documentation coverage distinct from trust, certification, lineage, and data quality.
+* **Backend Requirements:** None. The panel continues to use the currently loaded metadata and existing filter/detail actions; no API, database, or schema behavior changed.
+
 ### Version 259 — Hide Admin-Only Controls Outside PostgreSQL Mode (27 Oct 2026)
 * **Contributor:** Kairos AI Developer
 * **Frontend UI Changes:** Classification editor and full temporal snapshot export controls are now injected only when PostgreSQL catalog mode is selected; injected controls are removed when switching back to Demo mode.
 * **AI Feature Rationale:** Prevents demo users from seeing controls that call admin-protected persisted-data APIs and would fail by design.
 * **Backend Requirements:** None; existing admin-only endpoints and access rules are preserved.
-* **Remaining Verification:** Confirm the controls appear after selecting PostgreSQL mode in an authorized session and disappear in Demo mode.
+* **Verification:** The deployed anonymous preview starts in Demo mode without injected classification/export controls. A browser interaction test with mocked API responses confirmed that the deployed v259 script injects the controls when PostgreSQL mode is selected and that the classification dialog switches values correctly. A signed-in admin round trip against real persisted columns remains blocked because the current catalog has no stored `metadata.columns` definitions.
 
 ### Version 258 — Classification Precedence Correction (27 Oct 2026)
 * **Contributor:** Kairos AI Developer
@@ -131,8 +137,9 @@ This document is the **canonical full-stack specification, contributor change lo
 * **Frontend UI Component:** Lineage Explorer & Schema Detail Drawer (`data-view="lineage"`, `data-view="assets"`)
 * **Existing UI:** The demo workspace renders illustrative PII badges and a PII overlay. Demo classifications must not be treated as persisted classifications.
 * **Verified Current Backend:** Migration `migrations/009_kairos_pii_classification.sql` (see current migration manifest) and the `kairos_column_classifications` table are present. `kairos_assets` and `kairos_column_lineage` also expose classification fields. The admin-protected `GET/POST /api/v1/pii-classification` route is registered and responds; the current persisted classification query returned zero rows.
-* **Status in v257 work:** A manual classification editor is added by `public/pii-lineage-enhancements.js`; it calls the existing admin-protected POST endpoint and reloads the catalog after saving. Asset-level classification is stored on `kairos_assets`; column-level classification is stored in `kairos_column_classifications`. This UI path still requires live authorized write-and-refresh verification after deployment.
-* **Remaining Work / Acceptance Criteria:** With an authorized admin session, classify an existing persisted asset/column, verify the row survives refresh, and verify the PostgreSQL UI renders only that persisted value. Confirm that NULL/missing classification is shown as “not classified,” never “PII-free.” Automatic source ingestion from OpenLineage/dbt sensitivity facets remains unimplemented.
+* **Status in v259 work:** The manual classification editor in `public/pii-lineage-enhancements.js` calls the existing admin-protected API and reloads persisted metadata after saving. Browser interaction verification with mocked API responses passed for asset selection, switching between columns with different classifications, and switching back to the asset. The v259 deployment manifest contains the corrected script. This was a UI behavior test only; no classification was saved during the test.
+* **Verified data blocker:** The current persisted catalog has no `metadata.columns` definitions on its four assets, even though one asset reports `column_count: 5`. The API correctly refuses column classification unless the requested column exists in stored schema metadata. A real column-level save/reload test is therefore blocked until schema ingestion populates actual column names. Do not invent names or bypass validation.
+* **Remaining Work / Acceptance Criteria:** After schema ingestion supplies real column names, use an authorized admin session to classify a real persisted column, verify the row survives refresh, and verify PostgreSQL UI renders that persisted value. Asset-level save/reload also still requires an authorized write test. Confirm that NULL/missing classification is shown as “not classified,” never “PII-free.” Automatic source ingestion from OpenLineage/dbt sensitivity facets remains unimplemented.
 * **Operational Rationale:** Persisted sensitivity labels must be traceable and must not be inferred from demo records or absent metadata.
 
 ### Gap #2: Temporal Lineage Graph Export (JSON) — Backend Endpoint and UI Control Implemented
@@ -178,6 +185,7 @@ This document is the **canonical full-stack specification, contributor change lo
 | **Persisted PII & Sensitivity Classification** | Jatin Shende / Kairos AI Developer | Catalog asset rows, column lineage, `POST /api/v1/pii-classification` | **Problem:** PII labels could be demo-only or disappear on refresh.<br>**Rationale:** Stores reviewed asset/column classifications in PostgreSQL; NULL remains unknown rather than being misrepresented as non-PII. |
 | **Temporal Lineage Snapshot Export** | Jatin Shende / Kairos AI Developer | Lineage Explorer, `GET /api/v1/lineage/export` | **Problem:** Client-side export captures only visible graph slices.<br>**Rationale:** Exports the complete authorized snapshot payload and selected temporal values, while disclosing that table-level edges are not yet bitemporal. |
 | **19-View Full-Stack QA Verification** | Jatin Shende / AI Developer | All Workspace Views | **Problem:** Broken navigation links or unmapped buttons in UI views.<br>**Rationale:** Executed comprehensive audit across all 19 views and 11 sub-tabs to ensure complete API mapping or client-side fallback handling. |
+| **Metadata Attention Responsive Layout** | Kairos AI Developer / requested by Jatin Shende | Overview → Metadata attention (`public/app.js`, `public/styles.neo.css`) | **Problem:** Summary counts, common-gap controls, and long asset names could feel crowded or misalign at different widths.<br>**Rationale:** Separated the panel into a three-column metric summary, two-column common-gap grid, and wrapping asset cards that collapse on mobile; this makes discovery and ownership gaps easier to scan without changing the underlying coverage calculation. No backend changes were required. |
 
 ---
 
@@ -321,9 +329,24 @@ All 16 primary navigation views opened in the browser without JavaScript page er
 - The app’s existing temporal edge limitation is documented and should remain visible until a team-approved data model supports it.
 - No `public/app.js`, CSS, Observatory, API, schema, or migration changes were made in this audit. No deployment was initiated because the identified frontend fixes touch a shared file owned by another teammate and require coordination.
 
+### Follow-up verification after version 259 deployment (27 October 2026)
+
+The live deployment registry confirms **version 259 is live** (deployed 08:19:25 UTC). Version-256/257 notes above are retained as historical snapshots; current verification follows.
+
+- The anonymous preview rendered successfully, loads `public/pii-lineage-enhancements.js?v=259`, and shows footer **build v259**. The version-259 deployment manifest's script hash matches the current `public/pii-lineage-enhancements.js` source hash (`60ae1497e317fa14efb7ba1e6f9f3b3e45fc99580143381ff1da6f92fd777ca6`), confirming the column-specific editor correction is included in the live deployment. This deployment was already live when verification ran; this audit did not invoke deploy.
+- **Browser interaction test passed (mocked API responses only; no writes):** opened the real editor UI in the deployed anonymous preview and tested four cases: asset selection showed asset-level `true / PII`; selecting `order_total` showed its own `false / INTERNAL`; switching to `email` refreshed to `true / PII`; switching back to the asset restored `true / PII`. The form was cancelled without saving. This verifies the editor's field-selection behavior, not persistence against live rows.
+- **Real-data limitation discovered:** the live catalog has 4 assets and 0 persisted column classifications. The one asset reporting `column_count: 5` has no `metadata.columns` object, and the other three assets also lack stored column definitions. Because the API deliberately requires a named column in `kairos_assets.metadata.columns`, a real column-level classification round trip cannot yet be completed with the current catalog data. Schema ingestion must populate column names before a real column can be safely classified; do not invent column names or bypass the API validation.
+- Fresh API checks: admin GET `/api/v1/pii-classification` returned HTTP 200 with an empty list; anonymous GET returned HTTP 401. Admin GET `/api/v1/lineage/export` returned HTTP 200 with 4 assets and 2 current table-level edges; anonymous GET returned HTTP 401. Invalid export time returned HTTP 400. A test write against a nonexistent asset returned HTTP 404, and a follow-up classification read remained empty; no test data was written.
+- The table-edge bitemporal limitation remains unchanged: export semantics disclose that table-level edges are current stored relationships, not historical edge snapshots.
+- Latest deployment dry run reports `ok: true`, zero errors, and the same three known false-positive CTE-alias warnings in `api/v1/ingest.js`; it reports next version 260. No deployment was initiated for this verification.
+
 ### Handoff acceptance criteria
 
-1. Pranav confirms the scope/placement of the graph export control and token-unavailable control fix.
-2. A signed-in admin verifies PostgreSQL mode, column-classification save/reload, temporal queries, and authorization failures.
-3. The approved minimal frontend changes are tested against search, direction, depth, all four evidence states, column inventory, impact filters/exports, time controls, and 3D navigation.
-4. Before any deployment, update Section 2 with the actual contributor/change summary, rerun `dry_run_deploy`, review warnings, coordinate release, deploy once, and re-test the deployed version.
+1. Pranav confirms scope/placement before any further Lineage Explorer changes in shared `public/app.js`; do not duplicate the JSON export control already in v259.
+2. Once schema ingestion populates real column names, use an authorized admin session to verify an actual column classification save/reload and verify the persisted value after refresh.
+3. Verify the full JSON download in an authorized admin browser session and retain the table-edge temporal limitation disclosure.
+4. Before any future deployment, update Section 2 with the actual contributor/change summary, rerun `dry_run_deploy`, review warnings, coordinate release, deploy once, and re-test the deployed version.
+
+### Superseded v257 handoff checklist
+
+The current acceptance criteria are listed in the v259 follow-up above. Retain the original v257 checklist only as historical context; do not use its version-specific statements as current status.
