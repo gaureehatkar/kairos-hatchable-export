@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 258)  
+**Last Updated:** 27 October 2026 (Version 259)  
 
 ---
 
@@ -31,6 +31,13 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 259 — Hide Admin-Only Controls Outside PostgreSQL Mode (27 Oct 2026)
+* **Contributor:** Kairos AI Developer
+* **Frontend UI Changes:** Classification editor and full temporal snapshot export controls are now injected only when PostgreSQL catalog mode is selected; injected controls are removed when switching back to Demo mode.
+* **AI Feature Rationale:** Prevents demo users from seeing controls that call admin-protected persisted-data APIs and would fail by design.
+* **Backend Requirements:** None; existing admin-only endpoints and access rules are preserved.
+* **Remaining Verification:** Confirm the controls appear after selecting PostgreSQL mode in an authorized session and disappear in Demo mode.
 
 ### Version 258 — Classification Precedence Correction (27 Oct 2026)
 * **Contributor:** Kairos AI Developer

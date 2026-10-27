@@ -13,6 +13,15 @@
     if (!response.ok || !data.ok) throw new Error(data.message || data.error || 'Catalog request failed.');
     return data;
   }
+  function syncDialogFields(dialog) {
+    const entity = q('#kairosClassEntity', dialog).value;
+    q('#kairosClassColumnWrap', dialog).hidden = entity !== 'column';
+    const asset = dialog.__kairosAsset || {};
+    const columnName = q('#kairosClassColumn', dialog).value;
+    const record = entity === 'asset' ? asset : (dialog.__kairosColumnClassifications || {})[columnName];
+    q('#kairosClassPii', dialog).value = record && record.is_pii === true ? 'true' : record && record.is_pii === false ? 'false' : 'null';
+    q('#kairosClassSensitivity', dialog).value = record && record.sensitivity_classification || '';
+  }
   function ensureDialog() {
     let dialog = q('#kairosClassificationDialog');
     if (dialog) return dialog;
@@ -21,7 +30,8 @@
     dialog.innerHTML = '<form id="kairosClassificationForm"><h2 id="kairosClassificationTitle">PII &amp; sensitivity classification</h2><p class="small-note">Persist a reviewed classification in PostgreSQL. “Not classified” is not the same as “not PII”.</p><input type="hidden" id="kairosClassAsset"><label class="field"><span>Apply to</span><select id="kairosClassEntity"><option value="asset">Whole asset</option><option value="column">Specific column</option></select></label><label class="field" id="kairosClassColumnWrap" hidden><span>Column</span><select id="kairosClassColumn"></select></label><label class="field"><span>PII review</span><select id="kairosClassPii"><option value="null">Not classified / clear decision</option><option value="true">Confirmed PII</option><option value="false">Reviewed — not PII</option></select></label><label class="field"><span>Sensitivity classification</span><select id="kairosClassSensitivity"><option value="">No classification</option><option>PII</option><option>PHI</option><option>CONFIDENTIAL</option><option>INTERNAL</option><option>PUBLIC</option></select></label><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px"><button type="button" class="btn" id="kairosClassCancel">Cancel</button><button type="submit" class="btn primary">Save classification</button></div><p id="kairosClassMessage" role="status" aria-live="polite"></p></form>';
     document.body.append(dialog);
     q('#kairosClassCancel', dialog).addEventListener('click', () => dialog.close());
-    q('#kairosClassEntity', dialog).addEventListener('change', () => { q('#kairosClassColumnWrap', dialog).hidden = q('#kairosClassEntity', dialog).value !== 'column'; });
+    q('#kairosClassEntity', dialog).addEventListener('change', () => syncDialogFields(dialog));
+    q('#kairosClassColumn', dialog).addEventListener('change', () => syncDialogFields(dialog));
     q('#kairosClassificationForm', dialog).addEventListener('submit', async event => {
       event.preventDefault();
       const form = event.currentTarget, submit = q('button[type="submit"]', form), entity_type = q('#kairosClassEntity', form).value;
@@ -47,8 +57,13 @@
       const data = await getCatalog();
       const asset = (data.assets || []).find(row => String(row.id) === String(assetId));
       if (!asset) throw new Error('Asset not found in the persisted catalog.');
+      const classResponse = await fetch('/api/v1/pii-classification?asset_id=' + encodeURIComponent(assetId), { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+      const classData = await classResponse.json();
+      if (!classResponse.ok || !classData.ok) throw new Error(classData.message || classData.error || 'Could not load persisted column classifications.');
       const columns = asset.metadata && asset.metadata.columns && typeof asset.metadata.columns === 'object' ? Object.keys(asset.metadata.columns) : [];
       const dialog = ensureDialog();
+      dialog.__kairosAsset = asset;
+      dialog.__kairosColumnClassifications = Object.fromEntries((classData.classifications || []).map(row => [row.column_name, row]));
       q('#kairosClassAsset', dialog).value = asset.id;
       const entity = q('#kairosClassEntity', dialog);
       entity.value = 'asset';
@@ -56,9 +71,7 @@
       columnSelect.replaceChildren(...columns.map(name => make('option', { value: name }, name)));
       const columnOption = [...entity.options].find(option => option.value === 'column');
       if (columnOption) columnOption.disabled = columns.length === 0;
-      q('#kairosClassColumnWrap', dialog).hidden = true;
-      q('#kairosClassPii', dialog).value = asset.is_pii === true ? 'true' : asset.is_pii === false ? 'false' : 'null';
-      q('#kairosClassSensitivity', dialog).value = asset.sensitivity_classification || '';
+      syncDialogFields(dialog);
       q('#kairosClassMessage', dialog).textContent = '';
       dialog.showModal();
     } catch (error) { window.alert(error.message || 'Could not open classification editor.'); }
@@ -79,6 +92,11 @@
   }
   function enhance() {
     if (document.body.dataset.kairosEnhancementsDisabled === 'true') return;
+    const persistedMode = q('#dataModeSelect')?.value === 'postgresql';
+    if (!persistedMode) {
+      document.querySelectorAll('[data-kairos-classify], [data-kairos-full-export]').forEach(el => el.remove());
+      return;
+    }
     document.querySelectorAll('button[data-action="asset"][data-id]').forEach(button => {
       const row = button.closest('tr');
       if (!row || q('[data-kairos-classify]', row)) return;
