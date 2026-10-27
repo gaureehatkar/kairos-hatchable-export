@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 265)  
+**Last Updated:** 27 October 2026 (Version 268)  
 
 ---
 
@@ -31,6 +31,13 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 268 — Corrected Asset Type Breakdown & Broader Taxonomy (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by Jatin Shende
+* **Frontend UI Changes:** Fixed the asset-type count aggregation so category labels and counts use the same classifier. Replaced the crowded doughnut with a horizontal bar chart for readable category comparisons, added broader categories (source/warehouse tables, database views, transformation models, ML feature datasets, BI/reports/outputs, metrics/KPIs, files/event streams, and other/unclassified), and made the chart and matching coverage breakdown available in both demo and PostgreSQL catalog views.
+* **Classification method:** Categories are inferred from available asset `kind`, `type`, `name`, and `path` metadata. They are broad UI groupings, not persisted or manually reviewed classifications; unknown items remain in **Other / unclassified**.
+* **Backend Requirements:** No API or database changes. This is a frontend-only aggregation and visualization correction.
+* **Verification:** Deploy dry run required before publishing. Existing `api/v1/ingest.js:104` CTE-alias lint warnings are unrelated to this chart change.
 
 ### Version 265 — Responsive Asset Profile Layout (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by Jatin Shende
@@ -207,6 +214,7 @@ This document is the **canonical full-stack specification, contributor change lo
 | **19-View Full-Stack QA Verification** | Jatin Shende / AI Developer | All Workspace Views | **Problem:** Broken navigation links or unmapped buttons in UI views.<br>**Rationale:** Executed comprehensive audit across all 19 views and 11 sub-tabs to ensure complete API mapping or client-side fallback handling. |
 | **Metadata Attention Responsive Layout** | Kairos AI Developer / requested by Jatin Shende | Overview → Metadata attention (`public/app.js`, `public/styles.neo.css`) | **Problem:** Summary counts, common-gap controls, and long asset names could feel crowded or misalign at different widths.<br>**Rationale:** Separated the panel into a three-column metric summary, two-column common-gap grid, and wrapping asset cards that collapse on mobile; this makes discovery and ownership gaps easier to scan without changing the underlying coverage calculation. No backend changes were required. |
 | **Interactive Transformation Inspection & SQL Analysis** | Kairos AI Developer | Column dependency inspector and Column Lineage Logic modal (`public/app.js`) | **Problem:** Transformation text in the mapping inventory was not clickable, and SQL-view navigation relied on a generic view action. **Rationale:** Uses explicit `inspect-transform` and `analyze-transform-sql` actions to open transformation details and transfer the selected expression into the existing static SQL parser without changing backend behavior. |
+| **Asset Type Breakdown & Broad Classification** | Kairos AI Developer / requested by Jatin Shende | Data Assets → Asset type breakdown and Catalog coverage (`public/app.js`) | **Problem:** Chart labels and counts used mismatched category logic, and the chart was absent in persisted PostgreSQL catalog mode. **Rationale:** A shared metadata-based classifier groups assets into source/warehouse tables, views, transformation models, ML feature datasets, BI/reports/outputs, metrics/KPIs, files/event streams, and other/unclassified; a horizontal bar chart improves comparison. Categories are inferred from metadata and are not represented as reviewed/persisted classifications. |
 | **Responsive Asset Profile Layout** | Kairos AI Developer / requested by Jatin Shende | Asset Profile drawer (`public/styles.neo.css`) | **Problem:** Dense facts, long tab labels, and action buttons could feel cramped at smaller viewport widths. **Rationale:** Uses wrapping-safe metadata tiles, responsive 4/2/1-column grids, horizontally scrollable tabs, and mobile-stacked actions to preserve readability without changing data or backend behavior. |
 
 ---
