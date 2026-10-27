@@ -88,8 +88,9 @@ async function stwDecide(id, status) {
   const row = STW.rows.find((r) => String(r.id) === String(id));
   if (row && stwIsSample(row)) { toast('This is a sample row, so nothing was changed.', true); return; }
   try {
-    const res = await fetch('/api/v1/requests', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status }) });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const res = await fetch('/api/v1/request-decision', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status }) });
+    const data = await res.json();
+    if (!res.ok || !data.ok) throw new Error(data.error || 'HTTP ' + res.status);
     toast(status === 'approved' ? 'Access request approved.' : 'Access request rejected.');
     loadAccessRequests();
   } catch (e) {

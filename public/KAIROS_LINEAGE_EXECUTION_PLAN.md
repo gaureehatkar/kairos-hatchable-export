@@ -37,7 +37,7 @@ Owner: Pranav — Lineage Explorer
 | Bitemporal history | Browser-tested Demo notice correctly says no persisted query ran. API tests: valid admin query 200 with 0 stored evidence; invalid evidence/mapping timestamps 400; member access 403. | Reference behavior not verified | Query both timestamps; show historical context; report undated rows; test populated historical intervals and interval boundaries | P1 | Empty-store and validation passed; populated-history pending |
 | Zoom / pan / reset / fullscreen | Controls present in code | Reference uses graph navigation; interaction details need comparison | No stale transforms, broken canvas, keyboard traps, or lost graph after modal/resize | P2 | Verify |
 | 3D Observatory | Existing dedicated module | Older reference is not the replacement | Preserve module and behavior; no edits without explicit need | P1 guardrail | Preserve |
-| CSV exports | Export controls exist; targeted export behavior was restored in v246 | Reference export options exist in asset/lineage flows | Exports match documented semantics and do not silently mislabel modeled dependencies as runtime proof | P1 | Regression test |
+| CSV exports | v250 browser regression passed: Impact search Finance left 1 row and toast exported 1; column search email left 2 rows and toast exported 2. CSV bytes not directly inspected. | Reference export options exist in asset/lineage flows | Toast counts match visible filtered rows; inspect actual downloaded file bytes in a future file-capable browser test if available | P1 | Filtered export regression passed in Demo |
 | Demo vs PostgreSQL | Explicit mode switch and demo notices exist | Reference has mock/API-backed distinction | No demo fallback blended into persisted mode; labels match the actual data source | P1 | Verify |
 
 ## Competitor research notes
@@ -76,7 +76,7 @@ Owner: Pranav — Lineage Explorer
 - [ ] Inspect current and reference implementations before each change.
 - [ ] Record the confirmed issue and acceptance criteria.
 - [ ] Keep CSS and Observatory files unchanged.
-- [ ] Demo mode: search/filter/direction/depth/zoom/edge details/impact/column tracing/exports.
+- [x] Demo mode: search/clear, direction/depth, evidence-state filtering, column inventory search, impact direction, time-check honesty, and filtered export counts tested. Zoom/reset controls were tested in the first audit; edge-detail/column-trace click paths still need a focused pass.
 - [ ] PostgreSQL mode: empty catalog, populated catalog, permissions, API failures, temporal queries, undated mappings.
 - [ ] Confirm no demo data leaks into PostgreSQL results.
 - [ ] Run deployment dry-run and review all warnings.
