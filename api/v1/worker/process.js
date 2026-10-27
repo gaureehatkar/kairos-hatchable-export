@@ -1,7 +1,7 @@
 import { db } from "hatchable";
 
-export const access = "public"; // Public for easy demo triggering, can be restricted to 'scheduler' later
-export const methods = ["POST", "GET"];
+export const access = "scheduler";
+export const methods = ["POST"];
 
 export default async function handler(req, res) {
   // Fetch up to 50 queued jobs that are due

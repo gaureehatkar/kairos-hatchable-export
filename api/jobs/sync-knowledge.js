@@ -1,7 +1,7 @@
 import { db, knowledge } from 'hatchable';
 
-export const methods = ['POST', 'GET'];
-export const access = 'public'; // or admin
+export const methods = ['POST'];
+export const access = 'admin';
 
 export default async function (req, res) {
   const { rows: assets } = await db.query('SELECT * FROM kairos_assets');
