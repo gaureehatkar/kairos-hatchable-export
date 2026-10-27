@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 270)  
+**Last Updated:** 27 October 2026 (Version 272)  
 
 ---
 
@@ -31,6 +31,12 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 272 — Force Refresh All Assets View Routing (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by the project team
+* **Frontend UI Changes:** Bumped the frontend script cache key and visible build label so the browser fetches the latest view-routing code. All assets remains the asset-list page; Schemas & catalog remains the schema overview.
+* **AI Feature Rationale:** Prevents a stale cached frontend from showing the schema overview under the All assets breadcrumb, preserving the distinction between asset search and schema browsing.
+* **Backend Requirements:** None. Frontend cache-busting only; no API, database, or schema changes.
 
 ### Version 271 — Force-Refreshed All Assets Title & Welcome Name Fallback (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by the project team
