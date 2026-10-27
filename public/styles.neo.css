@@ -1,4 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+/* Personalized overview greeting */
+.welcome-greeting{margin:0 0 22px;padding:24px 28px;border:2px solid var(--ink);border-radius:18px;background:var(--tint-blue);box-shadow:5px 5px 0 var(--ink)}
+.welcome-greeting p{margin:0 0 7px;font-size:11px;font-weight:800;letter-spacing:.16em;color:var(--muted)}
+.welcome-greeting h1{margin:0;font-family:Outfit,sans-serif;font-size:clamp(30px,4vw,44px);line-height:1.12;font-weight:800;letter-spacing:-.04em}
+.welcome-greeting span{display:block;margin-top:9px;font-size:14px;color:var(--muted)}
+@media(max-width:600px){.welcome-greeting{padding:19px 20px}.welcome-greeting h1{font-size:32px}}
 /* ==========================================================================
    KAIROS - neo design (adapted from the supplied "blueprint" stylesheet)
    Language: Google four colours on a blueprint grid, 2px ink outlines, hard
