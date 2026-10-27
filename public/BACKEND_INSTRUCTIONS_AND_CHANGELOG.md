@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 268)  
+**Last Updated:** 27 October 2026 (Version 269)  
 
 ---
 
@@ -32,12 +32,12 @@ This document is the **canonical full-stack specification, contributor change lo
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
 
-### Version 268 — Corrected Asset Type Breakdown & Broader Taxonomy (27 Oct 2026)
+### Version 269 — Corrected Asset Type Breakdown & Broader Taxonomy (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by Jatin Shende
 * **Frontend UI Changes:** Fixed the asset-type count aggregation so category labels and counts use the same classifier. Replaced the crowded doughnut with a horizontal bar chart for readable category comparisons, added broader categories (source/warehouse tables, database views, transformation models, ML feature datasets, BI/reports/outputs, metrics/KPIs, files/event streams, and other/unclassified), and made the chart and matching coverage breakdown available in both demo and PostgreSQL catalog views.
 * **Classification method:** Categories are inferred from available asset `kind`, `type`, `name`, and `path` metadata. They are broad UI groupings, not persisted or manually reviewed classifications; unknown items remain in **Other / unclassified**.
 * **Backend Requirements:** No API or database changes. This is a frontend-only aggregation and visualization correction.
-* **Verification:** Deploy dry run required before publishing. Existing `api/v1/ingest.js:104` CTE-alias lint warnings are unrelated to this chart change.
+* **Verification:** The code and documentation passed a deploy dry run. Updated `public/index.html` cache keys to `app.js?v=268` and `styles.neo.css?v=268` and synchronized the footer build label so browsers fetch the corrected assets. Existing `api/v1/ingest.js:104` CTE-alias lint warnings are unrelated to this chart change.
 
 ### Version 265 — Responsive Asset Profile Layout (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by Jatin Shende
