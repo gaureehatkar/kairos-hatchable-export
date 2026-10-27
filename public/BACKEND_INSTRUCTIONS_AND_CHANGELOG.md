@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 278)  
+**Last Updated:** 27 October 2026 (Version 279)  
 
 ---
 
@@ -31,6 +31,12 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 279 — Reset All Filters When Opening Demo Assets (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by the project team
+* **Frontend UI Changes:** The All assets navigation action now clears search, asset type, domain/schema, owner, tag, trust, metadata completeness and missing-field filters before opening the asset catalog. This restores the full demo sample list instead of silently retaining a restrictive filter from a previous visit.
+* **Backend API & DB Requirements:** None; this is a client-side demo/catalog navigation fix. The All assets screen already exists in `public/app.js` as `assetsPage()` and the demo seed currently contains 12 sample assets.
+* **AI Feature Rationale:** Makes the All assets destination reliably show all available records when reopened from the demo workspace.
 
 ### Version 278 — Stop Aggressive Catalog Polling (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by the project team
