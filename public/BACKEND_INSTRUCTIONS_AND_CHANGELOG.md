@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 257)  
+**Last Updated:** 27 October 2026 (Version 258)  
 
 ---
 
@@ -31,6 +31,13 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 258 — Classification Precedence Correction (27 Oct 2026)
+* **Contributor:** Kairos AI Developer
+* **Frontend UI Changes:** Adjusted asset-level PII overlay precedence so a confirmed classified column remains visible even if the asset-level classification conflicts.
+* **AI Feature Rationale:** Column-level PII evidence must not be hidden by a contradictory asset-level label; the UI should surface the more specific positive classification.
+* **Backend Requirements:** None; this is a frontend interpretation correction over persisted classification records.
+* **Unimplemented Backend Gaps:** Conflicting asset/column classifications are surfaced as PII presence but are not yet shown as a dedicated conflict warning.
 
 ### Version 257 — PII Persistence, Temporal Lineage Export & Evidence-Filter UX (27 Oct 2026)
 * **Contributors:** Jatin Shende / Kairos AI Developer; Gauri / AI Developer
