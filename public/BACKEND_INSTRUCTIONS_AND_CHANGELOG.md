@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 256)  
+**Last Updated:** 27 October 2026 (Version 257)  
 
 ---
 
@@ -32,6 +32,23 @@ This document is the **canonical full-stack specification, contributor change lo
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
 
+### Version 257 — PII Persistence, Temporal Lineage Export & Evidence-Filter UX (27 Oct 2026)
+* **Contributors:** Jatin Shende / Kairos AI Developer; Gauri / AI Developer
+* **Frontend UI Changes:** Added persisted asset/column classification controls to catalog asset rows and a full-snapshot JSON export action to the Lineage Explorer. Catalog rendering distinguishes confirmed PII, reviewed-not-PII, sensitivity labels, and unknown classifications. Added a contextual empty state when evidence filtering hides every graph edge.
+* **AI Feature Rationale:**
+  * *What it is:* Persisted asset/column PII classification, full lineage snapshot export, and evidence-filter empty-state guidance.
+  * *How it applies:* Governance reviewers can record classifications in PostgreSQL and export a snapshot scoped to selected valid-time and recorded-time values; graph users get an explicit explanation when a filter yields no visible edges.
+  * *Why chosen:* Prevents refresh-loss for reviewed classifications, avoids exports limited to the visible graph slice, and prevents an empty filtered graph from being mistaken for proof that no dependency exists. NULL remains “not classified”, not “not PII”.
+* **Backend Requirements:**
+  * **API Endpoints:** Added GET/POST /api/v1/pii-classification and GET /api/v1/lineage/export; extended /api/v1/catalog and /api/v1/column-lineage responses.
+  * **Database Schema:** Added migrations/009_kairos_pii_classification.sql, nullable asset/mapping classification columns, and normalized kairos_column_classifications.
+  * **Logic & Security:** New routes require admin access and validate classification targets/values. Export includes temporally filtered column mappings and evidence; table-level edges are current-state only because the existing schema has no bitemporal edge columns.
+* **Unimplemented Backend Gaps (If any):**
+  * OpenLineage/dbt sensitivity facets are not ingested automatically; classification is currently manual.
+  * Column classification requires stored schema metadata for the target column.
+  * Live write-and-refresh verification for classification and the export download remains pending in an authorized owner/admin browser session.
+  * Existing temporal filtering for table-level edges remains an independent backlog item.
+
 ### Version 256 — Comprehensive Feature & Backend System Synchronization (27 Oct 2026)
 * **Contributor:** Jatin Shende / Kairos AI Developer
 * **Frontend UI Changes:** Updated and synchronized all 19 workspace views, 11 sub-tabs in Asset Profile Drawer, standalone Ingestion Portal (`/ingestion.html`), 2D D3 Lineage Explorer, 3D WebGL Observatory canvas, and interactive control matrix in the architectural reference sheet.
@@ -39,7 +56,7 @@ This document is the **canonical full-stack specification, contributor change lo
   * *What it is:* Consolidated full-stack architecture, feature selection rationale log, gap backlog, and deployment workflow prompt into one master reference document.
   * *How it applies:* Ensures complete transparency across all UI components, backend routes, database schema migrations, and pending engineering gaps.
   * *Why chosen:* Prevents knowledge fragmentation between frontend UI developments and backend API/database implementation phases across team members.
-* **Backend Requirements:** Re-verified live API health across 18 backend endpoints (`HTTP 200 OK`). Confirmed ESM isolate execution, PostgreSQL table reachability, and bi-temporal lineage snapshot engines.
+* **Backend Requirements:** The live registry contains 20 API routes, including the admin-protected `GET /api/v1/lineage/export` and `GET/POST /api/v1/pii-classification` routes. Smoke-tested the lineage export (HTTP 200 for valid times, HTTP 400 for invalid times, HTTP 401 for public access), PII classification read (HTTP 200 for admin, HTTP 401 for public), catalog, keyword search, and temporal evidence/column-lineage validation. PostgreSQL is reachable; current persisted classification and evidence sets are empty.
 
 ### Version 255 — Comprehensive End-to-End QA & Backend Synchronization (27 Oct 2026)
 * **Contributor:** Jatin Shende / Kairos AI Developer
@@ -49,6 +66,23 @@ This document is the **canonical full-stack specification, contributor change lo
   * *How it applies:* Guarantees that every visual control across all 19 workspace routes correctly maps to active API routes (`/api/v1/catalog`, `/api/v1/requests`, `/api/v1/column-lineage`, etc.) or robust local state handlers.
   * *Why chosen:* Solves broken frontend-backend linkages and ensures that zero unimplemented UI features go undocumented.
 * **Backend Requirements:** Re-verified live endpoint health status across 18 backend API routes (`HTTP 200 OK`). Confirmed ESM isolate execution and PostgreSQL connection stability.
+
+### Implementation Detail — Persisted PII Classification & Temporal Lineage Export
+* **Contributor:** Jatin Shende / Kairos AI Developer
+* **Frontend UI Changes:** Added persisted asset/column classification controls to catalog asset rows and a full-snapshot JSON export action to the Lineage Explorer. Updated catalog rendering to distinguish confirmed PII, reviewed-not-PII, sensitivity labels, and unknown classifications.
+* **AI Feature Rationale:**
+  * *What it is:* Persisted asset/column PII classification and complete lineage snapshot export.
+  * *How it applies:* Governance reviewers can record a classification in PostgreSQL and export a lineage snapshot scoped to valid-time and recorded-time values.
+  * *Why chosen:* Removes refresh-loss from transient classification UI and avoids exports limited to the currently visible graph slice. NULL remains “not classified”; it is not silently converted to “not PII”.
+* **Backend Requirements:**
+  * **API Endpoints:** Added GET/POST /api/v1/pii-classification; added GET /api/v1/lineage/export; extended /api/v1/catalog and /api/v1/column-lineage responses.
+  * **Database Schema:** Added migrations/009_kairos_pii_classification.sql, nullable asset/mapping classification columns, and normalized kairos_column_classifications.
+  * **Logic & Security:** Routes require admin access; validates asset/column identity and classification values; export includes bitemporal column mappings and evidence. Existing table edges are explicitly described as non-temporal in the current schema.
+* **Unimplemented Backend Gaps (If any):**
+  * OpenLineage/dbt sensitivity facets are not yet ingested automatically. The current classification editor supports manual reviewed values only.
+  * Column classification writes require column definitions in kairos_assets.metadata.columns; columns without stored schema metadata cannot be classified until schema ingestion populates them.
+  * Live browser verification of admin-only write-and-refresh flows must be completed in an authorized owner/admin browser session.
+* **Deployment Note:** This entry describes the code prepared for the v257 deployment; update the status after the deployment and smoke checks complete.
 
 ### Version 250 — Unimplemented Backend Gap Backlog & AI Rationale Framework (27 Oct 2026)
 * **Contributor:** Jatin Shende / Kairos AI Developer
@@ -78,44 +112,41 @@ This document is the **canonical full-stack specification, contributor change lo
 
 *This section tracks UI features added by frontend contributors or AI agents that currently require corresponding backend database schema migrations or API endpoint handlers to be built.*
 
-### Gap #1: Column-Level PII & Data Sensitivity Classification Tags
-* **Added By / Contributor:** Gauri / UI Team
+### Gap #1: Column-Level PII & Data Sensitivity Classification Tags — Implementation Present, Data/UX Verification Pending
+* **Original Contributor:** Gauri / UI Team
 * **Frontend UI Component:** Lineage Explorer & Schema Detail Drawer (`data-view="lineage"`, `data-view="assets"`)
-* **What Was Added in UI:** Rendered visual PII badges (`[PII]`, `[CONFIDENTIAL]`, `[PHI]`) next to sensitive column names in column lineage trees and asset schema tables.
-* **What the Backend Needs:**
-  * **Database Table / Column:** Add `is_pii BOOLEAN DEFAULT false` and `sensitivity_classification VARCHAR(50)` columns to `kairos_column_lineage` and `kairos_assets`.
-  * **Target File Paths:** `migrations/009_pii_classification.sql`, `api/v1/column-lineage.js`, `api/v1/catalog.js`.
-* **Why It Is Needed:** Currently, PII tags are rendered in UI state but revert on page refresh. Persisting PII classifications in PostgreSQL ensures compliance auditing and automated row/column masking policy generation.
-* **Implementation Plan:**
-  1. Write `migrations/009_pii_classification.sql` adding `sensitivity_level` enum and columns.
-  2. Update `api/v1/column-lineage.js` SELECT and INSERT statements to return and persist `is_pii`.
-  3. Update `api/v1/ingest.js` metadata parser to extract `pii_tag` from ingested OpenLineage / dbt column facets.
+* **Existing UI:** The demo workspace renders illustrative PII badges and a PII overlay. Demo classifications must not be treated as persisted classifications.
+* **Verified Current Backend:** Migration `migrations/009_kairos_pii_classification.sql` (see current migration manifest) and the `kairos_column_classifications` table are present. `kairos_assets` and `kairos_column_lineage` also expose classification fields. The admin-protected `GET/POST /api/v1/pii-classification` route is registered and responds; the current persisted classification query returned zero rows.
+* **Status in v257 work:** A manual classification editor is added by `public/pii-lineage-enhancements.js`; it calls the existing admin-protected POST endpoint and reloads the catalog after saving. Asset-level classification is stored on `kairos_assets`; column-level classification is stored in `kairos_column_classifications`. This UI path still requires live authorized write-and-refresh verification after deployment.
+* **Remaining Work / Acceptance Criteria:** With an authorized admin session, classify an existing persisted asset/column, verify the row survives refresh, and verify the PostgreSQL UI renders only that persisted value. Confirm that NULL/missing classification is shown as “not classified,” never “PII-free.” Automatic source ingestion from OpenLineage/dbt sensitivity facets remains unimplemented.
+* **Operational Rationale:** Persisted sensitivity labels must be traceable and must not be inferred from demo records or absent metadata.
 
-### Gap #2: Temporal Lineage Graph Export (JSON / SVG)
-* **Added By / Contributor:** Jatin Shende / AI Developer
-* **Frontend UI Component:** Visual Lineage Explorer Header (`data-view="lineage"`)
-* **What Was Added in UI:** Added "Export Lineage Graph" button supporting JSON structure download and D3 SVG snapshot rendering.
-* **What the Backend Needs:**
-  * **API Endpoint:** `GET /api/v1/lineage/export`
-  * **Target File Path:** `api/v1/lineage/export.js`
-* **Why It Is Needed:** Client-side canvas export only captures visible rendered nodes. A backend export endpoint generates a full upstream/downstream dependency graph payload matching exact bitemporal `valid_as_of` timestamps for governance compliance reports.
+### Gap #2: Temporal Lineage Graph Export (JSON) — Backend Endpoint and UI Control Implemented
+* **Contributor / Original Request:** Jatin Shende / AI Developer
+* **Affected Screen:** Lineage Explorer (`data-view="lineage"`)
+* **Verified Current Backend:** `GET /api/v1/lineage/export` is registered, admin-protected, and returned HTTP 200 with a snapshot payload; invalid temporal parameters returned HTTP 400. The payload includes assets, current table-level edges, temporally filtered column mappings/evidence, and classification rows.
+* **Frontend UI Status in v257 work:** `public/pii-lineage-enhancements.js` injects an “Export full snapshot JSON” control next to the existing “Export impact” action and calls the temporal export API with the selected valid/recorded timestamps. The control is available only after the updated script is deployed; live browser verification remains pending.
+* **Important Limitation:** The export response explicitly treats table-level edges as current stored relationships because the schema does not provide bitemporal bounds for those edges. Do not describe the whole graph export as a fully bitemporal graph snapshot.
+* **Target Paths / Ownership:** `public/app.js` (Lineage Explorer owner: Pranav; coordinate before editing); `api/v1/lineage/export.js` (existing backend implementation).
+* **Next Step:** Validate the JSON download in an authorized owner/admin browser session. SVG export remains out of scope until the Lineage Explorer owner confirms it is required. Keep the table-edge temporal limitation visible and ensure existing CSV exports remain unchanged.
+* **Operational Rationale:** Governance users need a discoverable way to export a snapshot, while the UI must not imply historical guarantees that the underlying table-edge model cannot support.
 
 ### Gap #3: Temporal Filtering for Table-Level Lineage Edges
 * **Added By / Contributor:** Kairos AI Developer — frontend audit finding (27 Oct 2026)
 * **UI Feature / Affected Screen:** Lineage Explorer valid-time and recorded-time controls (`data-view="lineage"`).
 * **Current Implementation:** `api/v1/evidence-at-time.js` applies both temporal dimensions to evidence records, and `api/v1/column-lineage.js` applies them to column mappings. The UI explicitly states that Time check does not rewrite the current catalog graph and that table-level edges are not time-filtered.
 * **Verified Backend Gap:** `api/v1/catalog.js` reads `kairos_lineage_edges` without valid-time or recorded-time predicates. The current `kairos_lineage_edges` schema has no dedicated `valid_from`, `valid_to`, `recorded_from`, or `recorded_to` columns. The catalog API therefore cannot return a table-edge snapshot filtered on both temporal dimensions.
-* **Required Backend Work:** Define the API contract and determine whether a migration is necessary.
-* **Target File Paths:** `api/v1/catalog.js`; `api/v1/ingest.js`; `migrations/009_temporal_edges.sql`.
+* **Required Backend Work:** Agree on the data model and API contract before implementation. The current schema does not support independent bitemporal bounds for table-level edges; do not add columns or migrations until the team approves whether edge history should be stored on edges or derived from another authoritative record.
+* **Target File Paths:** `api/v1/catalog.js`; `api/v1/lineage/export.js`; `api/v1/ingest.js` only if the approved design requires changes there; migration path/name TBD after design approval (migration 009 is already used for PII classification).
 * **Operational Rationale:** Historical impact and governance queries must not present today's table-level relationships as though they were valid at an earlier business time or known to the system at an earlier recorded time.
 
 ### Gap #4: Server-Issued Ingestion API Credentials
 * **Added By / Contributor:** Kairos AI Developer — frontend audit finding (27 Oct 2026)
 * **UI Feature / Affected Screen:** Integrations & API (`data-view="integrations"`).
-* **Current Implementation:** The screen explicitly says token issuance and validation are not configured and displays a disabled/unavailable token-issuance action.
-* **Verified Backend Gap:** The UI cannot issue a usable ingestion credential, and the inspected ingestion endpoint is configured for admin access rather than a server-issued bearer-token flow.
-* **Required Backend Work:** Implement token issuance, revocation, and scope validation backend tables and endpoints.
-* **Target File Paths:** `api/v1/ingest.js`; `api/v1/tokens.js`; `migrations/010_api_tokens.sql`.
+* **Current Implementation:** The screen says token issuance and validation are not configured. The “Token issuance unavailable” button is not natively disabled, but its click handler displays a clear message that no credential was created. The Integrations page shows a placeholder token string, not a usable credential.
+* **Verified Backend Gap:** The ingestion route remains admin-protected and there is no registered server-issued bearer-token issuance/revocation flow.
+* **Required Backend Work:** First confirm that service-to-service tokens are in scope and review Hatchable-supported secret/auth mechanisms. Only then define minimal issuance, revocation, expiry, scope, storage, and audit contracts. Do not add tables/endpoints before approval.
+* **Target File Paths:** `api/v1/ingest.js`; proposed token endpoints only after design approval; a migration only if the approved persistence design requires it. `public/app.js` is shared with the Lineage Explorer owner and requires coordination.
 * **Operational Rationale:** Ingestion integrations need a documented, revocable credential path that does not require granting collaborators broad admin access or embedding secrets in browser code.
 
 ---
@@ -130,6 +161,8 @@ This document is the **canonical full-stack specification, contributor change lo
 | **Bi-temporal Column Lineage Snapshotting** | Gauri & AI Developer | `api/v1/column-lineage.js` | **Problem:** Standard lineage tools overwrite history when column definitions change.<br>**Rationale:** Implemented valid-time (`valid_from`/`valid_to`) and system-recorded time (`recorded_from`/`recorded_to`) to permit temporal time-travel auditing. |
 | **Full-Stack Contributor & Gap Log** | Jatin Shende / AI Developer | `public/BACKEND_INSTRUCTIONS_AND_CHANGELOG.md` | **Problem:** Disconnect between frontend UI additions and missing backend DB endpoints.<br>**Rationale:** Created a single canonical markdown sheet that tracks UI changes, missing backend gaps, author attribution, and AI feature rationales automatically. |
 | **Automated Teammate AI Prompt** | Jatin Shende / AI Developer | Section 5 of Guide | **Problem:** Teammates' AI tools bypass documentation updates during deploys.<br>**Rationale:** Provided a structured copy-paste prompt enforcing automated log edits before every `deploy` call. |
+| **Persisted PII & Sensitivity Classification** | Jatin Shende / Kairos AI Developer | Catalog asset rows, column lineage, `POST /api/v1/pii-classification` | **Problem:** PII labels could be demo-only or disappear on refresh.<br>**Rationale:** Stores reviewed asset/column classifications in PostgreSQL; NULL remains unknown rather than being misrepresented as non-PII. |
+| **Temporal Lineage Snapshot Export** | Jatin Shende / Kairos AI Developer | Lineage Explorer, `GET /api/v1/lineage/export` | **Problem:** Client-side export captures only visible graph slices.<br>**Rationale:** Exports the complete authorized snapshot payload and selected temporal values, while disclosing that table-level edges are not yet bitemporal. |
 | **19-View Full-Stack QA Verification** | Jatin Shende / AI Developer | All Workspace Views | **Problem:** Broken navigation links or unmapped buttons in UI views.<br>**Rationale:** Executed comprehensive audit across all 19 views and 11 sub-tabs to ensure complete API mapping or client-side fallback handling. |
 
 ---
@@ -204,6 +237,7 @@ Start by reviewing `public/BACKEND_INSTRUCTIONS_AND_CHANGELOG.md` and state what
 | `006_kairos_pgvector_rag.sql` | Vector index tables | Vector embedding storage for semantic RAG search over schema definitions. |
 | `007_kairos_rls.sql` | RLS Policies | Row-Level Security policy definitions for workspace isolation. |
 | `008_kairos_column_lineage.sql` | `kairos_column_lineage` | Bi-temporal column mappings (`source_column`, `target_column`, `transformation`, `valid_from`, `valid_to`, `recorded_from`, `recorded_to`). |
+| `009_kairos_pii_classification.sql` | `kairos_assets`, `kairos_column_lineage`, `kairos_column_classifications` | Persisted asset/column sensitivity classification fields and classification registry. |
 
 ---
 
@@ -216,3 +250,66 @@ Before triggering `deploy`:
 4. **Backend Route Sync:** Are backend JS handlers configured with ESM (`import`) and declared `access` levels?
 5. **Dry-Run Check:** Run `dry_run_deploy` to verify zero blocking errors.
 6. **Publish:** Run `deploy` with `intent` and `summary` matching the log entry.
+
+---
+
+## 9. UI Audit & Handoff Snapshot (27 October 2026)
+
+**Scope:** Primary Hatchable app, version 256, using an anonymous preview session. The older project was not treated as the target. No database records were written by this audit. No frontend code, schema, or migration was changed. This audit snapshot is a draft until the canonical document is deployed.
+
+### Screen sweep
+
+All 16 primary navigation views opened in the browser without JavaScript page errors: Overview, Assets, Catalog, Search, Data Products, Lineage Explorer, SQL Analysis, 3D Observatory, Pipeline Runs, Data Quality, Incidents, Stewardship, Evidence, Time Travel, Integrations & API, and Settings. This is a render smoke test, not proof every control on every screen is correct.
+
+### Verified checks
+
+| Area | Expected behavior | Actual result | Severity / next action |
+|---|---|---|---|
+| Lineage search | Search narrows graph; no-match state is clear; clearing restores graph | Passed in demo: 7 assets / 8 dependencies baseline; no-match showed 0 / 0; clearing restored 7 / 8 | Pass |
+| Direction and depth | Upstream/downstream and hop depth update graph slice | Passed in demo: upstream and downstream each showed 4 assets / 3 dependencies; depth 3 expanded the slice | Pass |
+| Evidence-state filter | Four states remain distinct and filter edges without inventing evidence | Passed in demo: OBSERVED 2, POSSIBLE 1, REFUTED_FOR_RUN 1, UNKNOWN 4 out of 8 dependencies | Pass |
+| Browser runtime | Navigation and tested interactions do not throw browser errors | No page errors or console errors during the 16-view sweep and focused lineage checks | Pass; not a full accessibility audit |
+| PostgreSQL access | Anonymous user must not be shown persisted data as if access succeeded | Switching to PostgreSQL mode showed “Sign-in required” and no demo fallback | Pass; verify again in an authorized admin session |
+| Persisted catalog | API returns stored records and identifies source | Admin GET returned 4 assets, 2 edges, 0 evidence, 0 column mappings, 0 pipeline runs, 0 quality checks, 2 raw events, and 0 persisted column classifications | Pass; small dataset limits end-to-end coverage |
+| Keyword search API | Search uses persisted metadata and discloses keyword matching | Admin POST returned HTTP 200 and two matches for “orders”; response says this is keyword search, not semantic/RAG or lineage proof | Pass |
+| Temporal APIs | Valid timestamps succeed; invalid timestamps fail clearly | Evidence and column-lineage endpoints returned HTTP 200 for valid times with empty results; invalid time returned HTTP 400 on both | Pass for empty-store and validation cases; populated historical intervals remain untested |
+| Temporal lineage export API | Export route returns bounded snapshot and validates time parameters | Admin GET returned HTTP 200 with counts and explicit limitation for non-temporal table edges; invalid time returned HTTP 400 | Backend pass; table-level edges are not bitemporal |
+| PII classification API | Route reads persisted classifications and rejects unknown asset writes | Admin GET returned HTTP 200 with an empty classification list; invalid asset write returned HTTP 404 without changing data | API validation pass; persistence across refresh and UI round-trip still need an authorized write test |
+| Deployment lint | CTE aliases should not be treated as missing base tables | Three warnings name `lock_key`, `ts`, and `existing`, which are defined as CTEs in the same SQL statement at `api/v1/ingest.js:104`. This is a static-linter false positive; do not add tables for those aliases. | Informational; do not change ingestion solely to silence this warning |
+
+### Prioritized findings
+
+**P1 — Lineage graph export is not discoverable in the UI**
+- The live `GET /api/v1/lineage/export` endpoint is registered and passes the API smoke test, but the Lineage Explorer contains no “Export Lineage Graph” control; the only visible graph-page export action is “Export impact” (CSV).
+- The canonical spec previously claimed the button had been added. That description has been corrected in the gap backlog.
+- Next step: get approval from Pranav, the listed Lineage Explorer owner, before editing shared `public/app.js`. Confirm whether JSON, SVG, or both are required, then wire the smallest UI control to the existing endpoint and test download/error behavior.
+
+**P1 — Table-level lineage edges are not bitemporal**
+- The catalog API and snapshot export return current stored table-level edges without valid-time/recorded-time predicates. The edge table has no dedicated bitemporal interval columns.
+- The UI currently discloses this limitation. Keep that disclosure. Data-model and migration work requires team approval; no migration is proposed by this audit.
+
+**P2 — Footer build label is stale**
+- The current project deployment is version 256, but the live UI footer says “BUILD V254”. This is a presentation/documentation mismatch, not a data-integrity defect.
+- Next step: with the shared `public/app.js` owner’s agreement, replace the hard-coded footer label with a maintained release label or remove the stale build number. Do not change the Lineage Explorer layout or shared styles for this cosmetic fix.
+
+**Integrations token-unavailable control — behavior verified, no functional defect found**
+- The control is clickable, and its handler explicitly reports “API token issuance is not configured. No credential was created.” This is an explanatory action, not token issuance. It is not natively disabled; changing that is an optional accessibility/UX decision for the owner, not a release blocker.
+- Do not implement credential issuance before the auth/security design is approved.
+
+**P2 — PII-classification documentation was stale**
+- The PII migration/schema and admin API route already exist in version 256; the current persisted classification set is empty. The backlog now distinguishes implemented plumbing from pending authorized end-to-end UI verification.
+
+### Not yet verified / release blockers
+
+- An authorized admin browser session was not available for end-to-end PostgreSQL UI verification, including persisted classification save/reload and populated historical-time queries.
+- CSV exports were not inspected byte-for-byte; prior tracker notes record filtered-row count tests, but those do not validate every CSV field/escaping case.
+- The older reference UI has not received a full parity audit.
+- The app’s existing temporal edge limitation is documented and should remain visible until a team-approved data model supports it.
+- No `public/app.js`, CSS, Observatory, API, schema, or migration changes were made in this audit. No deployment was initiated because the identified frontend fixes touch a shared file owned by another teammate and require coordination.
+
+### Handoff acceptance criteria
+
+1. Pranav confirms the scope/placement of the graph export control and token-unavailable control fix.
+2. A signed-in admin verifies PostgreSQL mode, column-classification save/reload, temporal queries, and authorization failures.
+3. The approved minimal frontend changes are tested against search, direction, depth, all four evidence states, column inventory, impact filters/exports, time controls, and 3D navigation.
+4. Before any deployment, update Section 2 with the actual contributor/change summary, rerun `dry_run_deploy`, review warnings, coordinate release, deploy once, and re-test the deployed version.
