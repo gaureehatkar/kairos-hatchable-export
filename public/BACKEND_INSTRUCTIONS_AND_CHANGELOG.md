@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 272)  
+**Last Updated:** 27 October 2026 (Version 273)  
 
 ---
 
@@ -31,6 +31,12 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 273 — Dedicated All Assets Navigation Action (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by the project team
+* **Frontend UI Changes:** Changed the All assets submenu item to use a dedicated click action that resets asset filters and explicitly calls the asset-list renderer; bumped the frontend script cache key and visible build marker.
+* **AI Feature Rationale:** Prevents the All assets menu item from being handled by generic catalog navigation and makes the asset-list destination explicit.
+* **Backend Requirements:** None. Frontend navigation only; no API, database, or schema changes.
 
 ### Version 272 — Force Refresh All Assets View Routing (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by the project team
