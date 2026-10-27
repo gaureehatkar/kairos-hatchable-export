@@ -730,3 +730,19 @@ Responsive refinement rules below are disabled.
 .pii-node-label{pointer-events:none;}
 .pii-evidence-panel{color:var(--ink);}
 @media(max-width:640px){.graph-stage>svg{min-height:320px}.graph-toolbar.action-row .graph-actions-group{width:100%}.graph-toolbar.action-row .graph-actions-group .btn{flex:1 1 auto}.graph-toolbar.action-row .graph-zoom-controls{width:100%;margin-left:0}.graph-toolbar.action-row .graph-zoom-controls .btn{flex:1 1 auto;}}
+
+/* Asset Detail Profile Layout Grid & Navigation */
+.asset-detail-layout { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+.asset-detail-layout > .side-stack { position: sticky; top: 88px; }
+.asset-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.asset-tabs-nav { display: flex; align-items: center; gap: 8px; overflow-x: auto; white-space: nowrap; padding-bottom: 8px; margin-bottom: 20px; border-bottom: 2px solid var(--line); scrollbar-width: none; }
+.asset-tabs-nav::-webkit-scrollbar { display: none; }
+.governance-grid-3x2 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+.gov-card { padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+.gov-card .gov-label { font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.gov-card .gov-value { font-size: 0.88rem; font-weight: 600; color: var(--ink); }
+
+/* High-contrast PII Node Badge & Canvas Header Overlay Z-index */
+.pii-node-badge { fill: var(--surface) !important; stroke: var(--ink) !important; stroke-width: 1.5px !important; }
+.pii-node-label { fill: var(--ink) !important; font-weight: 800 !important; }
+.graph-overlay { z-index: 10 !important; pointer-events: none; }

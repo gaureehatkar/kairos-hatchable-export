@@ -1,101 +1,100 @@
-function stewardshipPage() {
-  return head('Data Stewardship & Governance', 'Review persisted dataset access requests and glossary proposals.', '<button class="btn primary" data-action="refresh-stewardship">↻ Refresh Queue</button>') +
-    notice('Governance & Stewardship Hub.', 'Counts and queues below are loaded from PostgreSQL. An empty queue means no records were returned; decisions require an authorized admin session.') +
-    '<div class="stat-grid" id="stewardshipStats">' +
-      card('Pending Requests', '—', '…', 'Loading persisted records') +
-      card('Approved Requests', '—', '…', 'Persisted decisions') +
-      card('Glossary Proposals', '—', '…', 'Persisted proposals') +
-      card('Governance Data', 'PostgreSQL', 'DB', 'No synthetic counts') +
-    '</div>' +
-    '<div class="grid-2" style="margin-top:20px;">' +
-      '<section class="panel"><div class="panel-head"><div><h2>Dataset Access Requests</h2><p>Persisted requests for restricted schemas and tables.</p></div><span class="pill">DATABASE</span></div><div class="panel-body" id="accessRequestsContainer"><div class="empty-state"><strong>Loading requests...</strong></div></div></section>' +
-      '<section class="panel"><div class="panel-head"><div><h2>Glossary Term Proposals</h2><p>Persisted proposed definitions awaiting review.</p></div><span class="pill">DATABASE</span></div><div class="panel-body" id="glossaryProposalsContainer"><div class="empty-state"><strong>Loading proposals...</strong></div></div></section>' +
-    '</div>';
+/* Stewardship page. Its styles live in /stewardship.css, scoped under .stw-page,
+   so the shared theme (styles.neo.css) is not touched. */
+(function () {
+  if (document.getElementById('stwCss')) return;
+  const l = document.createElement('link');
+  l.id = 'stwCss'; l.rel = 'stylesheet'; l.href = '/stewardship.css?v=1';
+  document.head.appendChild(l);
+})();
+
+const STW = { rows: [], filter: 'all', sample: false };
+const STW_FILTERS = [['all', 'All'], ['pending', 'Pending'], ['approved', 'Approved'], ['rejected', 'Rejected']];
+const STW_PILL = { pending: 'amber', approved: 'mint', rejected: 'red' };
+// The requests API returns relative strings such as "10 mins ago" for its built-in placeholder rows.
+// Real rows carry a database timestamp, so an unparseable time marks a placeholder.
+const stwIsSample = (r) => Number.isNaN(Date.parse(r.requested_at));
+const stwWhen = (v) => { const t = Date.parse(v); return Number.isNaN(t) ? String(v == null ? '' : v) : new Date(t).toISOString().slice(0, 16).replace('T', ' ') + ' UTC'; };
+
+function stwKpis(rows) {
+  const n = (s) => (rows ? rows.filter((r) => r.status === s).length : '\u2013');
+  const k = (cls, label, val, foot) => '<div class="stat-card stw-k stw-' + cls + '"><div class="stat-top"><span>' + label + '</span></div><div class="stat-value">' + val + '</div><div class="stat-foot">' + foot + '</div></div>';
+  return k('pending', 'Pending', n('pending'), 'Waiting for a steward') + k('approved', 'Approved', n('approved'), 'Access granted') + k('rejected', 'Rejected', n('rejected'), 'Access denied') + k('total', 'All requests', rows ? rows.length : '\u2013', 'In this queue');
 }
+
+function stewardshipPage() {
+  const terms = [
+    ['Net revenue', 'Gross revenue minus refunds and discounts.', 'Finance', 'PENDING', 'amber'],
+    ['Active customer', 'A customer with at least one order in the trailing 30 days.', 'Growth', 'APPROVED', 'mint']
+  ].map((t) => '<div class="stw-term"><div class="stw-term-top"><strong>' + t[0] + '</strong><span class="pill ' + t[4] + '">' + t[3] + '</span></div><p>' + t[1] + '</p><div class="stw-term-foot"><span class="stw-meta"><span>Domain ' + t[2] + '</span></span><button class="btn small" type="button" disabled>Approve</button></div></div>').join('');
+  return '<div class="stw-page">' +
+    head('Data Stewardship &amp; Governance', 'Review access requests for restricted assets and decide who gets in.', '<button class="btn primary" type="button" onclick="loadAccessRequests()">Refresh queue</button>') +
+    '<div id="stwNotice"></div>' +
+    '<div class="stat-grid stw-kpis" id="stwKpis">' + stwKpis(null) + '</div>' +
+    '<div class="grid-2 stw-layout">' +
+      '<section class="panel" aria-labelledby="stwReqTitle">' +
+        '<div class="panel-head"><div><h2 id="stwReqTitle">Access requests</h2><p>Requests for restricted schemas and tables.</p></div></div>' +
+        '<div class="stw-toolbar" id="stwChips" role="group" aria-label="Filter requests by status"></div>' +
+        '<div class="stw-list" id="accessRequestsContainer" aria-live="polite"><div class="empty-state"><strong>Loading requests\u2026</strong></div></div>' +
+      '</section>' +
+      '<section class="panel" aria-labelledby="stwGlossTitle">' +
+        '<div class="panel-head"><div><h2 id="stwGlossTitle">Glossary proposals</h2><p>Proposed definitions from domain owners.</p></div><span class="pill gray">SAMPLE</span></div>' +
+        '<div class="stw-terms">' + terms + '</div>' +
+        '<p class="small-note stw-foot">Glossary proposals are not stored yet. These two terms are examples, so their actions are disabled.</p>' +
+      '</section>' +
+    '</div></div>';
+}
+
+function stwRender() {
+  const rows = STW.rows, f = STW.filter, shown = f === 'all' ? rows : rows.filter((r) => r.status === f);
+  const set = (sel, html) => { const el = $(sel); if (el) el.innerHTML = html; };
+  set('#stwKpis', stwKpis(rows));
+  set('#stwNotice', STW.sample
+    ? '<div class="notice"><span class="notice-icon" aria-hidden="true">!</span><div><strong>Sample rows.</strong> The requests table is empty or unavailable, so the API returned placeholder requests. Approving or rejecting them changes nothing.</div></div>'
+    : '<div class="data-source-banner"><div><strong>Live queue.</strong> ' + rows.length + ' request' + (rows.length === 1 ? '' : 's') + ' from the project database.</div></div>');
+  set('#stwChips', STW_FILTERS.map(([k, label]) => {
+    const n = k === 'all' ? rows.length : rows.filter((r) => r.status === k).length;
+    return '<button class="stw-chip" type="button" aria-pressed="' + (f === k) + '" onclick="stwFilter(\'' + k + '\')">' + label + ' <b>' + n + '</b></button>';
+  }).join(''));
+  set('#accessRequestsContainer', shown.length ? shown.map((r) => {
+    const pending = r.status === 'pending', id = esc(r.id);
+    return '<article class="stw-req ' + esc(r.status) + '"><div class="stw-req-main">' +
+      '<div class="stw-req-top"><strong class="mono stw-asset">' + esc(r.asset_name) + '</strong><span class="pill ' + (STW_PILL[r.status] || 'gray') + '">' + esc(r.status) + '</span></div>' +
+      '<p class="stw-reason">' + esc(r.reason) + '</p>' +
+      '<p class="stw-meta"><span>' + esc(r.requester) + '</span><span>' + esc(stwWhen(r.requested_at)) + '</span></p></div>' +
+      '<div class="stw-actions">' + (pending
+        ? '<button class="btn small primary" type="button" onclick="approveAccessRequest(\'' + id + '\')">Approve</button><button class="btn small" type="button" onclick="rejectAccessRequest(\'' + id + '\')">Reject</button>'
+        : '<span class="small-note">Decided</span>') + '</div></article>';
+  }).join('') : '<div class="empty-state"><strong>' + (rows.length ? 'No ' + f + ' requests' : 'No access requests') + '</strong><p>' + (rows.length ? 'Choose another status to see the rest of the queue.' : 'New requests appear here as soon as someone asks for access.') + '</p></div>');
+}
+
+window.stwFilter = function (f) { STW.filter = f; stwRender(); };
 
 async function loadAccessRequests() {
-  const container = $('#accessRequestsContainer');
-  if (!container) return;
+  const box = $('#accessRequestsContainer');
+  if (!box) return;
   try {
     const res = await fetch('/api/v1/requests', { credentials: 'same-origin' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
-    if (!res.ok || json.ok === false) throw new Error(json.message || 'Could not load persisted requests.');
-    const reqs = json.requests || [];
-    if (!reqs.length) {
-      container.innerHTML = '<div class="empty-state"><strong>No persisted access requests</strong><p>No request records were returned from PostgreSQL. No sample requests are being substituted.</p></div>';
-      updateStewardshipStats(reqs, null);
-      return;
-    }
-    container.innerHTML = table(['Asset', 'Requester', 'Reason', 'Status', 'Action'], reqs.map(r =>
-      '<tr><td><strong>'+esc(r.asset_name)+'</strong></td><td>'+esc(r.requester)+'</td><td>'+esc(r.reason)+'</td><td>'+pill(r.status)+'</td><td>'+(r.status === 'pending' ? '<button class="btn small primary" onclick="decideAccessRequest(\''+esc(String(r.id))+'\',\'approved\')">Approve</button> <button class="btn small" onclick="decideAccessRequest(\''+esc(String(r.id))+'\',\'rejected\')">Reject</button>' : '<span class="small-note">Decision recorded</span>')+'</td></tr>'
-    ));
-    updateStewardshipStats(reqs, null);
-  } catch(err) {
-    container.innerHTML = '<div class="empty-state"><strong>Failed to load access requests</strong><p>'+esc(err.message)+'</p></div>';
+    STW.rows = json.requests || [];
+    STW.sample = STW.rows.some(stwIsSample);
+    stwRender();
+  } catch (err) {
+    box.innerHTML = '<div class="empty-state"><strong>Could not load access requests</strong><p>' + esc(err.message) + '</p></div>';
   }
 }
 
-async function loadGlossaryProposals() {
-  const container = $('#glossaryProposalsContainer');
-  if (!container) return;
+async function stwDecide(id, status) {
+  const row = STW.rows.find((r) => String(r.id) === String(id));
+  if (row && stwIsSample(row)) { toast('This is a sample row, so nothing was changed.', true); return; }
   try {
-    const res = await fetch('/api/v1/proposals', { credentials: 'same-origin' });
-    const json = await res.json();
-    if (!res.ok || json.ok === false) throw new Error(json.message || 'Could not load persisted proposals.');
-    const rows = json.proposals || [];
-    if (!rows.length) {
-      container.innerHTML = '<div class="empty-state"><strong>No persisted glossary proposals</strong><p>Submit a proposal before reviewing it. Example terms are not shown as real governance records.</p></div>';
-    } else {
-      container.innerHTML = table(['Term', 'Definition', 'Proposer', 'Status', 'Action'], rows.map(p =>
-        '<tr><td><strong>'+esc(p.name)+'</strong></td><td>'+esc(p.definition)+'</td><td>'+esc(p.proposer)+'</td><td>'+pill(p.status)+'</td><td>'+(p.status === 'pending' ? '<button class="btn small primary" onclick="decideGlossaryProposal(\''+esc(String(p.id))+'\',\'approved\')">Approve</button> <button class="btn small" onclick="decideGlossaryProposal(\''+esc(String(p.id))+'\',\'rejected\')">Reject</button>' : '<span class="small-note">Decision recorded</span>')+'</td></tr>'
-      ));
-    }
-    const stats = $('#stewardshipStats');
-    if (stats) {
-      const requestJson = await (await fetch('/api/v1/requests', { credentials: 'same-origin' })).json();
-      updateStewardshipStats(requestJson.requests || [], rows);
-    }
-  } catch(err) {
-    container.innerHTML = '<div class="empty-state"><strong>Failed to load glossary proposals</strong><p>'+esc(err.message)+'</p></div>';
+    const res = await fetch('/api/v1/requests', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, status }) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    toast(status === 'approved' ? 'Access request approved.' : 'Access request rejected.');
+    loadAccessRequests();
+  } catch (e) {
+    toast('Could not update the request: ' + e.message, true);
   }
 }
-
-function updateStewardshipStats(requests, proposals) {
-  const stats = $('#stewardshipStats');
-  if (!stats) return;
-  if (proposals === null) {
-    const current = stats.dataset.proposals ? JSON.parse(stats.dataset.proposals) : null;
-    proposals = current;
-  } else {
-    stats.dataset.proposals = JSON.stringify(proposals);
-  }
-  const reqs = requests || [];
-  const terms = proposals || [];
-  stats.innerHTML =
-    card('Pending Requests', String(reqs.filter(r => r.status === 'pending').length), '!', 'Persisted request records') +
-    card('Approved Requests', String(reqs.filter(r => r.status === 'approved').length), '✓', 'Persisted decisions') +
-    card('Glossary Proposals', String(terms.length), 'G', 'Persisted proposals') +
-    card('Pending Proposals', String(terms.filter(p => p.status === 'pending').length), '…', 'Awaiting review');
-}
-
-async function postGovernanceDecision(url, body, successMessage) {
-  try {
-    const res = await fetch(url, { method: 'POST', credentials: 'same-origin', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) });
-    const json = await res.json();
-    if (!res.ok || json.ok === false) throw new Error(json.message || json.error || 'Decision failed.');
-    toast(successMessage);
-    await Promise.all([loadAccessRequests(), loadGlossaryProposals()]);
-  } catch(e) {
-    toast(e.message || 'Governance action failed.', true);
-  }
-}
-
-window.decideAccessRequest = (id, status) => postGovernanceDecision('/api/v1/request-decision', { id, status }, status === 'approved' ? 'Access request decision recorded.' : 'Access request rejection recorded.');
-window.decideGlossaryProposal = (id, status) => postGovernanceDecision('/api/v1/proposal-decision', { id, status }, status === 'approved' ? 'Glossary proposal decision recorded.' : 'Glossary proposal rejection recorded.');
-
-window.approveAccessRequest = id => window.decideAccessRequest(id, 'approved');
-window.rejectAccessRequest = id => window.decideAccessRequest(id, 'rejected');
-
-function refreshStewardship() {
-  Promise.all([loadAccessRequests(), loadGlossaryProposals()]);
-}
+window.approveAccessRequest = (id) => stwDecide(id, 'approved');
+window.rejectAccessRequest = (id) => stwDecide(id, 'rejected');

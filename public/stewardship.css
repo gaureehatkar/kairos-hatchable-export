@@ -1,0 +1,59 @@
+/* ==========================================================================
+   Stewardship page. Scoped to .stw-page and built only from the neo theme's
+   own variables (styles.neo.css), so it follows light/dark and stays native.
+   ========================================================================== */
+
+/* KPI colour follows meaning (pending = yellow, approved = green, rejected = red),
+   not card position, which is what the shared theme keys on. */
+.stw-page .stat-card.stw-pending{background:var(--hl)}
+.stw-page .stat-card.stw-approved{background:var(--tint-green)}
+.stw-page .stat-card.stw-rejected{background:var(--tint-red)}
+.stw-page .stat-card.stw-total{background:var(--tint-blue)}
+.stw-page .stat-card.stw-pending .stat-top::after{background:var(--yellow)}
+.stw-page .stat-card.stw-approved .stat-top::after{background:var(--green)}
+.stw-page .stat-card.stw-rejected .stat-top::after{background:var(--red)}
+.stw-page .stat-card.stw-total .stat-top::after{background:var(--blue)}
+
+.stw-page .stw-layout{align-items:start}
+.stw-page .pill{text-transform:uppercase}
+
+/* Status filter */
+.stw-toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:0 26px 18px}
+.stw-chip{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:4px 16px;border:2px solid var(--ink);border-radius:999px;background:var(--surface);color:var(--ink);font:600 .86rem var(--font-body);transition:background-color .12s,transform .12s,box-shadow .12s}
+.stw-chip:hover{background:var(--hl);transform:translateY(-1px)}
+.stw-chip[aria-pressed="true"]{background:var(--yellow);color:var(--on-yellow);box-shadow:0 3px 0 var(--ink)}
+.stw-chip b{font:500 .74rem var(--font-mono);letter-spacing:.04em}
+
+/* Request queue: one readable card per request, the left rule carries the state */
+.stw-list{border-top:2px solid var(--ink)}
+.stw-list .empty-state{padding:40px 24px}
+.stw-req{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px 24px;align-items:center;padding:18px 26px 18px 20px;border-left:6px solid var(--line);border-bottom:1px solid var(--line)}
+.stw-req:last-child{border-bottom:0}
+.stw-req.pending{border-left-color:var(--yellow)}
+.stw-req.approved{border-left-color:var(--green)}
+.stw-req.rejected{border-left-color:var(--red)}
+.stw-req-main{min-width:0}
+.stw-req-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.stw-asset{font-size:.95rem;font-weight:600;overflow-wrap:anywhere}
+.stw-reason{margin:6px 0 10px;font-size:.94rem;line-height:1.5;overflow-wrap:anywhere}
+.stw-meta{display:flex;flex-wrap:wrap;gap:4px 16px;margin:0;font:400 .72rem var(--font-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.stw-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px}
+
+/* Glossary proposals (sample) */
+.stw-term{padding:16px 26px;border-top:1px solid var(--line)}
+.stw-terms{border-top:2px solid var(--ink)}.stw-terms .stw-term:first-child{border-top:0}
+.stw-term-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.stw-term p{margin:6px 0 12px;font-size:.9rem;line-height:1.5;color:var(--muted)}
+.stw-term-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.stw-foot{margin:0;padding:14px 26px 22px;border-top:1px solid var(--line)}
+
+@media(max-width:900px){.stw-page .stw-layout{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:640px){
+  .stw-page .stw-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+  .stw-page .stw-kpis .stat-card{padding:14px 16px}
+  .stw-page .stw-kpis .stat-value{font-size:1.7rem}
+  .stw-toolbar{padding:0 18px 14px}
+  .stw-req{grid-template-columns:minmax(0,1fr);padding:16px 18px 16px 14px}
+  .stw-actions{justify-content:flex-start}.stw-actions .btn{flex:1}
+  .stw-term,.stw-foot{padding-left:18px;padding-right:18px}
+}
