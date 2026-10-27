@@ -42,9 +42,9 @@ const Q=[
 {id:'q5',name:'Marketing attribution coverage',asset:'analytics.marketing_attribution',type:'Completeness',score:91,status:'WARNING', version:'v2.0', run_id:'run_8813', evidence_state:'REFUTED_FOR_RUN', source:'dbt tests', captured_time:'3h ago', business_valid_time:'3h ago', confidence:'Medium (Sampled)', incident:'INC-483', owner:'Marketing Ops'},
 {id:'q6',name:'Product SKU integrity',asset:'analytics.product_performance',type:'Integrity',score:99.4,status:'PASS'}];
 function profilePage(){
-  const name=localStorage.getItem('kairos_profileName')||'Jatin Shende',
-        title=localStorage.getItem('kairos_profileTitle')||'Data Engineer / Steward',
-        domain=localStorage.getItem('kairos_profileDomain')||'Finance',
+  const name=localStorage.getItem('kairos_profileName')||'Workspace user',
+        title=localStorage.getItem('kairos_profileTitle')||'Not configured',
+        domain=localStorage.getItem('kairos_profileDomain')||'Not configured',
         team=localStorage.getItem('kairos_profileTeam')||'Data Platform',
         email=localStorage.getItem('kairos_profileEmail')||'jatinshende2006@gmail.com',
         manager=localStorage.getItem('kairos_profileManager')||'Manoj Shende',
