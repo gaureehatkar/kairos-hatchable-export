@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 269)  
+**Last Updated:** 27 October 2026 (Version 270)  
 
 ---
 
@@ -31,6 +31,12 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 270 — Consistent All Assets Title & Welcome Name Fallback (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by the project team
+* **Frontend UI Changes:** Aligned the navigation breadcrumb and page heading to **All assets** in both Demo and PostgreSQL catalog modes. The overview greeting now ignores generic placeholder profile values such as “Workspace” and falls back to the configured default name. Updated the JavaScript cache key and footer build label.
+* **AI Feature Rationale:** Consistent page naming reduces confusion between the Catalog navigation item and the page heading; filtering placeholder labels avoids greeting users as if “Workspace” were a person's name.
+* **Backend Requirements:** None. Frontend-only copy and fallback behavior; no API, database, or schema changes.
 
 ### Version 269 — Corrected Asset Type Breakdown & Broader Taxonomy (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by Jatin Shende
