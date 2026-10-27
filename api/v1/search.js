@@ -1,76 +1,28 @@
-import { ai } from 'hatchable';
+import { db } from 'hatchable';
 
 export const methods = ['POST'];
-export const access = 'public';
+export const access = 'admin';
 
 export default async function (req, res) {
-  const { question } = req.body || {};
+  const question = typeof req.body?.question === 'string' ? req.body.question.trim() : '';
   if (!question) return res.status(400).json({ error: 'Missing question' });
+  if (question.length > 500) return res.status(400).json({ error: 'Question must be 500 characters or fewer' });
 
-  const queryLower = question.toLowerCase();
-  const matchedAssets = [];
-
-  if (queryLower.includes('revenue') || queryLower.includes('dashboard') || queryLower.includes('table')) {
-    matchedAssets.push({
-      name: 'analytics.daily_revenue',
-      type: 'dbt model',
-      description: 'Daily revenue rollup model feeding bi.revenue_dashboard with verified currency metrics.'
-    });
-    matchedAssets.push({
-      name: 'bi.revenue_dashboard',
-      type: 'BI semantic model',
-      description: 'Executive revenue dashboard consuming daily revenue transformations.'
-    });
-  } else if (queryLower.includes('pii') || queryLower.includes('customer') || queryLower.includes('user')) {
-    matchedAssets.push({
-      name: 'commerce.customer_profiles',
-      type: 'PostgreSQL table',
-      description: 'Contains customer profile data, encrypted email domains, and regional data.'
-    });
-  } else {
-    matchedAssets.push({
-      name: 'analytics.orders_enriched',
-      type: 'dbt model',
-      description: 'Enriched orders table combining customer orders, pricing, and profile metadata.'
-    });
-    matchedAssets.push({
-      name: 'commerce.orders',
-      type: 'PostgreSQL table',
-      description: 'Raw transactional orders table capturing checkout events.'
-    });
-  }
-
-  let answer = `Based on the Kairos metadata catalog and lineage trace, **${matchedAssets[0].name}** (${matchedAssets[0].type}) is the primary asset responding to your query [1]. It aggregates data to feed downstream consumers with verified freshness and SLA contracts.`;
+  const terms = [...new Set(question.toLowerCase().split(/[^a-z0-9_]+/).filter(term => term.length >= 2))].slice(0, 12);
+  if (!terms.length) return res.status(400).json({ error: 'Enter at least one searchable word' });
+  const patterns = terms.map(term => '%' + term.replace(/[\\%_]/g, '\\$&') + '%');
 
   try {
-    const contextText = matchedAssets.map((a, i) => `[${i + 1}] Asset: ${a.name} (${a.type}) - ${a.description}`).join('\n');
-    const result = await ai.generateText({
-      purpose: 'rag-answer',
-      model: 'sonnet',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are Kairos AI, an expert data catalog assistant. Answer the user question using ONLY the provided catalog context. Cite sources using [1], [2]. Be concise, professional, and precise.'
-        },
-        {
-          role: 'user',
-          content: `Catalog Context:\n${contextText}\n\nQuestion: ${question}`
-        }
-      ]
-    });
-    if (result && result.text) {
-      answer = result.text;
-    }
-  } catch (err) {
-    // Fallback gracefully if AI model provider key is not yet configured in project console
+    const { rows } = await db.query(
+      "SELECT id, qualified_name AS name, asset_type AS type, schema_name, owner_name, description FROM kairos_assets WHERE lower(qualified_name) LIKE ANY($1::text[]) OR lower(coalesce(description,'')) LIKE ANY($1::text[]) OR lower(coalesce(owner_name,'')) LIKE ANY($1::text[]) OR lower(coalesce(asset_type,'')) LIKE ANY($1::text[]) OR lower(coalesce(schema_name,'')) LIKE ANY($1::text[]) OR lower(coalesce(metadata::text,'')) LIKE ANY($1::text[]) ORDER BY qualified_name LIMIT 10",
+      [patterns]
+    );
+    const sources = rows.map(row => ({ title: row.name, type: row.type, schema: row.schema_name, owner: row.owner_name, description: row.description, match: 'Keyword match in persisted metadata' }));
+    const answer = sources.length
+      ? 'Found ' + sources.length + ' persisted catalog asset' + (sources.length === 1 ? '' : 's') + ' matching words in your question. This is keyword search over stored metadata, not semantic/RAG retrieval; matching assets are not proof of lineage or runtime behavior.'
+      : 'No persisted catalog assets matched those words. Try a shorter asset name, schema, type, owner, description, or metadata term. No demo assets were substituted.';
+    return res.json({ ok: true, mode: 'persisted_keyword_search', answer, sources });
+  } catch (error) {
+    return res.status(500).json({ error: 'Catalog search failed. Check the authorized workspace session and persisted catalog availability.' });
   }
-
-  return res.json({
-    answer,
-    sources: matchedAssets.map((m, i) => ({
-      title: m.name,
-      type: m.type,
-      score: (99 - i * 4) + '%'
-    }))
-  });
 }
