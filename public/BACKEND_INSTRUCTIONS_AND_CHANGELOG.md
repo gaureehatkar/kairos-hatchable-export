@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 27 October 2026 (Version 264)  
+**Last Updated:** 27 October 2026 (Version 265)  
 
 ---
 
@@ -31,6 +31,13 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 265 — Responsive Asset Profile Layout (27 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by Jatin Shende
+* **Frontend UI Changes:** Improved the Asset Profile drawer layout with consistent spacing and readable metadata tiles, a four-column facts grid on wide screens that collapses to two columns on tablet and one on narrow mobile screens, horizontally scrollable asset tabs that preserve labels, and full-width stacked action buttons on small screens. Updated `public/styles.neo.css` only.
+* **AI Feature Rationale:** The profile drawer contains dense metadata and multiple navigation tabs. Responsive grids, wrapping-safe tiles, and scrollable tabs reduce crowding and prevent labels/actions from colliding without hiding information or changing the information architecture.
+* **Backend Requirements:** None. This is a CSS-only responsive-layout adjustment; no API, database, migration, or data semantics changed.
+* **Verification / Caveat:** Version 265 deployed successfully after a passing dry run. The known CTE-alias lint warnings in `api/v1/ingest.js` remain informational. Authenticated visual verification was not completed. The HTML stylesheet cache-busting query remains at `v261`, so a hard refresh may be needed to fetch the latest stylesheet.
 
 ### Version 264 — Interactive Transformation Inspection and SQL Analysis (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by the project team
@@ -200,6 +207,7 @@ This document is the **canonical full-stack specification, contributor change lo
 | **19-View Full-Stack QA Verification** | Jatin Shende / AI Developer | All Workspace Views | **Problem:** Broken navigation links or unmapped buttons in UI views.<br>**Rationale:** Executed comprehensive audit across all 19 views and 11 sub-tabs to ensure complete API mapping or client-side fallback handling. |
 | **Metadata Attention Responsive Layout** | Kairos AI Developer / requested by Jatin Shende | Overview → Metadata attention (`public/app.js`, `public/styles.neo.css`) | **Problem:** Summary counts, common-gap controls, and long asset names could feel crowded or misalign at different widths.<br>**Rationale:** Separated the panel into a three-column metric summary, two-column common-gap grid, and wrapping asset cards that collapse on mobile; this makes discovery and ownership gaps easier to scan without changing the underlying coverage calculation. No backend changes were required. |
 | **Interactive Transformation Inspection & SQL Analysis** | Kairos AI Developer | Column dependency inspector and Column Lineage Logic modal (`public/app.js`) | **Problem:** Transformation text in the mapping inventory was not clickable, and SQL-view navigation relied on a generic view action. **Rationale:** Uses explicit `inspect-transform` and `analyze-transform-sql` actions to open transformation details and transfer the selected expression into the existing static SQL parser without changing backend behavior. |
+| **Responsive Asset Profile Layout** | Kairos AI Developer / requested by Jatin Shende | Asset Profile drawer (`public/styles.neo.css`) | **Problem:** Dense facts, long tab labels, and action buttons could feel cramped at smaller viewport widths. **Rationale:** Uses wrapping-safe metadata tiles, responsive 4/2/1-column grids, horizontally scrollable tabs, and mobile-stacked actions to preserve readability without changing data or backend behavior. |
 
 ---
 
