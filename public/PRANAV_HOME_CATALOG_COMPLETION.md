@@ -1,69 +1,71 @@
 # Pranav — Home & Catalog Completion Audit
-
-**Project:** Kairos Metadata Lineage Dashboard (primary 3D app)  
+**Project:** Kairos Metadata Lineage Dashboard  
 **Audit date:** 28 October 2026  
-**Reference:** Kairos Lineage Dashboard (older black app)  
-**Scope:** Home / Overview and Catalog only. The Lineage Explorer remains owned by the other teammate; no lineage behavior or Observatory code was changed.
+**Scope:** Home / Overview and Catalog only. The Lineage Explorer remains owned by the other teammate.
 
-## Executive result
+## Current implementation result
+The main app has source-adaptive Home metrics, metadata-attention and governance queues, dynamic catalog fields, search, filters, clear-filter navigation, inferred type coverage, and an asset profile. The old black reference has five linked KPIs, an attention queue, pending work, lineage evidence, domain health and recent updates. The current app offers richer metadata-discovery and source-mode separation, but several details still require interactive browser verification.
 
-The assigned Home/Catalog discovery work is now documented, and a stale frontend-cache issue has been corrected in the HTML shell. This is **not a claim that all end-to-end behavior is verified**: this environment did not provide a real interactive browser session, so visual interactions and authenticated user flows remain marked for manual verification. The project’s own API audit also says some Home/catalog values and UI controls remain unverified end to end.
-
-## 1. Current 3D app vs older black reference
-
-| Area | Older black reference | Current 3D app | Decision |
+## Current vs older black app — page-level decisions
+| Requirement | Older black reference | Current app evidence | Acceptance criteria / action |
 |---|---|---|---|
-| Home summary | Five linked KPIs: assets, open issues, approvals waiting, stale assets, evidence gaps | Home includes metadata overview, persisted-mode overview, documentation attention and governance handoff; demo overview includes evidence/run/quality summaries and sample activity | Preserve current 3D Home and its data-mode distinctions. Reuse the older app’s useful idea that KPI cards should navigate to the underlying filtered list; verify every current card/action before adding anything. |
-| Home attention queue | “Needs attention” rows with issue kind, asset link, detail and action | Metadata attention ranks missing documentation fields and offers focused review; governance handoff identifies owner/steward/glossary gaps | Existing feature overlap: do not duplicate another attention panel. Test that each gap action applies the intended Catalog filter and that empty states are accurate. |
-| Home data transparency | Explicit “Mock fixture” note | Current app shows Demo / Catalog labels and distinguishes synthetic examples from persisted catalog records in relevant panels | Keep explicit mode labels; verify switching Demo/PostgreSQL changes the displayed data and labels together. |
-| Catalog discovery | Facets for type, domain, tag, owner; sort by name, recently updated, tier; asset cards show trust/tier, description, platform/domain/owner/columns/tags; explicit mock-fixture disclaimer | Current app has All assets, Catalog structure, Catalog search, data products; richer filters include asset type, domain/schema, owner, tag, trust/unknown, metadata completeness and missing field; asset rows expose PII state and completeness; profile includes Overview/Schema/Lineage/Quality/Insights/Access tabs | Current app has broader discovery and governance features. Preserve them. Do not copy the old app’s whole structure or add redundant facets. Confirm search/filter/clear behavior in the live browser. |
-| Catalog classification | Type/domain facets; no comparable broad taxonomy chart identified in inspected reference source | Asset-type breakdown and Catalog coverage use a shared metadata classifier across Demo and PostgreSQL; categories are inferred, not reviewed classifications | Keep the chart, but label categories as inferred from available metadata and preserve Other / unclassified. Do not present them as authoritative classifications. |
-| Asset detail | Separate tabs and metadata; sample-data disclosure | Rich asset profile with schema, lineage, quality, insights and access tabs | Current app is more extensive; verify tab routing and column definitions are actually present in loaded records. |
+| Home KPIs | Assets, open issues, approvals, stale assets, evidence gaps; every figure links to its list | Source-adaptive metrics in persisted mode; sample evidence/run/quality metrics in Demo mode | Ensure each actionable metric has a meaningful destination; do not display synthetic activity in persisted mode |
+| Home attention | Failing tests, incidents, stale assets, undated dependencies | Metadata Attention ranks missing documentation; Governance Handoff counts owner/steward/glossary gaps | Every review action must set the correct filters; empty state must mean no gaps in the currently loaded source, not a source error |
+| Home data mode | Explicit mock fixture notice | Demo and persisted modes are distinguished in labels and content | Test switching both ways and prove no demo fixtures leak into PostgreSQL mode |
+| Catalog facets | Type, domain, tag, owner; name/updated/tier sort | Type, domain/schema, owner, tag, trust/unknown, completeness, missing field, search, sorting | Verify combinations, zero results, reset, keyboard use and URL/navigation behavior |
+| Catalog categories | Facets derived from sample records | Dynamic type breakdown; some categories inferred from metadata | Keep categories explicitly inferred and preserve unclassified/unknown; do not imply reviewed taxonomy |
+| Asset profile | Overview/schema/lineage/quality/insights/access patterns | Rich profile and metadata presentation; current DB has incomplete column metadata | Show unavailable values as unavailable; never invent columns or claim lineage evidence without stored support |
+| Refresh/polling | Reference app loads API data through hooks | Main app uses focus/visibility refresh throttling; demo heartbeat is visual only | Confirm no repeated full-catalog polling and that manual refresh/focus updates data |
 
-## 2. Competitor research baseline and decisions
+## Source-backed competitor research (official documentation checked 28 October 2026)
+This is a source-backed documentation comparison, not a claim of product parity or a live crawler.
 
-This is a targeted official-documentation baseline, not a claim of live Perplexity research or complete competitor feature parity.
+| Product | Documented pattern | Kairos implication | Complexity / boundary |
+|---|---|---|---|
+| DataHub — metadata model and ingestion | Typed entities, extensible metadata aspects and explicit ingestion/change-proposal patterns | Keep stable identity and source metadata distinct; preserve source-specific fields and provenance | High; shared data model and ingestion architecture |
+| OpenMetadata — asset tabs | A shared asset profile with tabs that vary by asset type; schema, quality/profiling, lineage, execution and custom properties are capability-specific | Keep the profile shell but make tab contents depend on actual asset type and available records | Medium UI, high shared capability/data requirements |
+| Atlan — asset profiles and discovery | Asset profile overview, columns, lineage, related assets, usage; discovery supports structured facets and natural-language search | Make asset context scannable; retain structured filters and avoid labeling keyword search as semantic AI | Medium UI, high for real usage integrations or semantic search |
+| OpenLineage — facets | Versioned/extensible facets attach metadata to run, job and dataset entities | Preserve event provenance and versioned custom metadata; distinguish a declared edge from execution evidence | High integration/data contract work |
+| OpenMetadata — manual lineage | Explicit user-defined table and column relationships | If relationship editing is ever exposed, label it as declared/manual and retain provenance | High and coordinated with Lineage owner; out of this Home/Catalog scope |
 
-| Product / source | Relevant pattern | Problem solved | Kairos decision | Complexity |
-|---|---|---|---|---|
-| DataHub — [Metadata model](https://docs.datahub.com/docs/metadata-modeling/metadata-model) | Stable entity identity, metadata aspects, explicit relationships | Avoids treating an asset as one unstructured metadata blob | **Investigate further / align shared model**; do not add a parallel store in the Home/Catalog UI | High; shared architecture |
-| DataHub — [Metadata ingestion](https://docs.datahub.com/docs/architecture/metadata-ingestion) | Separate ingestion, primary-key lookup, search and relationship traversal | Keeps catalog search distinct from ingestion and graph traversal | **Preserve current separation**; catalog UI should use canonical records and not infer lineage | High; shared backend |
-| OpenMetadata — [Asset tabs](https://docs.open-metadata.org/v1.12.x/how-to-guides/guide-for-data-users/data-asset-tabs) | Shared asset-profile shell with resource-specific tabs | Prevents showing capabilities unsupported by a given asset or its metadata | **Keep existing profile tabs**, but hide/disable only when the underlying capability/data is unavailable; verify schema/columns before claiming column support | Medium |
-| OpenMetadata — [Lineage](https://docs.open-metadata.org/) | Table and column lineage are distinct from previews and manual relationships | Reduces false certainty from declared mappings | **Coordinate with Lineage owner**; Catalog should link to lineage without claiming a mapping proves runtime execution | High; shared |
-| OpenLineage — [Facets](https://openlineage.io/docs/spec/facets/) | Extensible, versioned metadata attached to events/runs | Preserves source evidence and extensibility | **Future shared integration**; not a Home/Catalog-only change | High |
+### Official source links
+- DataHub metadata model: https://docs.datahub.com/docs/metadata-modeling/metadata-model
+- DataHub ingestion: https://docs.datahub.com/docs/architecture/metadata-ingestion
+- OpenMetadata asset tabs: https://docs.open-metadata.org/v1.12.x/how-to-guides/guide-for-data-users/data-asset-tabs
+- Atlan asset profiles: https://docs.atlan.com/product/capabilities/discovery/concepts/what-are-asset-profiles
+- Atlan discovery: https://docs.atlan.com/product/capabilities/discovery
+- OpenLineage facets: https://openlineage.io/docs/spec/facets/
+- OpenMetadata manual lineage: https://docs.open-metadata.org/v1.12.x/how-to-guides/data-lineage/manual
 
-The current project audit describes competitor-research API output as curated/prepared guidance rather than live research, and frontend integration is unverified. This document therefore records the findings and decisions rather than claiming a live research crawler or competitor parity.
+## Automated verification (28 October 2026)
+- `GET /api/v1/catalog`: HTTP 200. PostgreSQL source; 4 assets, 2 table-level edges, 0 evidence records, 0 pipeline runs, 0 quality checks, 2 raw events, 0 column classifications.
+- `POST /api/v1/search` with `{question:"customer orders"}`: HTTP 200, returns two matching persisted assets. The API explicitly describes this as persisted keyword search, **not** semantic/RAG retrieval.
+- `GET /api/v1/competitor-research`: HTTP 200, returns curated design guidance and source links; it is not a live research crawler.
+- `dry_run_deploy`: zero blocking errors; three warnings at `api/v1/ingest.js:108` about CTE aliases `lock_key`, `ts`, `existing`. These need source inspection before dismissing as false positives.
+- No writes were made during API verification. No authenticated interactive browser session was available for end-to-end UI regression.
 
-## 3. File ownership and change-scope review
+## Data limitations that prevent a truthful “fully complete” claim
+- Persisted catalog is sparse: 4 assets and 2 edges only; 0 evidence, runs, quality checks and column classifications.
+- Three records report zero columns; one record reports five columns but has no actual column definitions in the returned metadata.
+- The current search API is keyword-based. Do not market it as semantic search/RAG.
+- Competitor API content is curated guidance, not dynamic crawling or competitor parity proof.
+- Visual responsive checks, browser click-throughs, profile tab checks and authenticated data-mode transitions remain unverified.
 
-- public/app.js: shared single-file frontend for many views. Home/Catalog logic lives here, but Lineage Explorer also uses it. **No edits were made to this file in this pass** to avoid overlapping the other teammate’s ownership.
-- public/index.html: shared app shell and static asset references. Updated only the cache-busting versions for the current styles.neo.css, layout.css, and app.js, and aligned the visible build label. No layout, styles, navigation, APIs, schemas, migrations, or Observatory code were changed.
-- public/styles.neo.css, public/layout.css, public/assets.css: inspected by manifest only; not edited.
-- Backend/API/schema: no changes in this pass.
-- Changelog and this report: documentation only.
+## Ownership and release boundary
+- `public/app.js` is shared across Home, Catalog and Lineage Explorer. Lineage Explorer belongs to another teammate; avoid broad rewrites or changes to lineage behavior without coordination.
+- No changes to the Lineage Explorer, Observatory or database were made as part of this audit.
+- Current HTML asset cache keys and visible build marker are aligned to v301 in source; deploy and verify the live shell before calling the cache-refresh requirement complete.
 
-## 4. Current acceptance checklist
+## Acceptance checklist
+- [x] Current Home/Catalog and older black reference source-inspected.
+- [x] Source-backed competitor comparison and official source links recorded.
+- [x] Catalog and search API smoke-tested without writes.
+- [x] No blocking deploy validator errors.
+- [ ] Deploy v301 and confirm live HTML references v301 app/style assets.
+- [ ] Browser regression: Home gap action → Catalog filter → clear filters → asset profile → Schema; test Demo and PostgreSQL separately.
+- [ ] Confirm personalized greeting, saved workspace label, responsive breakpoints and navigation behavior in browser.
+- [ ] Review three ingest SQL lint warnings against the actual CTE query.
+- [ ] Populate real column metadata through supported ingestion before accepting column-level classification/profile completeness.
+- [ ] Re-run smoke tests and record screenshots/observations after browser verification.
 
-| Requirement | Status | Evidence / next action |
-|---|---|---|
-| Inspect current Home and Catalog | **Code-inspected** | Reviewed current overview, metadata-attention/governance panels, catalog facets and asset-profile behavior in public/app.js. |
-| Inspect older Home and Catalog | **Code-inspected** | Reviewed older public/dashboard.js and public/app.js; comparison above. |
-| Identify useful differences and avoid duplication | **Documented** | Existing current features are retained; recommendations recorded above. |
-| Competitor discovery | **Baseline documented; not fully complete** | Official docs recorded; live Perplexity research and a full source-by-source parity matrix remain separate work. |
-| Identify files/shared dependencies | **Complete for this pass** | Scope recorded above; shared app.js deliberately untouched. |
-| Fix stale asset cache references | **Deployed in v299** | public/index.html now references current build cache keys; deploy and confirm live shell before marking complete. |
-| Search, facets, clear filters, profile tabs and responsive UI | **Not browser-verified in this pass** | Test in an authorized browser session with Demo and PostgreSQL modes. Do not claim success based only on source. |
-| Validate Home statistics against underlying records | **Partially verified** | API-level audit has checked authorized catalog reads; Home UI/stat-to-record consistency still needs browser-level verification. |
-| Track remaining work | **Documented here** | No open Hatchable agent tasks were present at audit time. |
-
-## 5. Prioritized next actions
-
-1. **P1 — Release and verify cache refresh:** deploy the HTML cache-key correction, open the deployed app with a hard refresh, and confirm the current build marker and scripts/styles load.
-2. **P1 — Browser regression:** in Demo mode, test Home → metadata gap action → Catalog filter → clear filters → asset profile → Schema/Columns; repeat the relevant catalog reads in PostgreSQL mode. Confirm no demo records leak into persisted mode.
-3. **P1 — Data honesty:** ensure metadata completeness is described as documentation coverage, not data quality/trust; ensure inferred asset-type groups are labelled inferred; confirm empty column definitions are not fabricated.
-4. **P2 — Competitor research:** complete a live source-backed research pass and record citations, current-vs-reference parity, complexity and acceptance criteria. The current curated API is not a substitute for that research.
-5. **P2 — Tracker:** create individual Home/Catalog tasks only after browser results are known, with owner, priority, dependencies and evidence.
-
-## Final status
-
-**Home/Catalog discovery and comparison: documented. Cache-key correction: prepared in source. Full assignment: not yet fully complete until deployment and browser regression are verified.** No claim is made that the original task has been fully accepted or that all interactions work end to end.
+**Status:** Research and code comparison are now source-backed; API smoke tests pass. Full assignment remains open until deploy and authenticated browser regression are completed and the sparse-metadata limitations are resolved or explicitly accepted.
