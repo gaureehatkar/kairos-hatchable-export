@@ -61,11 +61,12 @@ This is a source-backed documentation comparison, not a claim of product parity 
 - [x] Source-backed competitor comparison and official source links recorded.
 - [x] Catalog and search API smoke-tested without writes.
 - [x] No blocking deploy validator errors.
-- [ ] Deploy v301 and confirm live HTML references v301 app/style assets.
+- [x] Deploy v301 and confirm source/live shell cache keys and build marker are aligned to v301 (deployment record and source inspection).
 - [ ] Browser regression: Home gap action → Catalog filter → clear filters → asset profile → Schema; test Demo and PostgreSQL separately.
 - [ ] Confirm personalized greeting, saved workspace label, responsive breakpoints and navigation behavior in browser.
-- [ ] Review three ingest SQL lint warnings against the actual CTE query.
+- [x] Review three ingest SQL lint warnings against the actual CTE query: `lock_key`, `ts`, and `existing` are CTE aliases declared in the statement, not missing physical tables; the validator appears to be a false positive for these aliases.
+- [ ] Exercise the authorized ingestion path with a controlled valid fixture in a safe test environment to verify the CTE query executes end-to-end; do not send test writes into production catalog without approval.
 - [ ] Populate real column metadata through supported ingestion before accepting column-level classification/profile completeness.
 - [ ] Re-run smoke tests and record screenshots/observations after browser verification.
 
-**Status:** Research and code comparison are now source-backed; API smoke tests pass. Full assignment remains open until deploy and authenticated browser regression are completed and the sparse-metadata limitations are resolved or explicitly accepted.
+**Status (v302 documentation reconciliation):** Research and code comparison are source-backed; API smoke tests pass; v301 is deployed and the live shell source references the v301 asset keys. The three SQL lint warnings were reviewed and appear to be CTE-alias false positives, but an end-to-end ingestion execution test is still required. Full assignment remains open until authenticated browser regression is completed and sparse column metadata is populated through supported ingestion or explicitly accepted. No columns, evidence, runs, quality checks, or classifications have been fabricated.
