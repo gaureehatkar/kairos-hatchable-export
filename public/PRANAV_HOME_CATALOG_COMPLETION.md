@@ -51,7 +51,7 @@ The current project audit describes competitor-research API output as curated/pr
 | Identify useful differences and avoid duplication | **Documented** | Existing current features are retained; recommendations recorded above. |
 | Competitor discovery | **Baseline documented; not fully complete** | Official docs recorded; live Perplexity research and a full source-by-source parity matrix remain separate work. |
 | Identify files/shared dependencies | **Complete for this pass** | Scope recorded above; shared app.js deliberately untouched. |
-| Fix stale asset cache references | **Implemented in draft** | public/index.html now references current build cache keys; deploy and confirm live shell before marking complete. |
+| Fix stale asset cache references | **Deployed in v299** | public/index.html now references current build cache keys; deploy and confirm live shell before marking complete. |
 | Search, facets, clear filters, profile tabs and responsive UI | **Not browser-verified in this pass** | Test in an authorized browser session with Demo and PostgreSQL modes. Do not claim success based only on source. |
 | Validate Home statistics against underlying records | **Partially verified** | API-level audit has checked authorized catalog reads; Home UI/stat-to-record consistency still needs browser-level verification. |
 | Track remaining work | **Documented here** | No open Hatchable agent tasks were present at audit time. |

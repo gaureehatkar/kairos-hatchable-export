@@ -635,3 +635,10 @@ The live deployment registry confirms **version 259 is live** (deployed 08:19:25
 ### Superseded v257 handoff checklist
 
 The current acceptance criteria are listed in the v259 follow-up above. Retain the original v257 checklist only as historical context; do not use its version-specific statements as current status.
+
+### Version 299 — Pranav Home & Catalog Audit and Cache Refresh (28 October 2026)
+* **Contributor:** Kairos AI Developer, requested by Pranav.
+* **Frontend changes:** Updated `public/index.html` cache-busting references for `styles.neo.css`, `layout.css`, and `app.js` to the current release key and aligned the visible build marker to v298, so browsers request current Home/Catalog logic and styles. Added `public/PRANAV_HOME_CATALOG_COMPLETION.md` with a comparison of the main 3D app against the older black reference, competitor-documentation baseline, file-ownership boundaries, prioritized actions, and acceptance checklist.
+* **Scope guard:** No edits to shared `public/app.js`, CSS source files, APIs, database schema, migrations, or Observatory. Existing UI and behavior were preserved.
+* **Verification:** Dry run passed with zero blocking errors and three existing `api/v1/ingest.js` CTE-alias lint warnings. After deployment, admin `GET /api/v1/catalog` returned HTTP 200 with 4 persisted assets and 2 table-level edges, but 0 evidence rows, 0 runs, 0 quality checks, and 0 column classifications. A search smoke test using the wrong request field (`query`) returned HTTP 400 `Missing question`; source inspection confirms the endpoint expects `question`. No writes were made. Interactive Home/Catalog browser regression remains unverified and must not be marked complete until tested.
+* **AI Feature Rationale:** Resolve stale browser assets and make ownership, comparison findings, and acceptance gaps explicit without overlapping the Lineage Explorer owner or redesigning the existing app.
