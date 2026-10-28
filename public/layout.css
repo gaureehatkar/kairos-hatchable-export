@@ -119,3 +119,18 @@ td{padding:11px 16px}
 .profile-side>.panel .panel-body{padding:14px 16px}
 @media(max-width:1000px){.profile-cols{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:640px){.profile-main .modal-grid{grid-template-columns:minmax(0,1fr)}}
+
+/* ---- Asset profile: padding inside the card, compact tabs, compact shortcuts ---- */
+.panel>.asset-tabs{flex-wrap:wrap;overflow:visible;margin:0;padding:4px 20px 14px;gap:6px}
+.panel>.asset-tab-content{padding:4px 20px 22px;margin:0;min-height:0}
+.panel>.node-actions{margin:0;padding:0 20px 20px}
+.asset-tab{padding:5px 12px;font-size:.86rem}
+.asset-tab-content .grid-equal{grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:0}
+.asset-tab-content .reasoning-item{padding:12px 14px}
+.asset-tab-content .reasoning-item p{margin:4px 0 0}
+.asset-tab-content .reasoning-item strong{font-size:.92rem}
+
+/* ---- Sidebar status card: fits its content ---- */
+.health-top strong{font-size:.86rem;white-space:nowrap}
+.health-foot{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:.62rem;letter-spacing:.04em}
+.health-foot b{text-align:right}
