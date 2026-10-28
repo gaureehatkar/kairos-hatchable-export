@@ -7,6 +7,7 @@
 <script>try{var t=localStorage.getItem('kairos_theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}</script>
 <link rel="stylesheet" href="/styles.neo.css?v=268">
 <link rel="stylesheet" href="/assets.css?v=3">
+<link rel="stylesheet" href="/layout.css?v=1">
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
 <script src="/observatory.js?v=5"></script>
@@ -21,8 +22,6 @@
 <div class="app-shell">
   <aside class="sidebar" id="sidebar">
     <div class="brand"><img class="brand-logo" src="/logo.png" alt="Kairos logo"><div><strong>KAIROS</strong><small>METADATA PLATFORM</small></div><button class="icon-btn mobile-close" id="closeNav" aria-label="Close navigation">×</button><button class="icon-btn" id="sidebarToggleBtn" aria-label="Toggle sidebar" title="Collapse sidebar" style="margin-left:auto; width:28px; height:28px; font-size:12px;">◀</button></div>
-    <div class="workspace-switch"><div class="workspace-icon">R</div><div><strong>Research workspace</strong><small>Sample environment</small></div><span class="chevron">⌄</span></div>
-    <div class="nav-label">Workspace</div>
     <nav class="nav-list nav-groups" aria-label="Main navigation">
       <button class="nav-item nav-primary active" data-view="overview"><span class="nav-icon">▫</span>Home</button>
       <div class="nav-group" data-nav-group="catalog">
@@ -38,6 +37,7 @@
         <button class="nav-item nav-primary" data-view="lineage" aria-expanded="false"><span class="nav-icon">⌘</span>Lineage<span class="nav-chevron" aria-hidden="true">⌄</span></button>
         <div class="nav-sublist" hidden>
           <button class="nav-item nav-child" data-view="lineage">Visual explorer</button>
+          <button class="nav-item nav-child" data-view="history">Time travel</button>
           <button class="nav-item nav-child" data-view="sql">SQL analysis</button>
           <button class="nav-item nav-child" data-view="observatory">3D observatory <span class="nav-tag">BETA</span></button>
         </div>
@@ -47,16 +47,15 @@
         <div class="nav-sublist" hidden>
           <a class="nav-item nav-child" href="/ingestion.html">Import metadata</a>
           <button class="nav-item nav-child" data-view="runs">Pipeline runs</button>
-          <button class="nav-item nav-child" data-view="quality">Data quality</button>
-          <button class="nav-item nav-child" data-view="incidents">Incident console <span class="nav-tag">NEW</span></button>
-          <button class="nav-item nav-child" data-view="stewardship">Stewardship <span class="nav-tag">NEW</span></button>
         </div>
       </div>
       <div class="nav-group" data-nav-group="trust">
-        <button class="nav-item nav-primary" data-view="evidence" aria-expanded="false"><span class="nav-icon">🛡</span>Trust & history<span class="nav-chevron" aria-hidden="true">⌄</span></button>
+        <button class="nav-item nav-primary" data-view="evidence" aria-expanded="false"><span class="nav-icon">🛡</span>Trust & governance<span class="nav-chevron" aria-hidden="true">⌄</span></button>
         <div class="nav-sublist" hidden>
           <button class="nav-item nav-child" data-view="evidence">Evidence & reasoning</button>
-          <button class="nav-item nav-child" data-view="history">Time travel</button>
+          <button class="nav-item nav-child" data-view="quality">Data quality</button>
+          <button class="nav-item nav-child" data-view="incidents">Incident console <span class="nav-tag">NEW</span></button>
+          <button class="nav-item nav-child" data-view="stewardship">Stewardship <span class="nav-tag">NEW</span></button>
         </div>
       </div>
       <div class="nav-group" data-nav-group="settings">
@@ -80,6 +79,6 @@
 </div>
 <div class="toast-region" id="toastRegion" aria-live="polite"></div>
 <div class="modal-backdrop" id="modalBackdrop" hidden><section class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><h2 id="modalTitle">Details</h2></div><button class="icon-btn" id="modalClose" aria-label="Close dialog">×</button></div><div id="modalBody"></div></section></div>
-<script src="/app.js?v=290"></script>
+<script src="/app.js?v=291-nav-layout"></script>
 <script src="/pii-lineage-enhancements.js?v=259"></script>
 </body></html>
