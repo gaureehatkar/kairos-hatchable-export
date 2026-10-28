@@ -96,3 +96,26 @@ td{padding:11px 16px}
   .panel-head{padding:14px 16px 8px}.panel-body{padding:14px 16px 18px}
   th,td{padding-inline:12px}
 }
+
+/* ---- Asset profile page ---- */
+/* cards inside the profile card become flat sections (no double border or shadow) */
+.panel .panel{border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:none;background:transparent;margin:0 0 4px}
+.panel .panel .panel-head{padding:16px 0 8px}
+.panel .panel .panel-body{padding:0 0 12px}
+.panel .panel.section-spacer{margin-top:18px}
+/* one scrollable row of tabs instead of several wrapped rows */
+.asset-tabs{flex-wrap:nowrap;gap:6px;margin:0 0 18px;padding:2px 2px 8px;overflow-x:auto;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+.asset-tab{flex:none;padding:6px 14px;white-space:nowrap}
+/* Overview: description and details left, ownership/tags/completeness right */
+.profile-cols{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:var(--gap);align-items:start}
+.profile-main,.profile-side{display:grid;gap:20px;min-width:0;align-content:start}
+.profile-block h3{margin:0 0 10px;font:800 1rem var(--font-display);letter-spacing:-.02em}
+.profile-desc{max-width:70ch;margin:0;line-height:1.65;color:var(--muted)}
+.profile-tags{display:flex;flex-wrap:wrap;gap:8px}
+.profile-main .modal-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.modal-grid.one{grid-template-columns:minmax(0,1fr)}
+.modal-tile strong{overflow-wrap:anywhere}
+.profile-side>.panel{margin:0;border:2px solid var(--ink);border-radius:14px;background:var(--surface)}
+.profile-side>.panel .panel-body{padding:14px 16px}
+@media(max-width:1000px){.profile-cols{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:640px){.profile-main .modal-grid{grid-template-columns:minmax(0,1fr)}}
