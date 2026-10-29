@@ -404,7 +404,7 @@ td .subline{margin-top:2px;font-size:.8rem;color:var(--muted)}
   .graph-stage,.observatory-stage{height:430px}.graph-zoom-controls{margin-left:0}
 }
 @media(max-width:640px){
-  :root{--pad:14px;--gap:22px}.content{padding-top:20px}.topbar{gap:8px;height:56px}.environment,.data-mode-control>span{display:none}.data-mode-control select{max-width:130px}
+  :root{--pad:14px;--gap:22px}.content{padding-top:20px}.topbar{gap:8px;height:56px}.environment,.data-mode-control>span{display:none}.breadcrumbs span,.breadcrumbs b{display:none}.breadcrumbs{min-width:0;white-space:nowrap}.top-actions{gap:4px}.top-actions #helpButton,.top-actions .top-avatar{display:none}.data-mode-control select{max-width:110px}
   .page-heading{display:block}.page-heading h1{font-size:1.9rem}.heading-actions{margin-top:16px}
   .stat-grid{grid-template-columns:minmax(0,1fr)}.stat-card.lead .stat-value{font-size:2.5rem}
   .side-stack,.room-grid,.form-grid,.modal-grid,.column-map-details,.profile-editor{grid-template-columns:minmax(0,1fr)}

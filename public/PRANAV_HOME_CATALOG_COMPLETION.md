@@ -70,3 +70,21 @@ This is a source-backed documentation comparison, not a claim of product parity 
 - [ ] Re-run smoke tests and record screenshots/observations after browser verification.
 
 **Status (v302 documentation reconciliation):** Research and code comparison are source-backed; API smoke tests pass; v301 is deployed and the live shell source references the v301 asset keys. The three SQL lint warnings were reviewed and appear to be CTE-alias false positives, but an end-to-end ingestion execution test is still required. Full assignment remains open until authenticated browser regression is completed and sparse column metadata is populated through supported ingestion or explicitly accepted. No columns, evidence, runs, quality checks, or classifications have been fabricated.
+
+## Browser regression snapshot — 29 October 2026 (live v304)
+
+This is an additional anonymous-preview test pass. It does not replace the required authorized PostgreSQL and safe-ingestion tests.
+
+| Acceptance criterion | Test input / actual result | Status |
+|---|---|---|
+| Home greeting and navigation | Home rendered `Hi, Research workspace`; main navigation was present. The separate workspace-label control was not located in the inspected DOM and is not independently verified. | PARTIAL |
+| Home metadata-attention action | Clicked `Review assets needing metadata`; Catalog opened with completeness filter `needs`. | PASS (Demo) |
+| Catalog clear/reset | Clicked Clear filters; search blank, completeness `all`, missing field `all`, 12 demo assets shown. | PASS (Demo) |
+| Catalog search → profile → Schema | Search `customer_orders` returned one row; opening the row displayed Asset profile; Structure tab rendered five defined demo columns. | PASS (Demo) |
+| PostgreSQL mode | Anonymous preview showed Sign-in required and an explicit catalog-load error, with zero persisted rows and no demo fallback. | PASS for anonymous guard; authorized workflow BLOCKED |
+| Responsive layout | At 390 px, document/body width was 568 px and `.top-actions` extended to x=568. At 768, 1024 and 1440 px, document width matched the viewport. | FAIL at 390 px |
+| Full filter matrix, sorting, zero results, keyboard behavior, remaining profile tabs | Not exhaustively exercised in this pass. | NOT TESTED |
+| Controlled ingestion with valid fixture | Not run; requires approved safe test environment and authorization. | BLOCKED |
+| Real column metadata / column classification | Persisted catalog remains sparse; do not invent column definitions. | BLOCKED on actual source metadata |
+
+**Files changed in this pass:** documentation only. No application code, CSS, API, schema, migration or catalog records were changed. Current live deployment observed: v304. No deployment was initiated.
