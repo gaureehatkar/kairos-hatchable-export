@@ -685,3 +685,10 @@ The current acceptance criteria are listed in the v259 follow-up above. Retain t
 * **Capability gaps retained:** Incidents and Data Products remain hidden in Connected Catalog mode per the existing access decision. Competitor features that need unavailable authoritative source fields or identity/persistence support—such as production column profiling/sample previews, cross-user follows, asset version history, and generic activity nodes—were not simulated. Connected metadata remains the source of truth.
 * **Files / backend:** Updated `public/app.js`, `public/styles.neo.css`, `public/index.html` cache/build markers, and this changelog. No API, schema, migration, permissions, or database records changed.
 * **Verification:** Source review and deployment validator only; no authenticated database writes or ingestion were run. The validator’s known three `api/v1/ingest.js` missing-table warnings concern same-statement CTE aliases `lock_key`, `ts`, and `existing`, previously assessed as likely false positives by source inspection. Interactive Connected Catalog acceptance remains dependent on an authorized session.
+
+### Version 306 — Catalog filter layout correction (29 October 2026)
+
+* **Contributor:** Kairos AI Developer, requested by Pranav with a screenshot of the All Assets filter panel.
+* **UI change:** Replaced the uneven wrapping filter rows with aligned responsive grids: the search and facets share a consistent desktop grid, saved-view actions/count/clear filters form one aligned row, and metadata-coverage filters stay grouped together. Tablet and mobile breakpoints collapse the grids cleanly.
+* **Files changed:** `public/assets.css` and `public/index.html` (asset stylesheet cache key); this changelog records the fix.
+* **Verification:** CSS/source review and Hatchable deploy validator; visual browser retest will be done against the newly deployed page. No API, schema, migration, permission, or database changes.
