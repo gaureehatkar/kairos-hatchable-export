@@ -107,6 +107,25 @@ The prior v304 responsive failure is historical and must not be treated as the c
 ### Release issue found and fixed in source
 
 Although Hatchable's deployment registry showed v309 live, the deployed shell still referenced older asset keys (styles and app v305; layout and PII enhancement script v304; assets CSS v4), and the footer said build v305. The shell cache keys and footer marker were aligned to v310 and published. Hatchable confirms v310 is live; read-only GET /api/v1/catalog, POST /api/v1/search with the correct question field, and GET /api/v1/competitor-research all returned HTTP 200 after deployment. The deployed shell source now shows build v310.
+ 
+## Detailed follow-up — combined filters, sorting and profile content (Demo, 29 October 2026)
+
+A second read-only browser run exercised actual filter combinations and sort changes in Demo mode.
+
+| Test | Actual observation | Status |
+|---|---|---|
+| Asset type filter | PostgreSQL table reduced 12 demo assets to 4. | PASS (Demo) |
+| Combined asset type + domain/schema | Adding domain/schema = commerce reduced 4 to 2: customer_orders and customer_profiles. | PASS (Demo) |
+| Sort Name Z–A | Row order reversed relative to A–Z. | PASS (Demo) |
+| Sort Owner | Rows reordered alphabetically by owner. | PASS (Demo) |
+| Search for churn | One result, churn_features. | PASS (Demo) |
+| Profile Overview | Content rendered with metadata, ownership, tags and completeness. | PASS (Demo) |
+| Profile All metadata | JSON metadata view rendered; it disclosed that absent values are not filled in. | PASS (Demo) |
+| Profile Structure | Correct empty state: catalog reports 22 columns, but no column definitions were returned. | PASS (Demo; truthful unavailable state) |
+| Other nine profile tabs | Labels were visible, but content was not clicked/verified in this run. | NOT VERIFIED |
+| Clear filters | Reset filters and sort to defaults; restored all 12 demo assets. | PASS (Demo) |
+
+These are synthetic Demo-mode results, not evidence that PostgreSQL-backed records behave identically. The full filter-pair matrix, keyboard accessibility, and every profile tab remain unverified.
 
 ### Remaining work that genuinely requires another person / environment
 
