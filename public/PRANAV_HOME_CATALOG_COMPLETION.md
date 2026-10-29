@@ -88,3 +88,30 @@ This is an additional anonymous-preview test pass. It does not replace the requi
 | Real column metadata / column classification | Persisted catalog remains sparse; do not invent column definitions. | BLOCKED on actual source metadata |
 
 **Files changed in this pass:** documentation only. No application code, CSS, API, schema, migration or catalog records were changed. Current live deployment verified after publishing this report: v308. Mobile header overflow remains a confirmed UI issue; no shared CSS/app code was changed because the header styles are shared and require owner coordination.
+## Follow-up acceptance verification — 29 October 2026 (pre-release v309 audit)
+
+The prior v304 responsive failure is historical and must not be treated as the current result without rechecking. The project changelog records a mobile-header fix in v305 and responsive filter-grid work in v306. A fresh anonymous-preview browser run on the current project was completed read-only.
+
+| Acceptance criterion | Latest observation | Status |
+|---|---|---|
+| Home greeting and workspace context | Demo preview rendered “Hi, Research workspace 👋”, the Demo badge/source label, and primary navigation. | PASS (Demo) |
+| Home metadata attention → Catalog | Review-assets action opened Catalog with the metadata-completeness filter set to Needs metadata. | PASS (Demo) |
+| Catalog search / zero-result / reset | An impossible search term displayed the no-match state; Clear filters restored the 12 demo assets and cleared search. | PASS (Demo) |
+| Filter and sort availability | Asset type, domain/schema, owner, tag, trust, completeness, missing-field and sort controls were present. The entire pairwise filter matrix and keyboard behavior were not exhaustively tested. | PARTIAL |
+| Asset profile | Profile opened; 12 tabs were present. Overview and Governance content were inspected; other tab contents were not all individually verified. | PARTIAL |
+| Responsive widths | Browser automation reported no horizontal overflow at 390, 768, 1024 and 1440 px. This is a browser-agent observation, not a captured automated DOM-width assertion; keep it as a provisional pass until directly reproduced if the team requires hard measurements. | PROVISIONAL PASS |
+| Connected/PostgreSQL UI | Preview mode did not provide an authorized app session. No authentication was bypassed and no persisted-mode workflow was attempted. | BLOCKED on authorized session |
+| Controlled ingestion | Not executed: the only confirmed target is the working project's live database, and there is no approved isolated test environment. | BLOCKED on safe test environment / approval |
+| Real column definitions | Persisted catalog reports 4 assets and 2 table-level edges, but no persisted column classifications; reported column counts do not provide actual column definitions for the sparse persisted records. | BLOCKED on genuine source metadata / approved ingestion |
+
+### Release issue found and fixed in source
+
+Although Hatchable's deployment registry showed v309 live, the deployed shell still referenced older asset keys (styles and app v305; layout and PII enhancement script v304; assets CSS v4), and the footer said build v305. The draft now aligns the shell cache keys and footer marker to v310. A deploy-time validation and live post-deploy check are required before considering that fix shipped.
+
+### Remaining work that genuinely requires another person / environment
+
+1. An authorized project session for PostgreSQL-mode UI acceptance, using the project's real access controls.
+2. Approval and access to a safe isolated environment for a valid ingestion fixture. Do not submit writes to the live catalog just to silence the CTE-alias lint warnings.
+3. Real schema/column metadata from a source adapter or a teammate who owns the source system; do not fabricate column names or classifications.
+
+No ingestion or catalog writes were performed during this audit. The full assignment is not marked complete: the Demo interaction checks are substantially covered, but authorized persisted-mode acceptance, safe ingestion execution, and real column metadata remain external dependencies.
