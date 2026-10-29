@@ -125,7 +125,22 @@ A second read-only browser run exercised actual filter combinations and sort cha
 | Other nine profile tabs | Labels were visible, but content was not clicked/verified in this run. | NOT VERIFIED |
 | Clear filters | Reset filters and sort to defaults; restored all 12 demo assets. | PASS (Demo) |
 
-These are synthetic Demo-mode results, not evidence that PostgreSQL-backed records behave identically. The full filter-pair matrix, keyboard accessibility, and every profile tab remain unverified.
+These are synthetic Demo-mode results, not evidence that PostgreSQL-backed records behave identically. The full filter-pair matrix and keyboard accessibility remain unverified.
+
+### Remaining asset-profile tabs — follow-up check
+
+A third read-only Demo-mode run clicked the remaining nine tabs on `ml_features.churn_features`. All nine responded without errors:
+- **Trust & signals:** rendered six synthetic metrics.
+- **Governance:** rendered six explicitly illustrative governance tiles.
+- **Relationships:** rendered six demo upstream assets and no stored downstream relationships for this demo asset.
+- **Impact:** rendered a clear no-downstream empty state.
+- **Field lineage:** rendered a clear no-explicit-column-mappings empty state.
+- **Quality:** rendered one synthetic freshness check (score 82, WARNING).
+- **Runs:** rendered a clear no-directly-linked-runs empty state.
+- **Evidence:** rendered one POSSIBLE static-SQL-parse evidence row.
+- **Activity:** rendered a clear message that the demo does not maintain a real metadata change log.
+
+All 12 profile tabs have now had their content inspected across the follow-up browser runs: Overview, All metadata, Structure, Trust & signals, Governance, Relationships, Impact, Field lineage, Quality, Runs, Evidence and Activity. This confirms the demo tab content/empty states only; it does not establish that all values are backed by persisted PostgreSQL records.
 
 ### Remaining work that genuinely requires another person / environment
 
