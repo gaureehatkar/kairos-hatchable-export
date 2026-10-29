@@ -4,7 +4,7 @@
 **Hatchable Project ID:** `proj_HTYAd2BCLtMt`  
 **Slug:** `kairos-metadata`  
 **Live URL:** [https://kairos-metadata.hatchable.site](https://kairos-metadata.hatchable.site)  
-**Last Updated:** 28 October 2026 (Version 302)  
+**Last Updated:** 29 October 2026 (Version 303)  
 
 ---
 
@@ -31,6 +31,15 @@ This document is the **canonical full-stack specification, contributor change lo
 ---
 
 ## 2. Comprehensive Contributor Deployment Log (Full-Stack Changelog)
+
+### Version 303 — Home/Catalog Acceptance Follow-up and Honest Blocker Status (29 Oct 2026)
+* **Contributor:** Kairos AI Developer, requested by the Home/Catalog assignment handoff.
+* **Intent:** Record the actual browser-test attempt, refresh API verification evidence, and keep the completion status honest without changing shared app behavior.
+* **Frontend UI modifications:** None. No edits to public/app.js, CSS, navigation, or Lineage Explorer behavior.
+* **Backend API & DB requirements:** No endpoint, schema, migration, or data changes. Read-only checks: GET /api/v1/catalog HTTP 200 (4 assets, 2 edges, 0 evidence, 0 runs, 0 quality checks, 2 raw events, 0 column classifications) and GET /api/v1/competitor-research HTTP 200. Deploy dry-run has zero blocking errors and three existing api/v1/ingest.js:108 CTE-alias lint warnings.
+* **Browser evidence:** First TinyFish run b26720ad-30c5-4f47-b5b9-84aa0324f34b reached /?_hbgate=1 and the Hatchable sign-in gateway. Second read-only run bf09a132-9c4c-4012-ad8f-a00533a18391 used a temporary preview link and passed Demo-mode Home/Catalog interaction checks: greeting/workspace/navigation, metadata-gap action into Catalog, search/zero-results, filter and sort controls, clear/reset, asset profile, All Metadata and Structure/Schema empty state, profile-tab navigation, and mode-switch control. PostgreSQL mode showed “Sign-in required”; authenticated persisted-mode behavior remains blocked. Tablet/mobile responsiveness remains unverified because viewport resizing was unavailable.
+* **Ingestion boundary:** No import payload was submitted. End-to-end ingestion remains pending until an approved safe test environment is identified; production writes are not authorized by this test request.
+* **Data limitation / AI rationale:** Catalog currently has sparse real metadata: three assets report zero columns and the fourth reports a column count of five without actual column definitions in the catalog response. Real column metadata must come from supported ingestion; no column definitions or classifications were fabricated. Honest unavailable states are preferable to false governance claims.
 
 ### Version 296 — Consolidated Research Baseline, API Verification & Remaining Work (27 Oct 2026)
 * **Contributor:** Kairos AI Developer, requested by Jatin Shende.
