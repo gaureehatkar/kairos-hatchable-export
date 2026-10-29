@@ -88,7 +88,7 @@ This is an additional anonymous-preview test pass. It does not replace the requi
 | Real column metadata / column classification | Persisted catalog remains sparse; do not invent column definitions. | BLOCKED on actual source metadata |
 
 **Files changed in this pass:** documentation only. No application code, CSS, API, schema, migration or catalog records were changed. Current live deployment verified after publishing this report: v308. Mobile header overflow remains a confirmed UI issue; no shared CSS/app code was changed because the header styles are shared and require owner coordination.
-## Follow-up acceptance verification — 29 October 2026 (pre-release v309 audit)
+## Follow-up acceptance verification — 29 October 2026 (live v310 audit)
 
 The prior v304 responsive failure is historical and must not be treated as the current result without rechecking. The project changelog records a mobile-header fix in v305 and responsive filter-grid work in v306. A fresh anonymous-preview browser run on the current project was completed read-only.
 
@@ -106,7 +106,7 @@ The prior v304 responsive failure is historical and must not be treated as the c
 
 ### Release issue found and fixed in source
 
-Although Hatchable's deployment registry showed v309 live, the deployed shell still referenced older asset keys (styles and app v305; layout and PII enhancement script v304; assets CSS v4), and the footer said build v305. The draft now aligns the shell cache keys and footer marker to v310. A deploy-time validation and live post-deploy check are required before considering that fix shipped.
+Although Hatchable's deployment registry showed v309 live, the deployed shell still referenced older asset keys (styles and app v305; layout and PII enhancement script v304; assets CSS v4), and the footer said build v305. The shell cache keys and footer marker were aligned to v310 and published. Hatchable confirms v310 is live; read-only GET /api/v1/catalog, POST /api/v1/search with the correct question field, and GET /api/v1/competitor-research all returned HTTP 200 after deployment. The deployed shell source now shows build v310.
 
 ### Remaining work that genuinely requires another person / environment
 
