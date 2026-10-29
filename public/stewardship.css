@@ -1,59 +1,112 @@
 /* ==========================================================================
-   Stewardship page. Scoped to .stw-page and built only from the neo theme's
-   own variables (styles.neo.css), so it follows light/dark and stays native.
+   Stewardship page styles.
+   Scoped to the page's own ids (#stewardshipStats, #accessRequestsContainer,
+   #glossaryProposalsContainer) so no other screen is affected. Built only from
+   the neo theme's variables, so light and dark both follow the theme.
+   Markup comes from stewardshipPage() / loadStewardshipQueues() in app.js.
    ========================================================================== */
 
-/* KPI colour follows meaning (pending = yellow, approved = green, rejected = red),
-   not card position, which is what the shared theme keys on. */
-.stw-page .stat-card.stw-pending{background:var(--hl)}
-.stw-page .stat-card.stw-approved{background:var(--tint-green)}
-.stw-page .stat-card.stw-rejected{background:var(--tint-red)}
-.stw-page .stat-card.stw-total{background:var(--tint-blue)}
-.stw-page .stat-card.stw-pending .stat-top::after{background:var(--yellow)}
-.stw-page .stat-card.stw-approved .stat-top::after{background:var(--green)}
-.stw-page .stat-card.stw-rejected .stat-top::after{background:var(--red)}
-.stw-page .stat-card.stw-total .stat-top::after{background:var(--blue)}
+/* 1. KPI colour follows meaning, not position.
+      Order is: Pending Requests, Approved Requests, Glossary Proposals, Pending Proposals.
+      The shared theme colours cards 1-4 green, red, yellow, blue, which made
+      "Approved" red and "Pending" green. */
+#stewardshipStats .stat-card:nth-child(1),
+#stewardshipStats .stat-card:nth-child(4){background:var(--hl)}
+#stewardshipStats .stat-card:nth-child(2){background:var(--tint-green)}
+#stewardshipStats .stat-card:nth-child(3){background:var(--tint-blue)}
+#stewardshipStats .stat-card:nth-child(1) .stat-top::after,
+#stewardshipStats .stat-card:nth-child(4) .stat-top::after{background:var(--yellow)}
+#stewardshipStats .stat-card:nth-child(2) .stat-top::after{background:var(--green)}
+#stewardshipStats .stat-card:nth-child(3) .stat-top::after{background:var(--blue)}
 
-.stw-page .stw-layout{align-items:start}
-.stw-page .pill{text-transform:uppercase}
+/* 2. Queue tables. The shared theme sets td{white-space:nowrap} with 26px padding,
+      which pushed Reason, Status and Action off-screen. Let text wrap, tighten the
+      padding, and drop the container padding the table already provides. */
+#accessRequestsContainer,
+#glossaryProposalsContainer{padding:0}
+#accessRequestsContainer .table-wrap,
+#glossaryProposalsContainer .table-wrap{overflow-x:visible}
+#accessRequestsContainer th,
+#glossaryProposalsContainer th{padding:12px 14px}
+#accessRequestsContainer td,
+#glossaryProposalsContainer td{padding:16px 14px;white-space:normal;overflow-wrap:anywhere;vertical-align:top;line-height:1.45}
+#accessRequestsContainer th:first-child,
+#accessRequestsContainer td:first-child,
+#glossaryProposalsContainer th:first-child,
+#glossaryProposalsContainer td:first-child{padding-left:20px}
+#accessRequestsContainer th:last-child,
+#accessRequestsContainer td:last-child,
+#glossaryProposalsContainer th:last-child,
+#glossaryProposalsContainer td:last-child{padding-right:20px}
+#accessRequestsContainer .pill,
+#glossaryProposalsContainer .pill{text-transform:uppercase}
+/* the action cell: buttons sit side by side and wrap rather than overflow */
+#accessRequestsContainer td:last-child .btn,
+#glossaryProposalsContainer td:last-child .btn{margin:0 6px 6px 0}
 
-/* Status filter */
-.stw-toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:0 26px 18px}
-.stw-chip{display:inline-flex;align-items:center;gap:8px;min-height:38px;padding:4px 16px;border:2px solid var(--ink);border-radius:999px;background:var(--surface);color:var(--ink);font:600 .86rem var(--font-body);transition:background-color .12s,transform .12s,box-shadow .12s}
-.stw-chip:hover{background:var(--hl);transform:translateY(-1px)}
-.stw-chip[aria-pressed="true"]{background:var(--yellow);color:var(--on-yellow);box-shadow:0 3px 0 var(--ink)}
-.stw-chip b{font:500 .74rem var(--font-mono);letter-spacing:.04em}
+/* Column sizing: keep names on one line, keep Approve and Reject side by side */
+#accessRequestsContainer th:nth-child(2),#accessRequestsContainer td:nth-child(2),
+#glossaryProposalsContainer th:nth-child(3),#glossaryProposalsContainer td:nth-child(3){min-width:140px}
+#accessRequestsContainer th:nth-child(4),#accessRequestsContainer td:nth-child(4),
+#glossaryProposalsContainer th:nth-child(4),#glossaryProposalsContainer td:nth-child(4){min-width:110px}
+#accessRequestsContainer td:last-child,
+#glossaryProposalsContainer td:last-child{white-space:nowrap}
 
-/* Request queue: one readable card per request, the left rule carries the state */
-.stw-list{border-top:2px solid var(--ink)}
-.stw-list .empty-state{padding:40px 24px}
-.stw-req{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px 24px;align-items:center;padding:18px 26px 18px 20px;border-left:6px solid var(--line);border-bottom:1px solid var(--line)}
-.stw-req:last-child{border-bottom:0}
-.stw-req.pending{border-left-color:var(--yellow)}
-.stw-req.approved{border-left-color:var(--green)}
-.stw-req.rejected{border-left-color:var(--red)}
-.stw-req-main{min-width:0}
-.stw-req-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
-.stw-asset{font-size:.95rem;font-weight:600;overflow-wrap:anywhere}
-.stw-reason{margin:6px 0 10px;font-size:.94rem;line-height:1.5;overflow-wrap:anywhere}
-.stw-meta{display:flex;flex-wrap:wrap;gap:4px 16px;margin:0;font:400 .72rem var(--font-mono);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
-.stw-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px}
+/* 3. Row state rail. The status pill is neutral for every status, so the rail carries it:
+      yellow while a decision is waiting, grey once a decision is recorded. The text
+      (Approve/Reject buttons, or "Decision recorded") still states it for everyone. */
+#accessRequestsContainer tbody td:first-child,
+#glossaryProposalsContainer tbody td:first-child{box-shadow:inset 6px 0 0 var(--line)}
+#accessRequestsContainer tbody tr:has([data-action^="decide"]) td:first-child,
+#glossaryProposalsContainer tbody tr:has([data-action^="decide"]) td:first-child{box-shadow:inset 6px 0 0 var(--yellow)}
 
-/* Glossary proposals (sample) */
-.stw-term{padding:16px 26px;border-top:1px solid var(--line)}
-.stw-terms{border-top:2px solid var(--ink)}.stw-terms .stw-term:first-child{border-top:0}
-.stw-term-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.stw-term p{margin:6px 0 12px;font-size:.9rem;line-height:1.5;color:var(--muted)}
-.stw-term-foot{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.stw-foot{margin:0;padding:14px 26px 22px;border-top:1px solid var(--line)}
+/* 4. Empty and error states fill the panel */
+#accessRequestsContainer > .empty-state,
+#glossaryProposalsContainer > .empty-state{padding:40px 20px}
 
-@media(max-width:900px){.stw-page .stw-layout{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:640px){
-  .stw-page .stw-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
-  .stw-page .stw-kpis .stat-card{padding:14px 16px}
-  .stw-page .stw-kpis .stat-value{font-size:1.7rem}
-  .stw-toolbar{padding:0 18px 14px}
-  .stw-req{grid-template-columns:minmax(0,1fr);padding:16px 18px 16px 14px}
-  .stw-actions{justify-content:flex-start}.stw-actions .btn{flex:1}
-  .stw-term,.stw-foot{padding-left:18px;padding-right:18px}
+/* 5. Layout: the two queue tables each need the full content width, and the shared theme's
+      two-column grid squeezes the glossary table to ~460px even on a 1440px screen
+      (the 240px sidebar stays open down to 900px). So the panels always stack here. */
+.grid-2:has(#accessRequestsContainer){grid-template-columns:minmax(0,1fr)}
+
+/* 6. Narrow content: each row becomes a stacked card with labelled fields.
+      The breakpoint is 1000px, not 720px, because the sidebar is still taking 240px
+      between 901px and 1000px. Labels are written here because the cells carry no
+      data-label attributes. */
+@media (max-width:1000px){
+  #accessRequestsContainer thead,
+  #glossaryProposalsContainer thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  #accessRequestsContainer table,#accessRequestsContainer tbody,#accessRequestsContainer tr,#accessRequestsContainer td,
+  #glossaryProposalsContainer table,#glossaryProposalsContainer tbody,#glossaryProposalsContainer tr,#glossaryProposalsContainer td{display:block;width:100%}
+  #accessRequestsContainer tr,
+  #glossaryProposalsContainer tr{padding:16px 20px 12px;border-bottom:1px solid var(--line);box-shadow:inset 6px 0 0 var(--line)}
+  #accessRequestsContainer tr:has([data-action^="decide"]),
+  #glossaryProposalsContainer tr:has([data-action^="decide"]){box-shadow:inset 6px 0 0 var(--yellow)}
+  #accessRequestsContainer td,
+  #glossaryProposalsContainer td{padding:4px 0;border:0;box-shadow:none}
+  #accessRequestsContainer td:first-child,#accessRequestsContainer td:last-child,
+  #glossaryProposalsContainer td:first-child,#glossaryProposalsContainer td:last-child{padding-left:0;padding-right:0}
+  #accessRequestsContainer tbody td:first-child,
+  #glossaryProposalsContainer tbody td:first-child,
+  #accessRequestsContainer tbody tr:has([data-action^="decide"]) td:first-child,
+  #glossaryProposalsContainer tbody tr:has([data-action^="decide"]) td:first-child{box-shadow:none}
+  #accessRequestsContainer td::before,
+  #glossaryProposalsContainer td::before{display:block;margin-bottom:1px;font:500 .68rem var(--font-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  #accessRequestsContainer td:nth-child(1)::before{content:"Asset"}
+  #accessRequestsContainer td:nth-child(2)::before{content:"Requester"}
+  #accessRequestsContainer td:nth-child(3)::before{content:"Reason"}
+  #accessRequestsContainer td:nth-child(4)::before{content:"Status"}
+  #glossaryProposalsContainer td:nth-child(1)::before{content:"Term"}
+  #glossaryProposalsContainer td:nth-child(2)::before{content:"Definition"}
+  #glossaryProposalsContainer td:nth-child(3)::before{content:"Proposer"}
+  #glossaryProposalsContainer td:nth-child(4)::before{content:"Status"}
+  #accessRequestsContainer td:last-child .btn,
+  #glossaryProposalsContainer td:last-child .btn{min-height:44px;margin:8px 8px 0 0}
+}
+
+/* 7. KPI cards on phones: two across, so the queue starts higher */
+@media (max-width:640px){
+  #stewardshipStats{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+  #stewardshipStats .stat-card{padding:12px 14px}
+  #stewardshipStats .stat-value{font-size:1.55rem}
 }
