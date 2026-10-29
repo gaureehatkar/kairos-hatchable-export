@@ -87,4 +87,4 @@ This is an additional anonymous-preview test pass. It does not replace the requi
 | Controlled ingestion with valid fixture | Not run; requires approved safe test environment and authorization. | BLOCKED |
 | Real column metadata / column classification | Persisted catalog remains sparse; do not invent column definitions. | BLOCKED on actual source metadata |
 
-**Files changed in this pass:** documentation only. No application code, CSS, API, schema, migration or catalog records were changed. Current live deployment observed: v304. No deployment was initiated.
+**Files changed in this pass:** documentation only. No application code, CSS, API, schema, migration or catalog records were changed. Current live deployment verified after publishing this report: v308. Mobile header overflow remains a confirmed UI issue; no shared CSS/app code was changed because the header styles are shared and require owner coordination.
