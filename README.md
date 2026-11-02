@@ -1,3 +1,5 @@
+[![Deploy to Hatchable](https://hatchable.com/deploy-button.svg)](https://hatchable.com/deploy?repo=https://github.com/gaureehatkar/kairos-hatchable-export)
+
 # Kairos Metadata Lineage — implementation backlog
 
 ## Official Backend Specification & Deployment Changelog
